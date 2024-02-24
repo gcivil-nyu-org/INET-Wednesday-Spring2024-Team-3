@@ -189,4 +189,8 @@ def confirm_view(request):
     else:
         return render(request, 'confirm.html')
     
+    
+def profile_view(request):
+    return render(request, 'profile.html')
+    
 

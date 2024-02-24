@@ -2,26 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta viewport="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Successfully Logged In</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #ececec; 
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            margin: 0;
+            background: linear-gradient(135deg, #a6c0fe 0%, #f0f8ff 100%);
+            color: #333;
         }
+
         .video-wrapper {
-            width: 80%; 
-            max-width: 960px; 
+            text-align: center;
+            padding: 30px;
+            border-radius: 20px;
+            background: #ffffff;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 85%;
+            max-width: 960px;
         }
+
         iframe {
-            width: 100%; 
-            height: 540px; 
+            width: 100%;
+            height: 540px;
+            border-radius: 15px;
+            border: none;
         }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #333;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 25px;
+            transition: all 0.3s;
+            color: #ffffff;
+            background-color: #6c7ae0;
+            text-decoration: none;
+            margin: 20px 10px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #5a68d6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 7px rgba(0, 0, 0, 0.1);
+        }
+
     </style>
 </head>
 <body>
@@ -29,6 +76,7 @@
     <div class="video-wrapper">
         <h1>Successfully Logged In</h1>
         <iframe src="https://player.vimeo.com/video/375468729?autoplay=1&loop=1&muted=1" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+        <a href="/profile" class="button">Go to Profile</a>
     </div>
 
 </body>
