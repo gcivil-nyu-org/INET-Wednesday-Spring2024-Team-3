@@ -52,7 +52,7 @@
 </head>
 <body>
 
-    <form method="post" action="{% url 'confirm' %}">  <!-- Update 'confirm' to the name of your URL for the confirm view -->
+    <form method="post" action="{% url 'confirm' %}"> 
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username" required>
         <input type="text" name="confirmation_code" placeholder="Confirmation Code" required>

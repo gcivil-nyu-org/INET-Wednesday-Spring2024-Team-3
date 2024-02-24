@@ -26,9 +26,8 @@ class CognitoBackend(BaseBackend):
                     'SECRET_HASH': secret_hash
                 }
             )
-            leeway = 60 #Time tolerance for syncronization
             id_token = result['AuthenticationResult']['IdToken']
-            # Fetch the JWKs and decode the JWT
+            # Fetch the JWKs 
             jwks = requests.get(settings.COGNITO_PUBLIC_KEYS_URL).json()
             key = JsonWebKey.import_key_set(jwks)
             claims = jwt.decode(id_token, key)
@@ -37,7 +36,7 @@ class CognitoBackend(BaseBackend):
             except Exception as e:
                 print(f"Validation failed: {str(e)}")
 
-            # Extract required attributes from claims
+            # Extract required attributes
             email = claims.get('email')
             given_name = claims.get('given_name')
             family_name = claims.get('family_name')
@@ -57,7 +56,7 @@ class CognitoBackend(BaseBackend):
 
             return user
         except Exception as e:
-            # Handle exceptions appropriately
+            # Handle exceptions
             print(f"Authentication failed: {str(e)}") 
             return None
 
