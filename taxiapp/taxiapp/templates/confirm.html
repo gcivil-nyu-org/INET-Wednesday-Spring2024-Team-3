@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,18 +24,17 @@
             width: 300px;
         }
 
-        input,
-        button {
+        input, button {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 5px;
             border: 1px solid #ddd;
-            box-sizing: border-box;
+            box-sizing: border-box; 
         }
 
         button {
-            background-color: #007bff;
+            background-color: #4CAF50; /* Green */
             color: white;
             border: none;
             cursor: pointer;
@@ -46,47 +44,28 @@
             background-color: #45a049;
         }
 
-        .footer-links {
-            text-align: center;
-        }
-
-        .footer-links a {
-            text-decoration: none;
-            color: #007bff;
-            margin: 0 10px;
-        }
-
         p {
             color: red;
             text-align: center;
         }
     </style>
 </head>
-
 <body>
 
-    <form method="post" action="{% url 'login' %}">
+    <form method="post" action="{% url 'confirm' %}">  <!-- Update 'confirm' to the name of your URL for the confirm view -->
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
+        <input type="text" name="confirmation_code" placeholder="Confirmation Code" required>
+        <button type="submit">Confirm Account</button>
         {% if messages %}
         <ul class="messages">
             {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
             {% endfor %}
         </ul>
         {% endif %}
     </form>
+    
 
-    <div class="footer-links">
-        <a href="{% url 'reset' %}">Reset Password</a>
-        <a href="{% url 'register' %}">Don't have an account? Signup</a>
-    </div>
-
-    <footer>
-        <p>NYU Tandon School of Engineering</p>
-    </footer>
 </body>
-
 </html>

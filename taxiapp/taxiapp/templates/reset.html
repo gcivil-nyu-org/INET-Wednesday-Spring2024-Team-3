@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaxiApp Forms</title>
+    <title>Password Reset</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -25,8 +24,7 @@
             width: 300px;
         }
 
-        input,
-        button {
+        input, button {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -46,47 +44,24 @@
             background-color: #45a049;
         }
 
-        .footer-links {
+        .form-header {
             text-align: center;
-        }
-
-        .footer-links a {
-            text-decoration: none;
-            color: #007bff;
-            margin: 0 10px;
-        }
-
-        p {
-            color: red;
-            text-align: center;
+            margin-bottom: 20px;
         }
     </style>
 </head>
-
 <body>
 
-    <form method="post" action="{% url 'login' %}">
-        {% csrf_token %}
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-        {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+    <form method="post" action="/path-to-your-password-reset-handler">
+        <div class="form-header">
+            <h2>Password Reset</h2>
+            <p>Please enter your email or username</p>
+        </div>
+
+        <input type="text" name="user_identifier" placeholder="Email or Username" required>
+        
+        <button type="submit">Submit</button>
     </form>
 
-    <div class="footer-links">
-        <a href="{% url 'reset' %}">Reset Password</a>
-        <a href="{% url 'register' %}">Don't have an account? Signup</a>
-    </div>
-
-    <footer>
-        <p>NYU Tandon School of Engineering</p>
-    </footer>
 </body>
-
 </html>

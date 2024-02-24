@@ -14,13 +14,47 @@ def login_view(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
             login(request, user)
-            # Redirect to a success page.
-            return redirect('home') 
+            return redirect('success')
         else:
-            # Return an error message
+
+            try:
+                client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+                secret_hash = get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
+                client.admin_initiate_auth(
+                    UserPoolId=settings.COGNITO_USER_POOL_ID,
+                    ClientId=settings.COGNITO_APP_CLIENT_ID,
+                    AuthFlow='ADMIN_NO_SRP_AUTH',
+                    AuthParameters={
+                        'USERNAME': username,
+                        'PASSWORD': password,
+                        'SECRET_HASH': secret_hash
+                    }
+                )
+            except client.exceptions.UserNotConfirmedException:
+                # Resend confirmation code
+                client.resend_confirmation_code(
+                    ClientId=settings.COGNITO_APP_CLIENT_ID,
+                    Username=username,
+                    SecretHash=secret_hash
+                )
+                messages.error(request, "User account is not confirmed. Please check your email for the confirmation code.")
+                return redirect('confirm')  # Redirect to a page where users can enter their confirmation code
+            except ClientError as e:
+                # Handle other Cognito exceptions
+                error_code = e.response['Error']['Code']
+                if error_code == 'NotAuthorizedException':
+                    messages.error(request, "Invalid username or password.")
+                elif error_code == 'UserNotFoundException':
+                    messages.error(request, "User does not exist.")
+                else:
+                    messages.error(request, f"An error occurred: {error_code}.")
+                return render(request, 'login.html')
+
             return render(request, 'login.html', {'error': 'Invalid credentials'})
+
     return render(request, 'login.html')
 
 # Registration view
@@ -75,12 +109,40 @@ def register_view(request):
 
     return render(request, 'register.html')
 
-def home_view(request):
-    return render(request, 'home.html')
-
 def get_secret_hash(username, client_id, client_secret):
     message = username + client_id
     dig = hmac.new(client_secret.encode('UTF-8'), 
                    msg=message.encode('UTF-8'), 
                    digestmod=hashlib.sha256).digest()
     return base64.b64encode(dig).decode()
+
+
+def home_view(request):
+    return render(request, 'home.html')
+
+def reset_view(request):
+    return render(request, 'reset.html')
+
+def success_view(request):
+    return render(request, 'success.html')
+
+def confirm_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        confirmation_code = request.POST.get('confirmation_code')
+        try:
+            client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+            secret_hash = get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
+            response = client.confirm_sign_up(
+                ClientId=settings.COGNITO_APP_CLIENT_ID,
+                SecretHash=secret_hash,
+                Username=username,
+                ConfirmationCode=confirmation_code
+            )
+            messages.success(request, "Your account has been confirmed. Please log in.")
+            return redirect('login')
+        except ClientError as e:
+            messages.error(request, f"Failed to confirm account: {e.response['Error']['Code']}")
+            return render(request, 'confirm.html')
+    else:
+        return render(request, 'confirm.html')
