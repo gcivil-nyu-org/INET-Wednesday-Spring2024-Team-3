@@ -99,7 +99,7 @@ def register_view(request):
                 ]
             )
             messages.success(request, "Registration successful. Please check your email to confirm your account.")
-            return redirect('login')
+            return redirect('confirm')
         except ClientError as e:
             if e.response['Error']['Code'] == 'UsernameExistsException':
                 messages.error(request, "A user with this username already exists.")
