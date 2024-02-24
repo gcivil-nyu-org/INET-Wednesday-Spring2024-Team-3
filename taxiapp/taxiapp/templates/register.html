@@ -30,7 +30,7 @@
             margin-bottom: 10px;
             border-radius: 5px;
             border: 1px solid #ddd;
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            box-sizing: border-box; 
         }
 
         button {
@@ -60,6 +60,14 @@
     <input type="password" name="password" placeholder="Password" required>
     <input type="password" name="confirm_password" placeholder="Confirm Password" required>
     <button type="submit">Register</button>
+    {% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+    {% endif %}
+
 </form>
 
 </body>

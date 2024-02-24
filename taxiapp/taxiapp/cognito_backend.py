@@ -1,9 +1,10 @@
-from django.conf import settings
 import boto3
 import requests
+from django.conf import settings
 from authlib.jose import JsonWebKey, jwt
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 class CognitoBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None):
@@ -23,10 +24,28 @@ class CognitoBackend(BaseBackend):
             jwks = requests.get(settings.COGNITO_PUBLIC_KEYS_URL).json()
             key = JsonWebKey.import_key_set(jwks)
             claims = jwt.decode(id_token, key)
-            claims.validate() 
-            #logic to create or get a Django user
-            ...
+            claims.validate()
+
+            # Extract required attributes from claims
+            email = claims.get('email')
+            given_name = claims.get('given_name')
+            family_name = claims.get('family_name')
+
+            # Logic to create or get a Django user
+            try:
+                user = User.objects.get(username=username)
+            except ObjectDoesNotExist:
+                # If user does not exist, create a new user
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    first_name=given_name,
+                    last_name=family_name
+                )
+                user.save()
+
             return user
         except Exception as e:
             # Handle exceptions appropriately
+            print(f"Authentication failed: {str(e)}")  # You can use logging instead of print
             return None
