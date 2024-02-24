@@ -56,6 +56,16 @@
             color: red;
             text-align: center;
         }
+
+        .footer-links {
+            text-align: center;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: #007bff;
+            margin: 0 10px;
+        }
     </style>
 </head>
 
@@ -78,7 +88,7 @@
         {% endif %}
     </form>
 
-    <div class="login-link">
+    <div class="footer-links">
         <a href="{% url 'login' %}">Already have an account? Login</a>
     </div>
 

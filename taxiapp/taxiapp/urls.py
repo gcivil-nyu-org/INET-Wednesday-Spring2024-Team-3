@@ -25,5 +25,6 @@ urlpatterns = [
     path('', views.home_view, name='home'),
     path('confirm/', views.confirm_view, name='confirm'),
     path('reset/', views.reset_view, name='reset'),
-    path('success/', views.success_view, name='success')
+    path('success/', views.success_view, name='success'),
+    path('reset-confirm/', views.reset_confirm_view, name='reset-confirm')
 ]

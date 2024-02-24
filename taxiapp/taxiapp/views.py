@@ -121,7 +121,49 @@ def home_view(request):
     return render(request, 'home.html')
 
 def reset_view(request):
+    if request.method == 'POST' and 'request_reset' in request.POST:
+        username = request.POST.get('username')
+
+        client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+        try:
+            response = client.forgot_password(
+                ClientId=settings.COGNITO_APP_CLIENT_ID,
+                Username=username,
+                # If you're using client secrets
+                SecretHash=get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
+            )
+            messages.success(request, "Password reset code sent. Please check your email.")
+            return render(request, 'reset_confirm.html', {'username': username})  # Render a template to enter the verification code and new password
+        except ClientError as e:
+            messages.error(request, f"Failed to initiate password reset: {e.response['Error']['Code']}")
+            return render(request, 'reset.html')
+
     return render(request, 'reset.html')
+
+def reset_confirm_view(request):
+    if request.method == 'POST' and 'confirm_reset' in request.POST:
+        username = request.POST.get('username')
+        verification_code = request.POST.get('verification_code')
+        new_password = request.POST.get('new_password')
+
+        client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+        try:
+            response = client.confirm_forgot_password(
+                ClientId=settings.COGNITO_APP_CLIENT_ID,
+                SecretHash=get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET),
+                Username=username,
+                ConfirmationCode=verification_code,
+                Password=new_password
+            )
+            messages.success(request, "Your password has been reset successfully. Please log in with your new password.")
+            return redirect('login')
+        except ClientError as e:
+            messages.error(request, f"Failed to reset password: {e.response['Error']['Code']}")
+            return render(request, 'reset_confirm.html', {'username': username})
+
+    return render(request, 'reset_confirm.html')
+
+
 
 def success_view(request):
     return render(request, 'success.html')
@@ -146,3 +188,5 @@ def confirm_view(request):
             return render(request, 'confirm.html')
     else:
         return render(request, 'confirm.html')
+    
+
