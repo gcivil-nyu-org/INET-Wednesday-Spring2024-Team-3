@@ -60,15 +60,30 @@
             color: red;
             text-align: center;
         }
-    </style>
+    </style><script>
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var errorMessage = document.getElementById("error-message");
+
+            var regex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+            if (!regex.test(password)) {
+                errorMessage.textContent = "Password must be at least 8 characters long, contain at least one number, one special character, one uppercase letter, and one lowercase letter.";
+                return false; // Prevent form submission
+            }
+
+            errorMessage.textContent = ""; // Clear error message
+            return true; // Allow form submission
+        }
+    </script>
 </head>
 
 <body>
 
-    <form method="post" action="{% url 'login' %}">
+    <form method="post" action="{% url 'login' %}" onsubmit="return validatePassword()">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" id="password" name="password" placeholder="Password" required>
         <button type="submit">Login</button>
         {% if messages %}
         <ul class="messages">
@@ -78,6 +93,8 @@
         </ul>
         {% endif %}
     </form>
+
+    <p id="error-message" style="color: red;"></p> <!-- Error message display -->
 
     <div class="footer-links">
         <a href="{% url 'reset' %}">Reset Password</a>

@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Confirm Password Reset</title>
+    <script>
+        function validatePasswords() {
+            var newPassword = document.getElementById('new_password').value;
+            var confirmPassword = document.getElementById('confirm_new_password').value;
+            if (newPassword !== confirmPassword) {
+                alert('The passwords do not match. Please try again.');
+                return false;
+            }
+            return true;
+        }
+    </script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -52,19 +63,25 @@
 </head>
 <body>
 
-    <form method="post" action="/path-to-your-password-reset-confirmation-handler">
+    <form method="post" action="{% url 'reset-confirm' %}" onsubmit="return validatePasswords()"> <!-- Update the action URL -->
         {% csrf_token %}
         <div class="form-header">
             <h2>Confirm Password Reset</h2>
             <p>Please enter the verification code sent to your email or phone, along with your new password.</p>
         </div>
 
+        {% if messages %}
+            {% for message in messages %}
+                <div>{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
         <input type="hidden" name="username" value="{{ username }}" required> 
         <input type="text" name="verification_code" placeholder="Verification Code" required>
-        <input type="password" name="new_password" placeholder="New Password" required>
-        <input type="password" name="confirm_new_password" placeholder="Confirm New Password" required>
+        <input type="password" id="new_password" name="new_password" placeholder="New Password" required>
+        <input type="password" id="confirm_new_password" name="confirm_new_password" placeholder="Confirm New Password" required>
         
-        <button type="submit">Confirm Reset</button>
+        <button type="submit" name="confirm_reset">Confirm Reset</button>
     </form>
 
 </body>

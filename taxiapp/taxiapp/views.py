@@ -7,6 +7,9 @@ from botocore.exceptions import ClientError
 import hmac
 import hashlib
 import base64
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Login view
 def login_view(request):
@@ -121,57 +124,70 @@ def home_view(request):
     return render(request, 'home.html')
 
 def reset_view(request):
-    if request.method == 'POST' and 'request_reset' in request.POST:
-        username = request.POST.get('username')
+    step = "request"  # Default step
 
-        client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
-        try:
-            response = client.forgot_password(
-                ClientId=settings.COGNITO_APP_CLIENT_ID,
-                Username=username,
-                # If you're using client secrets
-                SecretHash=get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
-            )
-            messages.success(request, "Password reset code sent. Please check your email.")
-            return render(request, 'reset_confirm.html', {'username': username})  # Render a template to enter the verification code and new password
-        except ClientError as e:
-            messages.error(request, f"Failed to initiate password reset: {e.response['Error']['Code']}")
-            return render(request, 'reset.html')
+    if request.method == 'POST':
+        if 'request_reset' in request.POST:  # Handling the initial reset request
+            user_identifier = request.POST.get('user_identifier', '').strip()
 
-    return render(request, 'reset.html')
+            if not user_identifier:
+                messages.error(request, "Please enter a valid email or username.")
+            elif '@' in user_identifier and not re.match(r"[^@]+@[^@]+\.[^@]+", user_identifier):
+                messages.error(request, "Please enter a valid email address.")
+            else:
+                try:
+                    client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+                    client.forgot_password(
+                        ClientId=settings.COGNITO_APP_CLIENT_ID,
+                        Username=user_identifier,
+                        SecretHash=get_secret_hash(user_identifier, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
+                    )
+                    messages.success(request, "Password reset code sent. Please check your email.")
+                    step = "confirm"  # Move to confirmation step
+                except ClientError as e:
+                    logger.error(f"Error initiating password reset for {user_identifier}: {e}")
+                    messages.error(request, "Failed to initiate password reset. Please try again later.")
 
-def reset_confirm_view(request):
-    if request.method == 'POST' and 'confirm_reset' in request.POST:
-        username = request.POST.get('username')
-        verification_code = request.POST.get('verification_code')
-        new_password = request.POST.get('new_password')
+        elif 'confirm_reset' in request.POST:  # Handling the confirmation step
+            username = request.POST.get('username', '').strip()
+            verification_code = request.POST.get('verification_code', '').strip()
+            new_password = request.POST.get('new_password', '').strip()
 
-        client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
-        try:
-            response = client.confirm_forgot_password(
-                ClientId=settings.COGNITO_APP_CLIENT_ID,
-                SecretHash=get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET),
-                Username=username,
-                ConfirmationCode=verification_code,
-                Password=new_password
-            )
-            messages.success(request, "Your password has been reset successfully. Please log in with your new password.")
-            return redirect('login')
-        except ClientError as e:
-            messages.error(request, f"Failed to reset password: {e.response['Error']['Code']}")
-            return render(request, 'reset_confirm.html', {'username': username})
+            if not username or not verification_code or not new_password:
+                messages.error(request, "All fields are required.")
+            else:
+                try:
+                    client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+                    client.confirm_forgot_password(
+                        ClientId=settings.COGNITO_APP_CLIENT_ID,
+                        SecretHash=get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET),
+                        Username=username,
+                        ConfirmationCode=verification_code,
+                        Password=new_password
+                    )
+                    messages.success(request, "Your password has been reset successfully. Please log in with your new password.")
+                    return redirect('login')
+                except ClientError as e:
+                    logger.error(f"Failed to reset password for username {username}: {e}")
+                    if e.response['Error']['Code'] == 'CodeMismatchException':
+                        messages.error(request, "Invalid verification code. Please try again.")
+                    else:
+                        messages.error(request, "Failed to reset password. Please try again later.")
 
-    return render(request, 'reset_confirm.html')
-
-
-
+    return render(request, 'reset.html', {'step': step, 'username': user_identifier if step == "confirm" else ""})
 def success_view(request):
     return render(request, 'success.html')
 
 def confirm_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        confirmation_code = request.POST.get('confirmation_code')
+        username = request.POST.get('username', '').strip()
+        confirmation_code = request.POST.get('confirmation_code', '').strip()
+
+        # Basic input validation
+        if not username or not confirmation_code:
+            messages.error(request, "Username and confirmation code are required.")
+            return render(request, 'confirm.html')
+
         try:
             client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
             secret_hash = get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
@@ -182,9 +198,18 @@ def confirm_view(request):
                 ConfirmationCode=confirmation_code
             )
             messages.success(request, "Your account has been confirmed. Please log in.")
-            return redirect('login')
+            return redirect('login')  # Ensure you have a URL named 'login' configured
         except ClientError as e:
-            messages.error(request, f"Failed to confirm account: {e.response['Error']['Code']}")
+            error_code = e.response['Error']['Code']
+            if error_code == 'CodeMismatchException':
+                error_message = "Invalid confirmation code. Please try again."
+            elif error_code == 'ExpiredCodeException':
+                error_message = "Confirmation code expired. Please request a new code."
+            else:
+                error_message = "Failed to confirm account. Please try again later."
+            
+            logger.error(f"Failed to confirm account for username {username}: {e}")
+            messages.error(request, error_message)
             return render(request, 'confirm.html')
     else:
         return render(request, 'confirm.html')

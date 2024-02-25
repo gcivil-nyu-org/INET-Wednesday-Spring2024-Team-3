@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +25,8 @@
             width: 300px;
         }
 
-        input, button {
+        input,
+        button {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -49,19 +51,41 @@
             margin-bottom: 20px;
         }
     </style>
-</head>
-<body>
 
-    <form method="post" action="/path-to-your-password-reset-handler">
+<body>
+    {% if step == "request" %}
+    <form method="post" action="{% url 'reset' %}">
+        {% csrf_token %}
         <div class="form-header">
             <h2>Password Reset</h2>
             <p>Please enter your email or username</p>
         </div>
 
         <input type="text" name="user_identifier" placeholder="Email or Username" required>
-        
-        <button type="submit">Submit</button>
-    </form>
 
+        <button type="submit" name="request_reset">Submit</button>
+    </form>
+    {% elif step == "confirm" %}
+    <form method="post" action="{% url 'reset' %}" onsubmit="return validatePasswords()">
+        {% csrf_token %}
+        <div class="form-header">
+            <h2>Confirm Password Reset</h2>
+            <p>Please enter the verification code sent to your email or phone, along with your new password.</p>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div>{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <input type="hidden" name="username" value="{{ username }}" required>
+        <input type="text" name="verification_code" placeholder="Verification Code" required>
+        <input type="password" id="new_password" name="new_password" placeholder="New Password" required>
+        <input type="password" id="confirm_new_password" name="confirm_new_password" placeholder="Confirm New Password"
+            required>
+
+        <button type="submit" name="confirm_reset">Confirm Reset</button>
+    </form>
+    {% endif %}
 </body>
-</html>
