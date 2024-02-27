@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the TaxiApp</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            background: linear-gradient(135deg, #004cff 0%, #32485b 100%);
+            color: #ffffff;
+        }
+
+        header, footer {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px 60px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 25px;
+            font-size: 1rem;
+            border-radius: 50px;
+            transition: background-color 0.3s, transform 0.3s;
+            color: #007bff;
+            background-color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        footer {
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- <header>
+        <h2>CS-GY 6063 Software Engineering I</h2>
+    </header> -->
+    <div class="container">
+        <h1>Welcome to the TaxiApp</h1>
+        <p>Our very cool slogan here.</p>
+        <a href="login" class="button">Login</a>
+        <a href="register" class="button">Register</a>
+    </div>
+    <footer>
+        NYU School of Engineering, Spring 2024
+    </footer>
+</body>
+</html>
