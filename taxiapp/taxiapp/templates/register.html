@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaxiApp Forms</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            padding: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .login-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        p {
+            color: red;
+            text-align: center;
+        }
+
+        .footer-links {
+            text-align: center;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: #007bff;
+            margin: 0 10px;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var form = document.querySelector("form");
+            form.onsubmit = function (event) {
+                var password = document.querySelector('input[name="password"]').value;
+                var confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+                var errorMessage = document.querySelector("#error-message");
+
+                var passwordRegex = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+                if (!passwordRegex.test(password)) {
+                    errorMessage.textContent = "Password must be at least 8 characters long and include at least one number, one special character, one uppercase letter, and one lowercase letter.";
+                    event.preventDefault(); // Prevent form submission
+                    return false;
+                }
+
+                if (password !== confirmPassword) {
+                    errorMessage.textContent = "Passwords do not match.";
+                    event.preventDefault(); // Prevent form submission
+                    return false;
+                }
+
+                errorMessage.textContent = ""; // Clear error message
+                return true; // Allow form submission
+            };
+        });
+    </script>
+</head>
+
+<body>
+
+    <form method="post" action="{% url 'register' %}">
+        {% csrf_token %}
+        <input type="text" name="full_name" placeholder="Full Name" required>
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="email" name="email" placeholder="Email" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+        <p id="error-message" style="color: red;"></p> <!-- Error message display -->
+        <button type="submit">Register</button>
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                {% endfor %}
+        </ul>
+        {% endif %}
+    </form>
+
+    <div class="footer-links">
+        <a href="{% url 'login' %}">Already have an account? Login</a>
+    </div>
+
+    <footer>
+        <p>NYU Tandon School of Engineering</p>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Edit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #eef2f3 0%, #a6c0fe 100%);
+            color: #333;
+        }
+
+        .form-wrapper {
+            text-align: center;
+            padding: 40px;
+            border-radius: 30px;
+            background: #ffffff;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            border: 1px solid #d3d9df;
+            background: #edf2f7;
+            color: #333;
+            font-size: 1rem;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
+            border-color: #a6c0fe;
+            box-shadow: 0 0 0 3px rgba(166,192,254,0.2);
+            outline: none;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 30px;
+            transition: all 0.3s;
+            color: #ffffff;
+            background-color: #6c7ae0;
+            text-decoration: none;
+            margin: 10px 5px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #5a68d6;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="form-wrapper">
+        <h1>Edit Profile</h1>
+        <form action="/save-profile" method="POST">
+            <input type="text" name="first_name" placeholder="First Name" required>
+            <input type="text" name="middle_name" placeholder="Middle Name">
+            <input type="text" name="last_name" placeholder="Last Name" required>
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="tel" name="phone_number" placeholder="Phone Number">
+            <input type="text" name="address" placeholder="Address">
+            <button type="submit" class="button">Save Changes</button>
+            <a href="/reset" class="button">Reset Password</a>
+        </form>
+    </div>
+
+</body>
+</html>

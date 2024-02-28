@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            padding: 40px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        form {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+
+<body>
+    {% if step == "request" %}
+    <form method="post" action="{% url 'reset' %}">
+        {% csrf_token %}
+        <div class="form-header">
+            <h2>Password Reset</h2>
+            <p>Please enter your email or username</p>
+        </div>
+
+        <input type="text" name="user_identifier" placeholder="Email or Username" required>
+
+        <button type="submit" name="request_reset">Submit</button>
+    </form>
+    {% elif step == "confirm" %}
+    <form method="post" action="{% url 'reset' %}" onsubmit="return validatePasswords()">
+        {% csrf_token %}
+        <div class="form-header">
+            <h2>Confirm Password Reset</h2>
+            <p>Please enter the verification code sent to your email or phone, along with your new password.</p>
+        </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div>{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+
+        <input type="hidden" name="username" value="{{ username }}" required>
+        <input type="text" name="verification_code" placeholder="Verification Code" required>
+        <input type="password" id="new_password" name="new_password" placeholder="New Password" required>
+        <input type="password" id="confirm_new_password" name="confirm_new_password" placeholder="Confirm New Password"
+            required>
+
+        <button type="submit" name="confirm_reset">Confirm Reset</button>
+    </form>
+    {% endif %}
+</body>
