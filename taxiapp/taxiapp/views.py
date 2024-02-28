@@ -8,6 +8,7 @@ import hmac
 import hashlib
 import base64
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
