@@ -155,13 +155,14 @@
         }
 
         .settings-nav {
-            border-right: 1px solid #ddd; }
-
-        .settings-content {
-            padding-left: 20px; 
+            border-right: 1px solid #ddd;
         }
 
-        
+        .settings-content {
+            padding-left: 20px;
+        }
+
+
         .settings-nav .nav-link {
             color: var(--text-color);
             font-weight: 500;
@@ -172,8 +173,9 @@
             color: var(--primary-color);
         }
 
-        .settings-content input, .settings-content button {
-            margin-bottom: 20px; 
+        .settings-content input,
+        .settings-content button {
+            margin-bottom: 20px;
         }
 
         .settings-content input {
@@ -219,57 +221,64 @@
                 <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
             </li>
             {% endif %}
-            
+
         </ul>
     </div>
 </nav>
-    <div class="container-fluid mt-5 pt-5">
-        <div class="row">
-            <div class="col-md-3 settings-nav">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Activity</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Friends</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Preferences</a>
-                    </li>
-                </ul>
-            </div>
+<div class="container-fluid mt-5 pt-5">
+    <div class="row">
+        <div class="col-md-3 settings-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Activity</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Friends</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Preferences</a>
+                </li>
+            </ul>
+        </div>
 
-            <div class="col-md-9 settings-content">
-                <h2>Edit Profile</h2>
-                <form action="/save-profile" method="POST">
-                    <input type="text" name="first_name" placeholder="First Name" required>
-                    <input type="text" name="middle_name" placeholder="Middle Name">
-                    <input type="text" name="last_name" placeholder="Last Name" required>
-                    <input type="text" name="username" placeholder="Username" required>
-                    <input type="email" name="email" placeholder="Email" required>
-                    <input type="tel" name="phone_number" placeholder="Phone Number">
-                    <input type="text" name="address" placeholder="Address">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </form>
-            </div>
+        <div class="col-md-9 settings-content">
+            <h2>Edit Profile</h2>
+            <form action="{% url 'save_profile' %}" method="POST">
+                <input type="text" name="first_name" placeholder="First Name" value="{{ first_name }}" required>
+                <input type="text" name="middle_name" placeholder="Middle Name" value="{{ middle_name }}">
+                <input type="text" name="last_name" placeholder="Last Name" value="{{ last_name }}" required>
+                <input type="text" name="username" placeholder="Username" value="{{ username }}" required>
+                <input type="email" name="email" placeholder="Email" value="{{ email }}" required>
+                <input type="tel" name="phone_number" placeholder="Phone Number" value="{{ phone_number }}">
+                <input type="text" name="address" placeholder="Address" value="{{ address }}">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                    {% endfor %}
+            </ul>
+            {% endif %}
         </div>
     </div>
+</div>
 
-    <footer class="footer-container">
-        <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Contact</a>
-        </div>
-        © 2024 Taxi Compare. All rights reserved.
-    </footer>
+<footer class="footer-container">
+    <div class="footer-links">
+        <a href="#">About Us</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Contact</a>
+    </div>
+    © 2024 Taxi Compare. All rights reserved.
+</footer>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 
 </html>

@@ -223,10 +223,10 @@ def confirm_view(request):
         return render(request, 'confirm.html')
     
     
-def profile_view(request):
-    if not request.user.is_authenticated:
-        return redirect('/')
-    return render(request, 'profile.html')
+# def profile_view(request):
+#     if not request.user.is_authenticated:
+#         return redirect('/')
+#     return render(request, 'profile.html')
     
 
 def logout_view(request):
@@ -234,7 +234,9 @@ def logout_view(request):
     return redirect('/')
 
 @login_required
-def edit_profile_view(request):
+def profile_view(request):
+    if not request.user.is_authenticated:
+        return redirect('/')
     client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
     cognito_username = request.user.username
 
@@ -257,7 +259,7 @@ def edit_profile_view(request):
         messages.error(request, f"Failed to retrieve profile information: {str(e)}")
         context = {}
 
-    return render(request, 'edit_profile.html', context)
+    return render(request, 'profile.html', context)
 
 @login_required
 def save_profile_view(request):
