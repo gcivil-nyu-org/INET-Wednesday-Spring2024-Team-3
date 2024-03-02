@@ -208,7 +208,7 @@
 
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
-        <a class="navbar-brand" href="">Taxi Compare</a>
+        <a class="navbar-brand" href="/">Taxi Compare</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -218,7 +218,7 @@
                 <li class="nav-item"><a class="nav-link" href="/forum">Forum</a></li>
                 <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
                 <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
-                {% if user_is_authenticated %}
+                {% if user.is_authenticated %}
                 <li class="nav-item">
                     <a href="/profile" class="btn btn-outline-success my-2 my-sm-0" role="button">Profile</a>
                 </li>
@@ -233,6 +233,7 @@
                     <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
                 </li>
                 {% endif %}
+                
             </ul>
         </div>
     </nav>

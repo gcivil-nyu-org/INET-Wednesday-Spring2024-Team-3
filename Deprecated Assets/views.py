@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as django_login
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import boto3
 from django.conf import settings
@@ -10,7 +11,7 @@ import hmac
 import hashlib
 import base64
 import logging
-
+import re
 logger = logging.getLogger(__name__)
 
 def login_view(request):
@@ -37,21 +38,20 @@ def login_view(request):
                     }
                 )
 
-                # If successful authentication, retrieve tokens
                 id_token = response['AuthenticationResult']['IdToken']
                 access_token = response['AuthenticationResult']['AccessToken']
-                # Refresh token can also be stored if needed
+                # Refresh token
                 
-                # Store tokens in session, cookies, or send to client as needed
+                # Store tokens in session, cookies, or send to client 
+                #  May change in the future
                 request.session['id_token'] = id_token
                 request.session['access_token'] = access_token
 
                 # Create or update Django user and log in
                 django_user, created = User.objects.get_or_create(username=username)
-                # Optionally update Django user fields here
                 django_login(request, django_user)
 
-                return redirect('/')  # Redirect to home page
+                return redirect('/') 
 
             except client.exceptions.UserNotConfirmedException:
                 messages.error(request, "User account is not confirmed. Please check your email for the confirmation code.")
@@ -183,8 +183,8 @@ def reset_view(request):
 
     return render(request, 'reset.html', {'step': step, 'username': user_identifier if step == "confirm" else ""})
 
-def success_view(request):
-    return render(request, 'home.html')
+# def success_view(request):
+#     return render(request, 'home.html')
 
 def confirm_view(request):
     if request.method == 'POST':
@@ -231,3 +231,55 @@ def logout_view(request):
     logout(request)  # Clears the session
     #maybe some additional steps
     return redirect('/')
+
+
+@login_required
+def edit_profile_view(request):
+    client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+    try:
+        cognito_username = request.user.username
+        response = client.admin_get_user(
+            UserPoolId=settings.COGNITO_USER_POOL_ID,
+            Username=cognito_username
+        )
+        
+        user_attributes = {attr['Name']: attr['Value'] for attr in response['UserAttributes']}
+        
+        return render(request, 'profile.html', {'user_attributes': user_attributes})
+    except client.exceptions.UserNotFoundException:
+        messages.error(request, "Cognito user not found.")
+        return redirect('/')
+    except Exception as e:
+        messages.error(request, str(e))
+        return redirect('/')
+    
+
+@login_required
+def save_profile_view(request):
+    if request.method == 'POST':
+        client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+        cognito_username = request.user.username 
+
+        updated_attributes = [
+            {'Name': 'given_name', 'Value': request.POST.get('first_name')},
+            {'Name': 'middle_name', 'Value': request.POST.get('middle_name')},
+            {'Name': 'family_name', 'Value': request.POST.get('last_name')},
+            {'Name': 'email', 'Value': request.POST.get('email')},
+            {'Name': 'phone_number', 'Value': request.POST.get('phone_number')},
+            {'Name': 'address', 'Value': request.POST.get('address')},
+            # Add more attributes as needed
+        ]
+        
+        try:
+            client.admin_update_user_attributes(
+                UserPoolId=settings.COGNITO_USER_POOL_ID,
+                Username=cognito_username,
+                UserAttributes=updated_attributes
+            )
+            messages.success(request, "Profile updated successfully.")
+        except Exception as e:
+            messages.error(request, f"Failed to update profile: {str(e)}")
+        
+        return redirect('/profile')
+    else:
+        return redirect('/profile')
