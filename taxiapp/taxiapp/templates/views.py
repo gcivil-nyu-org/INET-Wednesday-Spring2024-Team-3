@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import login as django_login
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 import boto3
 from django.conf import settings
 from django.contrib import messages
@@ -11,7 +13,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Login view
 def login_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -19,14 +20,13 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            login(request, user)
-            return redirect('success')
+            django_login(request, user)
+            return redirect('/')  # Redirect to home page
         else:
-
             try:
                 client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
                 secret_hash = get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
-                client.admin_initiate_auth(
+                response = client.admin_initiate_auth(
                     UserPoolId=settings.COGNITO_USER_POOL_ID,
                     ClientId=settings.COGNITO_APP_CLIENT_ID,
                     AuthFlow='ADMIN_NO_SRP_AUTH',
@@ -36,17 +36,27 @@ def login_view(request):
                         'SECRET_HASH': secret_hash
                     }
                 )
+
+                # If successful authentication, retrieve tokens
+                id_token = response['AuthenticationResult']['IdToken']
+                access_token = response['AuthenticationResult']['AccessToken']
+                # Refresh token can also be stored if needed
+                
+                # Store tokens in session, cookies, or send to client as needed
+                request.session['id_token'] = id_token
+                request.session['access_token'] = access_token
+
+                # Create or update Django user and log in
+                django_user, created = User.objects.get_or_create(username=username)
+                # Optionally update Django user fields here
+                django_login(request, django_user)
+
+                return redirect('/')  # Redirect to home page
+
             except client.exceptions.UserNotConfirmedException:
-                # Resend confirmation code
-                client.resend_confirmation_code(
-                    ClientId=settings.COGNITO_APP_CLIENT_ID,
-                    Username=username,
-                    SecretHash=secret_hash
-                )
                 messages.error(request, "User account is not confirmed. Please check your email for the confirmation code.")
-                return redirect('confirm')  # Redirect to a page where users can enter their confirmation code
+                return redirect('confirm')
             except ClientError as e:
-                # Handle other Cognito exceptions
                 error_code = e.response['Error']['Code']
                 if error_code == 'NotAuthorizedException':
                     messages.error(request, "Invalid username or password.")
@@ -54,12 +64,9 @@ def login_view(request):
                     messages.error(request, "User does not exist.")
                 else:
                     messages.error(request, f"An error occurred: {error_code}.")
-                return render(request, 'login.html')
-
-            return render(request, 'login.html', {'error': 'Invalid credentials'})
+                return render(request, 'login.html', {'error': 'Invalid credentials'})
 
     return render(request, 'login.html')
-
 # Registration view
 def register_view(request):
     if request.method == 'POST':
@@ -124,8 +131,8 @@ def home_view(request):
     return render(request, 'home.html')
 
 def reset_view(request):
-    step = "request" 
-    
+    step = "request"  # Default step
+
     if request.method == 'POST':
         if 'request_reset' in request.POST:  # Handling the initial reset request
             user_identifier = request.POST.get('user_identifier', '').strip()
@@ -175,8 +182,9 @@ def reset_view(request):
                         messages.error(request, "Failed to reset password. Please try again later.")
 
     return render(request, 'reset.html', {'step': step, 'username': user_identifier if step == "confirm" else ""})
+
 def success_view(request):
-    return render(request, 'success.html')
+    return render(request, 'home.html')
 
 def confirm_view(request):
     if request.method == 'POST':
@@ -219,3 +227,7 @@ def profile_view(request):
     return render(request, 'profile.html')
     
 
+def logout_view(request):
+    logout(request)  # Clears the session
+    #maybe some additional steps
+    return redirect('/')

@@ -1,102 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile Edit</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <title>Settings - Taxi Compare</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
     <style>
+        :root {
+            --primary-color: #5D93E1;
+            --secondary-color: #1d86a7;
+            --background-color: #F9FAFB;
+            --text-color: #343A40;
+            --link-color: #007BFF;
+            --font-family: 'Roboto', sans-serif;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: var(--font-family);
+            background: var(--background-color);
+            color: var(--text-color);
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #eef2f3 0%, #a6c0fe 100%);
-            color: #333;
+            line-height: 1.6;
+            font-size: 18px;
+            padding-bottom: 100px;
+
         }
 
-        .form-wrapper {
+        .navbar,
+        .footer-container {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .container-fluid,
+        .hero-section {
+            margin-bottom: 60px;
+        }
+
+        footer.footer-container {
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
             text-align: center;
-            padding: 40px;
-            border-radius: 30px;
-            background: #ffffff;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 400px;
+            background-color: var(--primary-color);
+            padding: 10px 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            font-weight: 500;
+        .navbar-brand,
+        .nav-link,
+        .footer-links a {
+            color: inherit;
+            transition: color 0.3s ease;
         }
 
-        input[type="text"], input[type="email"], input[type="tel"] {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 20px;
+        .navbar-brand:hover,
+        .nav-link:hover,
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        .hero-section {
+            padding: 50px 20px;
+            text-align: center;
+            max-width: 800px;
+            margin: 40px auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .map-container {
+            height: 300px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)), url('map-placeholder.png') no-repeat center center;
+            background-size: cover;
+        }
+
+        .forum-post,
+        .comparison-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .forum-post:hover,
+        .comparison-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn,
+        .form-control {
             border-radius: 20px;
-            border: 1px solid #d3d9df;
-            background: #edf2f7;
-            color: #333;
-            font-size: 1rem;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus {
-            border-color: #a6c0fe;
-            box-shadow: 0 0 0 3px rgba(166,192,254,0.2);
-            outline: none;
+        .btn-primary,
+        .btn-outline-success {
+            background-color: var(--primary-color);
+            border-color: transparent;
+            color: #fff;
+            padding: 10px 20px;
         }
 
-        .button {
-            display: inline-block;
-            padding: 12px 30px;
-            font-size: 1rem;
-            border-radius: 30px;
-            transition: all 0.3s;
-            color: #ffffff;
-            background-color: #6c7ae0;
+        .btn-primary:hover,
+        .btn-outline-success:hover {
+            background-color: var(--secondary-color);
+            color: #fff;
+        }
+
+        .comparison-item,
+        .forum-post {
+            background-color: #FFFFFF;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #e3e3e3;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .comparison-item:hover,
+        .forum-post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .read-more {
+            color: var(--secondary-color);
             text-decoration: none;
-            margin: 10px 5px;
+            font-weight: 600;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+
+            .container-fluid {
+                margin-bottom: 40px;
+            }
+
+            .comparison-item,
+            .forum-post {
+                padding: 15px;
+            }
+        }
+
+        .settings-nav {
+            border-right: 1px solid #ddd; }
+
+        .settings-content {
+            padding-left: 20px; 
+        }
+
+        
+        .settings-nav .nav-link {
+            color: var(--text-color);
             font-weight: 500;
+        }
+
+        .settings-nav .nav-link.active {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .settings-content input, .settings-content button {
+            margin-bottom: 20px; 
+        }
+
+        .settings-content input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .settings-content button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
             border: none;
-            cursor: pointer;
+            color: #fff;
+            border-radius: 5px;
         }
-
-        .button:hover {
-            background-color: #5a68d6;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .button:active {
-            transform: translateY(0);
-            box-shadow: none;
-        }
-
     </style>
 </head>
-<body>
 
-    <div class="form-wrapper">
-        <h1>Edit Profile</h1>
-        <form action="/save-profile" method="POST">
-            <input type="text" name="first_name" placeholder="First Name" required>
-            <input type="text" name="middle_name" placeholder="Middle Name">
-            <input type="text" name="last_name" placeholder="Last Name" required>
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <input type="tel" name="phone_number" placeholder="Phone Number">
-            <input type="text" name="address" placeholder="Address">
-            <button type="submit" class="button">Save Changes</button>
-            <a href="/reset" class="button">Reset Password</a>
-        </form>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
+        <a class="navbar-brand" href="">Taxi Compare</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="/forum">Forum</a></li>
+                <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
+                <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
+                <li class="nav-item">
+                    <a href="/login" class="btn btn-outline-success my-2 my-sm-0" role="button">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
+                </li>
+            </ul>
+        </div>
+        
+    </nav>
+
+    <div class="container-fluid mt-5 pt-5">
+        <div class="row">
+            <div class="col-md-3 settings-nav">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Friends</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Preferences</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-9 settings-content">
+                <h2>Edit Profile</h2>
+                <form action="/save-profile" method="POST">
+                    <input type="text" name="first_name" placeholder="First Name" required>
+                    <input type="text" name="middle_name" placeholder="Middle Name">
+                    <input type="text" name="last_name" placeholder="Last Name" required>
+                    <input type="text" name="username" placeholder="Username" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="tel" name="phone_number" placeholder="Phone Number">
+                    <input type="text" name="address" placeholder="Address">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
     </div>
 
+    <footer class="footer-container">
+        <div class="footer-links">
+            <a href="#">About Us</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Contact</a>
+        </div>
+        © 2024 Taxi Compare. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
+
 </html>
