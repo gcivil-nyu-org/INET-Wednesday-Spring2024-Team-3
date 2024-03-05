@@ -35,8 +35,5 @@ deploy:
   bucket_name: elasticbeanstalk-us-east-1-963295565159
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
-    branch:
-      - master
-      - testbranch
   skip_cleanup: 'true'
   
