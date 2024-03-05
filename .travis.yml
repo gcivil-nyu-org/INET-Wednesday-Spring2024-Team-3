@@ -1,0 +1,14 @@
+language: python
+
+install:
+- cd taxiapp
+- pip install -r requirements.txt
+before_script:
+- python manage.py migrate
+script:
+- black --check .
+- flake8 .
+- coverage run --source=mysite,polls manage.py test
+- coverage report
+after_script:
+- coveralls
