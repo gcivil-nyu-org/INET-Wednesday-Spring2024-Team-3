@@ -6,8 +6,8 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-#env = environ.Env()
-#environ.Env.read_env(env_file="secrets.env")
+# env = environ.Env()
+# environ.Env.read_env(env_file="secrets.env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
