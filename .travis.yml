@@ -28,12 +28,15 @@ deploy:
   provider: elasticbeanstalk
   access_key_id: AKIA6ASHD2VT2VLIVJUW
   secret_access_key:
-    secure: TXIBSMmZ3DF4rlJnY2Zll6seM1ehkJ8iwy2bP6kQ5Ot5O+7nh6bWDpFx4R73jQsNWp9tTAwMfzsrfTcrt0TU406pG2+LepK46MY2nU7yArjv9OLfDivshSLpuEXUUyVqO/JY8zMDOR9+icaYwClA+/LThzaJesI6g5PxIaPcZdYkl5cf1PmGnuWsA3T9q1pOYomVoogiwJUSzGwnVDn2t12geXcUzkhETq6t1S0Xpen5YTyRmdStDoC/xsSemY14ADAK49UMocadpVKQ4qmqNXBOs6T8lT3DIX2CHLfoAOaYGd9Db/rny/YYEJP1flrz+M4NIhHH2CgGO3AIiBs8l1xB4leAa/xYfzzHC6IpT5WyxT78Td3e8tIFPkoUstqn9jZOCMhmjo42scZwicUv+HV2bEZALgK8UWvATJXj1f6Bbo0s/sWx0bKOCC6VJ3i0bDtMgkUmfJOEGmakmRTx2zOP9ZFLBQsf9ne6bCFdEZFGw4t05axJ8wjwFho7w4ty4jDVbX1MK8nwtEAZsQblaHcBZQejrrzAwR8J4c0A8MpVRaBXBG3uhLyGICpnKTU9Ii3E9cg+78ZX59NdxTkkKeH1NDWXEH/hdXiQ0lDLKlrHoomSFAQMQAnnnKfxUqHm7PoxqY5bzwWpV8zghZ16Qism8899J3LSkMTzznCEXbo=
+    secure: Ez966NfKEmO1Sf1/Qyrxh+nRvXEhBu1XoICrpnb1G/bIjPHje+DQPtFrSI7LlpA61Z3bFrlLb+QvO85RRLZfV17T+VkTuxZhWEVr+gkHY+Vy8pSrHBI6t7KB1eIH0nlhN7Bvq8QDr/G3911qh2sLqGyN5AcgVR45mDFBCR90rNGhUEvnscXQ1YRml74roJb30r6HgAJYAau6GBVj62H+1qDVsy8YHnLuTDD8OP3y0YMlzWHceRrPxG9qJW4cDY52KLu4vpEgyBB09o4JXwwZ0R0JbsWVgUGGJtD7YcuU5Wu0JqPGy8YHq+oCGPMqK0S06oQJC5xFIOO7iG5QmGcXvg1h2XmS63brUZff/sP6z89ZYcgTezzyPPMCLiLuvMK99snEAtkwmD2ShkhbC+X47Ths9DRB2g7f1C1aZWIisfSzWa1o/GSbZHAVtyui3/0sb/i8TybKN+aJsBlDo4YPjdQN/dybYf4b+JfYCNawgNq9UBHqbwrf9/8aBWC3SqJzTbxrTDcpR2A2MUSo9ztYY8VLlw+HAkpo64cGmDiZ4s95gs5kLBmRrtxSXHtaDxOin0851raFTuJVTWfBHlmGKg3alPaq50WH+biJzxQS+WHhizpxML/LTlO1Ssk5ijSnI5Yo9VWDzLIceRkXahGpgbipNku7CQts43XU5N3v+KU=
   region: us-east-1
   app: taxiapp
   env: taxiapp-env
   bucket_name: elasticbeanstalk-us-east-1-963295565159
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
+    branch: 
+      - master
+      - testbranch
   skip_cleanup: 'true'
   
