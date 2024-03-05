@@ -6,11 +6,11 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-env = environ.Env()
-environ.Env.read_env(env_file="secrets.env")
+#env = environ.Env()
+#environ.Env.read_env(env_file="secrets.env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -25,7 +25,6 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
 COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
 COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
 COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
