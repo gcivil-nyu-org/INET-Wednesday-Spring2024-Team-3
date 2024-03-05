@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login as django_login
+from django.contrib.auth import authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 import boto3
@@ -20,13 +21,12 @@ def login_view(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
-            login(request, user, backend="taxiapp.cognito_backend.CognitoBackend")
-            logger.debug(f"User {username} logged in: {request.user.is_authenticated}")
-            return redirect("/")
+            django_login(request, user)
+            return redirect("/")  # Redirect to home page
         else:
             try:
-                logger.error(f"Authentication failed for user {username}")
                 client = boto3.client(
                     "cognito-idp", region_name=settings.COGNITO_AWS_REGION
                 )
@@ -45,8 +45,10 @@ def login_view(request):
                         "SECRET_HASH": secret_hash,
                     },
                 )
+
                 id_token = response["AuthenticationResult"]["IdToken"]
                 access_token = response["AuthenticationResult"]["AccessToken"]
+                # Refresh token
 
                 # Store tokens in session, cookies, or send to client
                 #  May change in the future
@@ -55,12 +57,7 @@ def login_view(request):
 
                 # Create or update Django user and log in
                 django_user, created = User.objects.get_or_create(username=username)
-                login(
-                    request,
-                    django_user,
-                    backend="taxiapp.cognito_backend.CognitoBackend",
-                )
-                # login(request, django_user, backend='django.contrib.auth.backends.ModelBackend')
+                django_login(request, django_user)
 
                 return redirect("/")
 
@@ -253,8 +250,8 @@ def reset_view(request):
     )
 
 
-def success_view(request):
-    return render(request, "home.html")
+# def success_view(request):
+#     return render(request, 'home.html')
 
 
 def confirm_view(request):
@@ -283,7 +280,7 @@ def confirm_view(request):
                 ConfirmationCode=confirmation_code,
             )
             messages.success(request, "Your account has been confirmed. Please log in.")
-            return redirect("login")
+            return redirect("login")  # Ensure you have a URL named 'login' configured
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "CodeMismatchException":
@@ -300,45 +297,36 @@ def confirm_view(request):
         return render(request, "confirm.html")
 
 
-# def profile_view(request):
-#     if not request.user.is_authenticated:
-#         return redirect('/')
-#     return render(request, 'profile.html')
+def profile_view(request):
+    return render(request, "profile.html")
 
 
 def logout_view(request):
-    logout(request)
+    logout(request)  # Clears the session
+    # maybe some additional steps
     return redirect("/")
 
 
 @login_required
-def profile_view(request):
-    if not request.user.is_authenticated:
-        return redirect("/")
+def edit_profile_view(request):
     client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
-    cognito_username = request.user.username
-
     try:
+        cognito_username = request.user.username
         response = client.admin_get_user(
             UserPoolId=settings.COGNITO_USER_POOL_ID, Username=cognito_username
         )
+
         user_attributes = {
             attr["Name"]: attr["Value"] for attr in response["UserAttributes"]
         }
-        context = {
-            "first_name": user_attributes.get("given_name", ""),
-            "middle_name": user_attributes.get("middle_name", ""),
-            "last_name": user_attributes.get("family_name", ""),
-            "username": cognito_username,
-            "email": user_attributes.get("email", ""),
-            "phone_number": user_attributes.get("phone_number", ""),
-            "address": user_attributes.get("address", ""),
-        }
-    except Exception as e:
-        messages.error(request, f"Failed to retrieve profile information: {str(e)}")
-        context = {}
 
-    return render(request, "profile.html", context)
+        return render(request, "profile.html", {"user_attributes": user_attributes})
+    except client.exceptions.UserNotFoundException:
+        messages.error(request, "Cognito user not found.")
+        return redirect("/")
+    except Exception as e:
+        messages.error(request, str(e))
+        return redirect("/")
 
 
 @login_required
@@ -354,6 +342,7 @@ def save_profile_view(request):
             {"Name": "email", "Value": request.POST.get("email")},
             {"Name": "phone_number", "Value": request.POST.get("phone_number")},
             {"Name": "address", "Value": request.POST.get("address")},
+            # Add more attributes as needed
         ]
 
         try:
