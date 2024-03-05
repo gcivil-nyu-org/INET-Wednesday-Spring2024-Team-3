@@ -19,15 +19,15 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('login/', views.login_view, name='login'),
-    path('register/', views.register_view, name='register'),
-    path('', views.home_view, name='home'),
-    path('confirm/', views.confirm_view, name='confirm'),
-    path('reset/', views.reset_view, name='reset'),
-    path('success/', views.success_view, name='success'),
+    path("admin/", admin.site.urls),
+    path("login/", views.login_view, name="login"),
+    path("register/", views.register_view, name="register"),
+    path("", views.home_view, name="home"),
+    path("confirm/", views.confirm_view, name="confirm"),
+    path("reset/", views.reset_view, name="reset"),
+    path("success/", views.success_view, name="success"),
     # path('reset-confirm/', views.reset_confirm_view, name='reset-confirm'), //I think we might not need this
-    path('profile/', views.profile_view, name='profile'),
-    path('logout/', views.logout_view, name='logout'),
-    path('profile/', views.save_profile_view, name='save_profile')
+    path("profile/", views.profile_view, name="profile"),
+    path("logout/", views.logout_view, name="logout"),
+    path("profile/", views.save_profile_view, name="save_profile"),
 ]

@@ -11,30 +11,32 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger(__name__)
+
+
 class CognitoBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None):
-        client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
+        client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
         try:
             secret_hash = self.get_secret_hash(username)
             result = self.initiate_auth(client, username, password, secret_hash)
-            id_token = result['AuthenticationResult']['IdToken']
+            id_token = result["AuthenticationResult"]["IdToken"]
             claims = self.verify_token(id_token)
             if claims:
                 return self.get_or_create_user(claims, username)
         except Exception as e:
-            logger.error(f"Authentication failed: {str(e)}") 
+            logger.error(f"Authentication failed: {str(e)}")
             return None
 
     def initiate_auth(self, client, username, password, secret_hash):
         return client.admin_initiate_auth(
             UserPoolId=settings.COGNITO_USER_POOL_ID,
             ClientId=settings.COGNITO_APP_CLIENT_ID,
-            AuthFlow='ADMIN_NO_SRP_AUTH',
+            AuthFlow="ADMIN_NO_SRP_AUTH",
             AuthParameters={
-                'USERNAME': username,
-                'PASSWORD': password,
-                'SECRET_HASH': secret_hash
-            }
+                "USERNAME": username,
+                "PASSWORD": password,
+                "SECRET_HASH": secret_hash,
+            },
         )
 
     def verify_token(self, id_token):
@@ -49,9 +51,9 @@ class CognitoBackend(BaseBackend):
             return None
 
     def get_or_create_user(self, claims, username):
-        email = claims.get('email')
-        given_name = claims.get('given_name')
-        family_name = claims.get('family_name')
+        email = claims.get("email")
+        given_name = claims.get("given_name")
+        family_name = claims.get("family_name")
         try:
             user = User.objects.get(username=username)
         except ObjectDoesNotExist:
@@ -59,7 +61,7 @@ class CognitoBackend(BaseBackend):
                 username=username,
                 email=email,
                 first_name=given_name,
-                last_name=family_name
+                last_name=family_name,
             )
         return user
 
@@ -72,7 +74,9 @@ class CognitoBackend(BaseBackend):
     @staticmethod
     def get_secret_hash(username, client_id, client_secret):
         message = username + client_id
-        dig = hmac.new(client_secret.encode('UTF-8'),
-                       msg=message.encode('UTF-8'),
-                       digestmod=hashlib.sha256).digest()
+        dig = hmac.new(
+            client_secret.encode("UTF-8"),
+            msg=message.encode("UTF-8"),
+            digestmod=hashlib.sha256,
+        ).digest()
         return base64.b64encode(dig).decode()
