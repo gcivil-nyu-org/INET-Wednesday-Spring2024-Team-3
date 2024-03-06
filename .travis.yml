@@ -12,6 +12,7 @@ env:
     COGNITO_APP_CLIENT_SECRET:
       secure: XIZUhjkDo8eNTmgpNIA9g2LiCA33SJlyiKedgZehGiRGdNT/Ic9E993k/SMGWY0lkq/dRE6AJ+fPnMlO90dfiNSK1s6WDaFHQDln7/3+WqpeToouyw5Gby+Y+I/n3RCRkvpxVXjGH0HQU4GjWrduUZ+/JPe/akfxzQmdwY2rPvGInjNr/D9HvIaa3nRv99emKjqERZbIKl+OrDdx3Y6M0E7+Mt2+IJTjv5ds3szfdmjkCNo0AdczINpX+E6ZELWD3S3yKniiiwg4ChYbNSer5ZisYDb6+SsuTBAtkgZspAz7h9iNvAC7sMRk2PvGnfdkQltJZH0jAClnRSGe2UIXkocGxCxNGN6S2Q1gP8Vu0N6ZxCcfW2IfBFHWHuQg/Zb0GZzIycq+d9cBz4H03l32jyDpoLCsJNqIvtPZl6hMGQGRr1RcbU1AnAjR44Z+B1tqAFeAxbB99L/dNV/3Aszlyhod5NVoPnOt+BPggeMJSfMIm17X7ea4/Clwfg5sbRqX08d9nrT47OQzZkgQ7mDRRVcufBJBDbOKTuPD+GhmfoUQIDucrpZvJND++i3VQ5/qPf4SYSGkUUtEhhnqeP3m5yZktfKhrYrFMxhkkFSi6XHSrHEcjM0sd23v2RqFdmQsu1GiFtnWi2JiMxePQ7A6iA3Kgj6pT4sc/fgBj19g2+Q=
 
+
 install:
 - cd taxiapp
 - pip install -r requirements.txt
