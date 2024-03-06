@@ -3,7 +3,7 @@ env:
   global:
     #AWS Secret Access Key
     - secure: RD/vZFd5yiyTKzvNwwRmoEwLVwOIp2QRTmB53vGCXwonhwlJdyNqc45M+gHxdUmHpyFMDi8bCAnt47gapn0NGHIn08O4zDuLdMi4711hCwaUXKToLFC8rdzZxmnDUfKTKloq2qPVlV3E3uOuQcdJJXL5yWLG1VMcaiI1koY7Obm92IALNKRezj9KSMx2f3bNpV+XSKNU/qrgGUnkMSramhIYp3z2tedKSMutRd4o3Q/N9CkqGBPuPgJxIC5aolIxSEbh7IRL26YdG9qo9a7drQEW4AgB2iQTlF5GnkMZAPvv8UA0AAJltX56m54qRwd+SjSGSJZ1vi403vNhmOBYsFHgFkI9wzuxIMsgbd2HgE0EvHUbEelyvj6Xhwz2DWuIRXffssJ20qkmEUdxHYHG+8D4TTJN2nCD7KyTJsMoa+w4vC8mewmLVXVfjA2eFS9ts/6jAHdJ7tFE4nvsoFfksiilsgHPGfJtDFh6RNT3CKCFqPqGUJw2yieMQCs2cT5KPRw3uQgxDsWg1Ic8RtE1Cwd22ljoxhdPnu+UnZYwWpln1g5rwN7rD0kfz6VM/k01EYpU+ZxuG2vt5gGhRlm7kxl/P80Py5Hf42zRSGN7wkoajHR0EunB+yDkPk+dYT0bmkkhCYb54zvqHKzqm1ICpJomqxMPG4d4GnCgzeJY5d8=
-    - SECRET_KEY = $"SECRET_KEY"
+    - SECRET_KEY = $SECRET_KEY
     - COGNITO_DOMAIN=https://taxiapp.auth.us-east-1.amazoncognito.com
     - COGNITO_USER_POOL_ID=us-east-1_xjtJDp8bd
     - COGNITO_APP_CLIENT_ID=4534h0um83kap0o29gqt5heids
