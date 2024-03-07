@@ -9,24 +9,24 @@ env:
     - COGNITO_APP_CLIENT_SECRET=$COGNITO_APP_CLIENT_SECRET
 
 install:
-- cd taxiapp
-- pip install -r requirements.txt
+  - cd taxiapp
+  - pip install -r requirements.txt
 before_script:
-- python manage.py migrate
+  - python manage.py migrate
 script:
-- black --check .
-- flake8 .
-- coverage run --source=taxiapp manage.py test
-- coverage report
+  - black --check .
+  - flake8 .
+  - coverage run --source=taxiapp manage.py test
+  - coverage report
 after_script:
-- coveralls
+  - coveralls
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIA6ASHD2VT2VLIVJUW
   secret_access_key: $AWS_SECRET_KEY
   region: us-east-1
   app: taxiapp
-  env: taxiapp-env
+  env: taxiapp-dev
   bucket_name: elasticbeanstalk-us-east-1-963295565159
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
@@ -34,4 +34,3 @@ deploy:
       - master
       - testbranch
   skip_cleanup: 'true'
-  
