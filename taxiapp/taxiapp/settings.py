@@ -5,13 +5,30 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# env = environ.Env()
-# environ.Env.read_env(env_file="secrets.env")
+"""
+#############Uncomment for local development, add secrets.env local file###############
+env = environ.Env()
+environ.Env.read_env(env_file="secrets.env")
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: keep the secret key used in production secret!
+COGNITO_DOMAIN = env("COGNITO_DOMAIN")
+COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
+COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
+COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
+COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
+"""
+
+#############Uncomment for travis deployment##############
 SECRET_KEY = os.environ["SECRET_KEY"]
-# SECRET_KEY = env("SECRET_KEY")
+COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]
+COGNITO_APP_CLIENT_SECRET = os.environ["COGNITO_APP_CLIENT_SECRET"]
+COGNITO_USER_POOL_ID = os.environ["COGNITO_USER_POOL_ID"]
+COGNITO_APP_CLIENT_ID = os.environ["COGNITO_APP_CLIENT_ID"]
+COGNITO_AWS_REGION = os.environ["COGNITO_AWS_REGION"]
+COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
+
+###########################################################
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -25,20 +42,7 @@ AUTHENTICATION_BACKENDS = [
     "taxiapp.cognito_backend.CognitoBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
-"""
-COGNITO_DOMAIN = env("COGNITO_DOMAIN")
-COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
-COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
-COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
-COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 
-"""
-COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]
-COGNITO_APP_CLIENT_SECRET = os.environ["COGNITO_APP_CLIENT_SECRET"]
-COGNITO_USER_POOL_ID = os.environ["COGNITO_USER_POOL_ID"]
-COGNITO_APP_CLIENT_ID = os.environ["COGNITO_APP_CLIENT_ID"]
-COGNITO_AWS_REGION = os.environ["COGNITO_AWS_REGION"]
-COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 
 
 INSTALLED_APPS = [
