@@ -1,13 +1,9 @@
 from pathlib import Path
 import environ
 import os
-import yaml
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-yaml_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", ".travis.yml")
-)
 
 """
 #############Uncomment for local development, add secrets.env local file###############
