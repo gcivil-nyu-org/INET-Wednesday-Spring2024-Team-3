@@ -1,10 +1,11 @@
 from pathlib import Path
 import environ
 import os
+import yaml
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+print(BASE_DIR)
 """
 #############Uncomment for local development, add secrets.env local file###############
 env = environ.Env()
@@ -20,6 +21,15 @@ COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 """
 
 #############Uncomment for travis deployment##############
+yml_data = yaml.safe_load(os.path.join(BASE_DIR, '.travis.yml'))
+os.environ["SECRET_KEY"] = yml_data["SECRET_KEY"]
+os.environ["COGNITO_DOMAIN"] = yml_data["COGNITO_DOMAIN"]
+os.environ["COGNITO_APP_CLIENT_SECRET"] = yml_data["COGNITO_APP_CLIENT_SECRET"]
+os.environ["COGNITO_USER_POOL_ID"] = yml_data["COGNITO_USER_POOL_ID"]
+os.environ["COGNITO_APP_CLIENT_ID"] = yml_data["COGNITO_APP_CLIENT_ID"]
+os.environ["COGNITO_AWS_REGION"] = yml_data["COGNITO_AWS_REGION"]
+
+
 SECRET_KEY = os.environ["SECRET_KEY"]
 COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]
 COGNITO_APP_CLIENT_SECRET = os.environ["COGNITO_APP_CLIENT_SECRET"]
