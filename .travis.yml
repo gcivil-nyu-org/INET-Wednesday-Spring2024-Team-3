@@ -6,8 +6,7 @@ env:
   - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
   - COGNITO_AWS_REGION="us-east-1"
   - COGNITO_APP_CLIENT_SECRET="194t8b57d9uikl7f19pnih83vn8l2i19mhkm5rpjes5irnthrtuk"
-  - SECRET_KEY:
-    - secure: mTANvuksm8E/7gnoC61k1IuD/EA9YGoioyn624nIU+8AMpMOm86alCiHc/0gEGJZgs2aDC/JmRB2i7GxQGrwREe8R34d2S1bkmtHqkKSB4MgnjmAxg605oLfZ31tCbIAnfcbvd4a5FQR6dXCpOPE/jVg8R16Zt+BrXBUg6059HJbhsRWkxb2Dkl6m0us4p76cnnqX8fnZ5QbEn0ggeJGbpE53/Uf1RXgBKtTyYHdHTqMbnxJ1LZ/2Z1r6K4g+vPtnhZwrCcMHw+ApDr5pjrePo9BB3K27fa1IgZ2rRUL879qWQ68IpraZSLszfZsyz6qabwi5XMtbsFR71wXcma+efNWYbFlfv9fAoLef0GRmOiO0up+UOSqNLE5I8bx8b/howsAX0uKKJCebtd2DDeHcShDJR9Ue3W5ceMVBvQCO6BhZKnWt6UDH4o9GzE2d7mUyAbGbqYQLb0pepfQEU2fhAvP0Nm1Pm6puljnNQPlHOUJM1bc5ZfVpztoQvR5Trxk06iI2ejRWc+hCiHxKtxAgHNGk/BuWG74pLkLF+uA5f58Ndspe+bIE52HEfxWUGPxgu/p9+sIYVOs+jgvlntwugygKHd+44WcZsvBirshgVXW6/VMyeU1CJmKkLIYsmYBitqAYXoX/wOVuQJQ+Ggqvr8Y0h1iUxAq7R6qTnFNsUM=
+  - SECRET_KEY=$SECRET_KEY
 install:
 - cd taxiapp
 - pip install -r requirements.txt
@@ -23,12 +22,11 @@ after_script:
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIA6ASHD2VT2VLIVJUW
-  secret_access_key: "$AWS_SECRET_KEY"
+  secret_access_key: $AWS_SECRET_KEY
   region: us-east-1
   app: taxiapp
   env:
-  - SECRET_KEY:
-    - secure: mTANvuksm8E/7gnoC61k1IuD/EA9YGoioyn624nIU+8AMpMOm86alCiHc/0gEGJZgs2aDC/JmRB2i7GxQGrwREe8R34d2S1bkmtHqkKSB4MgnjmAxg605oLfZ31tCbIAnfcbvd4a5FQR6dXCpOPE/jVg8R16Zt+BrXBUg6059HJbhsRWkxb2Dkl6m0us4p76cnnqX8fnZ5QbEn0ggeJGbpE53/Uf1RXgBKtTyYHdHTqMbnxJ1LZ/2Z1r6K4g+vPtnhZwrCcMHw+ApDr5pjrePo9BB3K27fa1IgZ2rRUL879qWQ68IpraZSLszfZsyz6qabwi5XMtbsFR71wXcma+efNWYbFlfv9fAoLef0GRmOiO0up+UOSqNLE5I8bx8b/howsAX0uKKJCebtd2DDeHcShDJR9Ue3W5ceMVBvQCO6BhZKnWt6UDH4o9GzE2d7mUyAbGbqYQLb0pepfQEU2fhAvP0Nm1Pm6puljnNQPlHOUJM1bc5ZfVpztoQvR5Trxk06iI2ejRWc+hCiHxKtxAgHNGk/BuWG74pLkLF+uA5f58Ndspe+bIE52HEfxWUGPxgu/p9+sIYVOs+jgvlntwugygKHd+44WcZsvBirshgVXW6/VMyeU1CJmKkLIYsmYBitqAYXoX/wOVuQJQ+Ggqvr8Y0h1iUxAq7R6qTnFNsUM=
+  - SECRET_KEY=$SECRET_KEY
   - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
   - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
   - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
