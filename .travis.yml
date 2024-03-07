@@ -15,7 +15,7 @@ install:
 before_script:
   - python manage.py migrate
 script:
-  - print(SECRET_KEY)
+  - ECHO SECRET_KEY
   - black --check .
   - flake8 .
   - coverage run --source=taxiapp manage.py test
