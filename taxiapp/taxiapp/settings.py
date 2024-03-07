@@ -20,6 +20,7 @@ COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 """
 
 # #############Uncomment for travis deployment##############
+print(os.environ["SECRET_KEY"])
 SECRET_KEY = os.environ["SECRET_KEY"]
 COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]
 COGNITO_APP_CLIENT_SECRET = os.environ["COGNITO_APP_CLIENT_SECRET"]
