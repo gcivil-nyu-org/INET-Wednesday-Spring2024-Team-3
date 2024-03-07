@@ -3,11 +3,11 @@ language: python
 env:
   global:
     - SECRET_KEY=$SECRET_KEY
-    - COGNITO_DOMAIN=$COGNITO_DOMAIN
-    - COGNITO_USER_POOL_ID=$COGNITO_USER_POOL_ID
-    - COGNITO_APP_CLIENT_ID=$COGNITO_APP_CLIENT_ID
-    - COGNITO_AWS_REGION=$COGNITO_AWS_REGION
-    - COGNITO_APP_CLIENT_SECRET=$COGNITO_APP_CLIENT_SECRET
+    - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
+    - COGNITO_USER_POOL_ID=us-east-1_xjtJDp8bd
+    - COGNITO_APP_CLIENT_ID=4534h0um83kap0o29gqt5heids
+    - COGNITO_AWS_REGION=us-east-1
+    - COGNITO_APP_CLIENT_SECRET=194t8b57d9uikl7f19pnih83vn8l2i19mhkm5rpjes5irnthrtuk
 
 install:
   - cd taxiapp
@@ -28,7 +28,7 @@ deploy:
   region: us-east-1
   app: taxiapp
   env: taxiapp-dev
-  bucket_name: $BUCKET_NAME
+  bucket_name: elasticbeanstalk-us-east-1-963295565159
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
     branch:
