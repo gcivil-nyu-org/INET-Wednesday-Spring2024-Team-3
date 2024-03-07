@@ -18,7 +18,7 @@ script:
   - black --check .
   - flake8 .
   - coverage run --source=taxiapp manage.py test
-- coverage report
+  - coverage report
 after_script:
   - coveralls
 deploy:
