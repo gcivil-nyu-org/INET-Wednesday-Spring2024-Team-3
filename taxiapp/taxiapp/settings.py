@@ -23,7 +23,7 @@ COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
 COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 """
 
-#############Uncomment for travis deployment##############
+# #############Uncomment for travis deployment##############
 SECRET_KEY = os.environ["SECRET_KEY"]
 COGNITO_DOMAIN = os.environ["COGNITO_DOMAIN"]
 COGNITO_APP_CLIENT_SECRET = os.environ["COGNITO_APP_CLIENT_SECRET"]
@@ -32,7 +32,7 @@ COGNITO_APP_CLIENT_ID = os.environ["COGNITO_APP_CLIENT_ID"]
 COGNITO_AWS_REGION = os.environ["COGNITO_AWS_REGION"]
 COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 
-###########################################################
+# ##########################################################
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
