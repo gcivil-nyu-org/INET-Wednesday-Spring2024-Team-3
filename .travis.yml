@@ -34,3 +34,10 @@ deploy:
       - master
       - testbranch
   skip_cleanup: 'true'
+  env:
+    - SECRET_KEY=$SECRET_KEY
+    - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
+    - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
+    - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
+    - COGNITO_AWS_REGION="us-east-1"
+    - COGNITO_APP_CLIENT_SECRET=$COGNITO_APP_CLIENT_SECRET
