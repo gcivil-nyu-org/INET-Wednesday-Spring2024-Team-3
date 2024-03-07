@@ -3,7 +3,7 @@ language: python
 env:
   global:
     - SECRET_KEY=$SECRET_KEY
-    - COGNITO_DOMAIN=https://taxiapp.auth.us-east-1.amazoncognito.com
+    - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
     - COGNITO_USER_POOL_ID=us-east-1_xjtJDp8bd
     - COGNITO_APP_CLIENT_ID=4534h0um83kap0o29gqt5heids
     - COGNITO_AWS_REGION=us-east-1
@@ -15,7 +15,6 @@ install:
 before_script:
   - python manage.py migrate
 script:
-  - echo $SECRET_KEY
   - black --check .
   - flake8 .
   - coverage run --source=taxiapp manage.py test
