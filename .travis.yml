@@ -1,41 +1,36 @@
 language: python
 env:
   global:
-  - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
-  - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
-  - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
-  - COGNITO_AWS_REGION="us-east-1"
-  - COGNITO_APP_CLIENT_SECRET="194t8b57d9uikl7f19pnih83vn8l2i19mhkm5rpjes5irnthrtuk"
-  - SECRET_KEY=$SECRET_KEY
+    - SECRET_KEY=$SECRET_KEY
+    - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
+    - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
+    - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
+    - COGNITO_AWS_REGION="us-east-1"
+    - COGNITO_APP_CLIENT_SECRET="194t8b57d9uikl7f19pnih83vn8l2i19mhkm5rpjes5irnthrtuk"
+
 install:
-- cd taxiapp
-- pip install -r requirements.txt
+  - cd taxiapp
+  - pip install -r requirements.txt
 before_script:
-- python manage.py migrate
+  - python manage.py migrate
 script:
-- black --check .
-- flake8 .
-- coverage run --source=taxiapp manage.py test
+  - black --check .
+  - flake8 .
+  - coverage run --source=taxiapp manage.py test
 - coverage report
 after_script:
-- coveralls
+  - coveralls
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIA6ASHD2VT2VLIVJUW
   secret_access_key: $AWS_SECRET_KEY
   region: us-east-1
   app: taxiapp
-  env:
-  - SECRET_KEY=$SECRET_KEY
-  - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
-  - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
-  - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
-  - COGNITO_AWS_REGION="us-east-1"
-  - COGNITO_APP_CLIENT_SECRET="194t8b57d9uikl7f19pnih83vn8l2i19mhkm5rpjes5irnthrtuk"
+  env: taxiapp-env
   bucket_name: elasticbeanstalk-us-east-1-963295565159
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
     branch:
-    - master
-    - testbranch
+      - master
+      - testbranch
   skip_cleanup: 'true'
