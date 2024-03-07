@@ -1,43 +1,43 @@
 language: python
 env:
   global:
-    - SECRET_KEY=$SECRET_KEY
-    - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
-    - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
-    - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
-    - COGNITO_AWS_REGION="us-east-1"
-    - COGNITO_APP_CLIENT_SECRET=$COGNITO_APP_CLIENT_SECRET
-
+  - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
+  - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
+  - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
+  - COGNITO_AWS_REGION="us-east-1"
+  - COGNITO_APP_CLIENT_SECRET="194t8b57d9uikl7f19pnih83vn8l2i19mhkm5rpjes5irnthrtuk"
+  SECRET_KEY:
+    - secure: ZNAF6Gahox1f8b9p0KmUFylXZf9BdBcGcOnK2AF7ElgqNiyhEbvpF+YhNeH6nEs6ORKYyl+cGjP/dC6KTu+C8FnsYQ4Zq3t04GCXVtq9UpJKh8UGjUAXU6aH6JodqKO8iEVHBfuYqbVSwuAj2w+wkuo8XAtEd5sMDX5mlgYzh36VHUM+syy3TOG7V7t6sCXcjks4tx7AQ0a6LdFKhU9BKE7SuJ6QDIXC6O3ZZB+EjjzbAY1iPWAlrwSPOLxxAEU2a5Xg32/rS4BxlFe6/2iZoOddbGcjUZmRkPmd89jFM58eM81WLFTpgoWzLt+JiIQUsd0NzL93jh96rdENPW3u6TdVuMzZ/YWxwuQKp2FHVc0giSV9iTwPBTdFhUFQ+pOXHDXVIWKMMW+tjOInjOTsAz1RD3/zhN5PhEgFrUmTjhH6iPHCj0h/6c6mDOfuqMuUjor3t6lS/XjhpdE1hnpu4ndSqTB5I5k9/3R/OVgg4yIKsrYpCS2YuxcsZuUAFAfIH9Z57G/bZLLguca/uA0ji/OR9D2qWwbEbJiaNfb9BP++TS/hv8dzShGm+ehu1RJXtqo91dXeE0vi2HjJUTl2B+N/j54j6a5LGQgQBXeKeVufw+9H8XCI09rghIMdkfsY8yVTS8KMUZpV22Gk0gg3GYFyaspKvbNhBvLv1s9+ZDM=
 install:
-  - cd taxiapp
-  - pip install -r requirements.txt
+- cd taxiapp
+- pip install -r requirements.txt
 before_script:
-  - python manage.py migrate
+- python manage.py migrate
 script:
-  - black --check .
-  - flake8 .
-  - coverage run --source=taxiapp manage.py test
-  - coverage report
+- black --check .
+- flake8 .
+- coverage run --source=taxiapp manage.py test
+- coverage report
 after_script:
-  - coveralls
+- coveralls
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIA6ASHD2VT2VLIVJUW
   secret_access_key: $AWS_SECRET_KEY
   region: us-east-1
   app: taxiapp
-  env: taxiapp-dev
+  env:
+  - SECRET_KEY:
+    - secure: ZNAF6Gahox1f8b9p0KmUFylXZf9BdBcGcOnK2AF7ElgqNiyhEbvpF+YhNeH6nEs6ORKYyl+cGjP/dC6KTu+C8FnsYQ4Zq3t04GCXVtq9UpJKh8UGjUAXU6aH6JodqKO8iEVHBfuYqbVSwuAj2w+wkuo8XAtEd5sMDX5mlgYzh36VHUM+syy3TOG7V7t6sCXcjks4tx7AQ0a6LdFKhU9BKE7SuJ6QDIXC6O3ZZB+EjjzbAY1iPWAlrwSPOLxxAEU2a5Xg32/rS4BxlFe6/2iZoOddbGcjUZmRkPmd89jFM58eM81WLFTpgoWzLt+JiIQUsd0NzL93jh96rdENPW3u6TdVuMzZ/YWxwuQKp2FHVc0giSV9iTwPBTdFhUFQ+pOXHDXVIWKMMW+tjOInjOTsAz1RD3/zhN5PhEgFrUmTjhH6iPHCj0h/6c6mDOfuqMuUjor3t6lS/XjhpdE1hnpu4ndSqTB5I5k9/3R/OVgg4yIKsrYpCS2YuxcsZuUAFAfIH9Z57G/bZLLguca/uA0ji/OR9D2qWwbEbJiaNfb9BP++TS/hv8dzShGm+ehu1RJXtqo91dXeE0vi2HjJUTl2B+N/j54j6a5LGQgQBXeKeVufw+9H8XCI09rghIMdkfsY8yVTS8KMUZpV22Gk0gg3GYFyaspKvbNhBvLv1s9+ZDM=
+  - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
+  - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
+  - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
+  - COGNITO_AWS_REGION="us-east-1"
+  - COGNITO_APP_CLIENT_SECRET="194t8b57d9uikl7f19pnih83vn8l2i19mhkm5rpjes5irnthrtuk"
   bucket_name: elasticbeanstalk-us-east-1-963295565159
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
     branch:
-      - master
-      - testbranch
+    - master
+    - testbranch
   skip_cleanup: 'true'
-  env:
-    - SECRET_KEY=$SECRET_KEY
-    - COGNITO_DOMAIN="https://taxiapp.auth.us-east-1.amazoncognito.com"
-    - COGNITO_USER_POOL_ID="us-east-1_xjtJDp8bd"
-    - COGNITO_APP_CLIENT_ID="4534h0um83kap0o29gqt5heids"
-    - COGNITO_AWS_REGION="us-east-1"
-    - COGNITO_APP_CLIENT_SECRET=$COGNITO_APP_CLIENT_SECRET
