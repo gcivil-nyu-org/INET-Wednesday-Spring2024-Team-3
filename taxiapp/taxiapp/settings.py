@@ -42,7 +42,7 @@ ALLOWED_HOSTS = ["127.0.0.1", "taxiapp-dev2.us-east-1.elasticbeanstalk.com"]
 AUTHENTICATION_BACKENDS = [
     "taxiapp.cognito_backend.CognitoBackend",
     "django.contrib.auth.backends.ModelBackend",
-    'taxiapp.cognito_auth.CognitoAuthenticationBackend'
+    "taxiapp.cognito_auth.CognitoAuthenticationBackend",
 ]
 
 
