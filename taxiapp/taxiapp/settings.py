@@ -1,6 +1,7 @@
 from pathlib import Path
 import environ
 import os
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +21,18 @@ COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 """
 
 # #############Uncomment for travis deployment##############
+logger = logging.getLogger(__name__)
 SECRET_KEY = os.environ.get("SECRET_KEY")
 COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
+logger.debug(f"COGNITO_DOMAIN: {COGNITO_DOMAIN}")
 COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
+logger.debug(f"COGNITO_APP_CLIENT_SECRET: {COGNITO_APP_CLIENT_SECRET}")
 COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
+logger.debug(f"COGNITO_USER_POOL_ID: {COGNITO_USER_POOL_ID}")
 COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
+logger.debug(f"COGNITO_APP_CLIENT_ID: {COGNITO_APP_CLIENT_ID}")
 COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
+logger.debug(f"COGNITO_AWS_REGION: {COGNITO_AWS_REGION}")
 COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 
 
