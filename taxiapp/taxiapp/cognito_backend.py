@@ -20,6 +20,7 @@ COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
 COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
 COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 
+
 class CognitoBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None):
         client = boto3.client("cognito-idp", region_name=COGNITO_AWS_REGION)
