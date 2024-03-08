@@ -9,21 +9,13 @@ from authlib.jose import JsonWebKey, jwt
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-import os
 
 logger = logging.getLogger(__name__)
-SECRET_KEY = os.environ.get("SECRET_KEY")
-COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
-COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
-COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
-COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
-COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
-COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 
 
 class CognitoBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None):
-        client = boto3.client("cognito-idp", region_name=COGNITO_AWS_REGION)
+        client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
         try:
             secret_hash = self.get_secret_hash(username)
             result = self.initiate_auth(client, username, password, secret_hash)
@@ -37,8 +29,8 @@ class CognitoBackend(BaseBackend):
 
     def initiate_auth(self, client, username, password, secret_hash):
         return client.admin_initiate_auth(
-            UserPoolId=COGNITO_USER_POOL_ID,
-            ClientId=COGNITO_APP_CLIENT_ID,
+            UserPoolId=settings.COGNITO_USER_POOL_ID,
+            ClientId=settings.COGNITO_APP_CLIENT_ID,
             AuthFlow="ADMIN_NO_SRP_AUTH",
             AuthParameters={
                 "USERNAME": username,
@@ -48,7 +40,7 @@ class CognitoBackend(BaseBackend):
         )
 
     def verify_token(self, id_token):
-        jwks = requests.get(COGNITO_PUBLIC_KEYS_URL).json()
+        jwks = requests.get(settings.COGNITO_PUBLIC_KEYS_URL).json()
         key = JsonWebKey.import_key_set(jwks)
         claims = jwt.decode(id_token, key)
         try:
