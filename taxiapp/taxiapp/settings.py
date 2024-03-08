@@ -1,7 +1,6 @@
 from pathlib import Path
 import environ
 import os
-import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +20,6 @@ COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 """
 
 # #############Uncomment for travis deployment##############
-logger = logging.getLogger(__name__)
 SECRET_KEY = os.environ.get("SECRET_KEY")
 COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
 COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
@@ -42,7 +40,6 @@ ALLOWED_HOSTS = ["127.0.0.1", "taxiapp-dev2.us-east-1.elasticbeanstalk.com"]
 AUTHENTICATION_BACKENDS = [
     "taxiapp.cognito_backend.CognitoBackend",
     "django.contrib.auth.backends.ModelBackend",
-    "taxiapp.cognito_auth.CognitoAuthenticationBackend",
 ]
 
 
