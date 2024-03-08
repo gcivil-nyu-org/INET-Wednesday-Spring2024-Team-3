@@ -1,5 +1,13 @@
 language: python
-
+env:
+  global:
+    - SECRET_KEY=$SECRET_KEY
+    - COGNITO_DOMAIN=$COGNITO_DOMAIN
+    - COGNITO_USER_POOL_ID=$COGNITO_USER_POOL_ID
+    - COGNITO_APP_CLIENT_ID=$COGNITO_APP_CLIENT_ID
+    - COGNITO_AWS_REGION=$COGNITO_AWS_REGION
+    - COGNITO_APP_CLIENT_SECRET=$COGNITO_APP_CLIENT_SECRET
+    
 install:
 - cd taxiapp
 - pip install -r requirements.txt
