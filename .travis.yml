@@ -19,10 +19,19 @@ script:
 - coverage run --source=taxiapp manage.py test
 - coverage report
 after_script:
-  - echo COGNITO_DOMAIN $COGNITO_DOMAIN
-  - echo COGNITO_USER_POOL_ID $COGNITO_USER_POOL_ID
-  - echo COGNITO_APP_CLIENT_ID $COGNITO_APP_CLIENT_ID
-  - echo COGNITO_AWS_REGION $COGNITO_AWS_REGION
-  - echo COGNITO_APP_CLIENT_SECRET $COGNITO_APP_CLIENT_SECRET
   - coveralls
 
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: $AWS_KEY
+  secret_access_key: $AWS_SECRET_KEY
+  region: us-east-1
+  app: taxiapp
+  env: taxiapp-dev
+  bucket_name: elasticbeanstalk-us-east-1-963295565159
+  on:
+    repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
+    branch: 
+      - master
+      - test-branch
+  skip_cleanup: 'true'

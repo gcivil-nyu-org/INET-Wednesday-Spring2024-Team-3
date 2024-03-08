@@ -41,14 +41,7 @@ AUTHENTICATION_BACKENDS = [
     "taxiapp.cognito_backend.CognitoBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
-"""
-COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
-COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
-COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
-COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
-COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
-COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
-"""
+
 
 INSTALLED_APPS = [
     "taxiapp",
