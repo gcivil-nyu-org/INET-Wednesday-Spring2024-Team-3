@@ -28,6 +28,7 @@ COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
 COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
 COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 
+# ##########################################################
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
