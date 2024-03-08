@@ -34,4 +34,4 @@ deploy:
     branch: 
       - master
       - test-branch
-  skip_cleanup: 'true'
+  cleanup: 'false'
