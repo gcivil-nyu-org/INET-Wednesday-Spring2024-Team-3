@@ -6,7 +6,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 """
-#############Uncomment for local development, add secrets.env local file###############
+# ############Uncomment for local development, add secrets.env local file###############
 env = environ.Env()
 environ.Env.read_env(env_file="secrets.env")
 SECRET_KEY = env("SECRET_KEY")
