@@ -77,9 +77,26 @@
         }
     </script>
 </head>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <script>
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var errorMessage = document.getElementById("error-message");
 
+            if (password.length < 8) {
+                errorMessage.innerHTML = "Password must be at least 8 characters long.";
+                return false;
+            }
+
+            errorMessage.innerHTML = "";
+            return true;
+        }
+    </script>
+</head>
 <body>
-
     <form method="post" action="{% url 'login' %}" onsubmit="return validatePassword()">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username" required>
@@ -88,7 +105,7 @@
         {% if messages %}
         <ul class="messages">
             {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
             {% endfor %}
         </ul>
         {% endif %}
@@ -105,5 +122,4 @@
         <p>NYU Tandon School of Engineering</p>
     </footer>
 </body>
-
 </html>

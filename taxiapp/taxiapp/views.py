@@ -1,10 +1,17 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
 from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+from django.contrib.auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.views.generic import FormView
+from django import forms
 import boto3
 from django.conf import settings
-from django.contrib import messages
 from botocore.exceptions import ClientError
 import hmac
 import hashlib
@@ -14,27 +21,35 @@ import re
 
 logger = logging.getLogger(__name__)
 
+class LoginForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+    username = forms.CharField(max_length=150)
+    password = forms.CharField(widget=forms.PasswordInput)
 
-def login_view(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
+class CustomLoginView(LoginView):
+    template_name = 'login.html'
+    form_class = LoginForm
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request
+        return kwargs
+    
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(request=self.request, username=username, password=password)
         if user is not None:
-            login(request, user, backend="taxiapp.cognito_backend.CognitoBackend")
-            logger.debug(f"User {username} logged in: {request.user.is_authenticated}")
+            login(self.request, user, backend='taxiapp.cognito_backend.CognitoBackend')
+            logger.debug(f"User {username} logged in: {self.request.user.is_authenticated}")
             return redirect("/")
         else:
             try:
                 logger.error(f"Authentication failed for user {username}")
-                client = boto3.client(
-                    "cognito-idp", region_name=settings.COGNITO_AWS_REGION
-                )
-                secret_hash = get_secret_hash(
-                    username,
-                    settings.COGNITO_APP_CLIENT_ID,
-                    settings.COGNITO_APP_CLIENT_SECRET,
-                )
+                client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
+                secret_hash = get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
                 response = client.admin_initiate_auth(
                     UserPoolId=settings.COGNITO_USER_POOL_ID,
                     ClientId=settings.COGNITO_APP_CLIENT_ID,
@@ -48,78 +63,75 @@ def login_view(request):
                 id_token = response["AuthenticationResult"]["IdToken"]
                 access_token = response["AuthenticationResult"]["AccessToken"]
 
-                # Store tokens in session, cookies, or send to client
-                #  May change in the future
-                request.session["id_token"] = id_token
-                request.session["access_token"] = access_token
+                self.request.session["id_token"] = id_token
+                self.request.session["access_token"] = access_token
 
-                # Create or update Django user and log in
                 django_user, created = User.objects.get_or_create(username=username)
-                login(
-                    request,
-                    django_user,
-                    backend="taxiapp.cognito_backend.CognitoBackend",
-                )
-                # login(request, django_user, backend='django.contrib.auth.backends.ModelBackend')
-
+                login(self.request, django_user, backend='taxiapp.cognito_backend.CognitoBackend')
+                
                 return redirect("/")
 
             except client.exceptions.UserNotConfirmedException:
-                messages.error(
-                    request,
-                    "User account is not confirmed. Please check your email for the confirmation code.",
-                )
+                messages.error(self.request, "User account is not confirmed. Please check your email for the confirmation code.")
                 return redirect("confirm")
             except ClientError as e:
                 error_code = e.response["Error"]["Code"]
                 if error_code == "NotAuthorizedException":
-                    messages.error(request, "Invalid username or password.")
+                    messages.error(self.request, "Invalid username or password.")
                 elif error_code == "UserNotFoundException":
-                    messages.error(request, "User does not exist.")
+                    messages.error(self.request, "User does not exist.")
                 else:
-                    messages.error(request, f"An error occurred: {error_code}.")
-                return render(request, "login.html", {"error": "Invalid credentials"})
+                    messages.error(self.request, f"An error occurred: {error_code}.")
+                return self.form_invalid(form)
+class CustomLogoutView(LogoutView):
+    next_page = '/'
 
-    return render(request, "login.html")
+    def dispatch(self, request, *args, **kwargs):
+        if request.method == 'GET':
+            return self.get(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
+    def get(self, request, *args, **kwargs):
+        return HttpResponseRedirect(self.next_page)
 
-# Registration view
-def register_view(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        confirm_password = request.POST.get("confirm_password")
-        full_name = request.POST.get("full_name", "").split()
+class RegisterForm(forms.Form):
+    username = forms.CharField(max_length=150)
+    email = forms.EmailField()
+    password = forms.CharField(widget=forms.PasswordInput)
+    confirm_password = forms.CharField(widget=forms.PasswordInput)
+    full_name = forms.CharField(max_length=255)
 
-        # Basic validation for full_name
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if password != confirm_password:
+            raise forms.ValidationError("Passwords do not match.")
+
+        full_name = cleaned_data.get("full_name", "").split()
         if len(full_name) < 2:
-            messages.error(
-                request, "Please enter your full name (both given and family name)."
-            )
-            return render(request, "register.html")
+            raise forms.ValidationError("Please enter your full name (both given and family name).")
+
+        if len(password) < 8 or not any(char.isdigit() for char in password) or not any(char.isupper() for char in password) or not any(char.islower() for char in password) or not any(char in "!@#$%^&*()_+" for char in password):
+            raise forms.ValidationError("Password does not meet the requirements.")
+        return cleaned_data
+
+class RegisterView(FormView):
+    template_name = 'register.html'
+    form_class = RegisterForm
+    success_url = reverse_lazy('confirm')
+
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        email = form.cleaned_data['email']
+        password = form.cleaned_data['password']
+        full_name = form.cleaned_data['full_name'].split()
 
         given_name = full_name[0]
         family_name = " ".join(full_name[1:])
-        # Check password confirmation
-        if password != confirm_password:
-            messages.error(request, "Passwords do not match.")
-            return render(request, "register.html")
 
-        # Password validation
-        if (
-            len(password) < 8
-            or not any(char.isdigit() for char in password)
-            or not any(char.isupper() for char in password)
-            or not any(char.islower() for char in password)
-            or not any(char in "!@#$%^&*()_+" for char in password)
-        ):
-            messages.error(request, "Password does not meet the requirements.")
-            return render(request, "register.html")
-
-        secret_hash = get_secret_hash(
-            username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET
-        )
+        secret_hash = get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
         client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
 
         try:
@@ -135,142 +147,34 @@ def register_view(request):
                 ],
             )
             messages.success(
-                request,
+                self.request,
                 "Registration successful. Please check your email to confirm your account.",
             )
-            return redirect("confirm")
+            return super().form_valid(form)
         except ClientError as e:
             if e.response["Error"]["Code"] == "UsernameExistsException":
-                messages.error(request, "A user with this username already exists.")
+                form.add_error('username', "A user with this username already exists.")
             else:
                 messages.error(
-                    request, "An error occurred: " + e.response["Error"]["Message"]
+                    self.request, "An error occurred: " + e.response["Error"]["Message"]
                 )
-            return render(request, "register.html")
+            return self.form_invalid(form)
 
-    return render(request, "register.html")
+class ConfirmForm(forms.Form):
+    username = forms.CharField(max_length=150)
+    confirmation_code = forms.CharField(max_length=6)
 
+class ConfirmView(FormView):
+    template_name = 'confirm.html'
+    form_class = ConfirmForm
+    success_url = reverse_lazy('login')
 
-def get_secret_hash(username, client_id, client_secret):
-    message = username + client_id
-    dig = hmac.new(
-        client_secret.encode("UTF-8"),
-        msg=message.encode("UTF-8"),
-        digestmod=hashlib.sha256,
-    ).digest()
-    return base64.b64encode(dig).decode()
-
-
-def home_view(request):
-    return render(request, "home.html")
-
-
-def reset_view(request):
-    step = "request"  # Default step
-
-    if request.method == "POST":
-        if "request_reset" in request.POST:  # Handling the initial reset request
-            user_identifier = request.POST.get("user_identifier", "").strip()
-
-            if not user_identifier:
-                messages.error(request, "Please enter a valid email or username.")
-            elif "@" in user_identifier and not re.match(
-                r"[^@]+@[^@]+\.[^@]+", user_identifier
-            ):
-                messages.error(request, "Please enter a valid email address.")
-            else:
-                try:
-                    client = boto3.client(
-                        "cognito-idp", region_name=settings.COGNITO_AWS_REGION
-                    )
-                    client.forgot_password(
-                        ClientId=settings.COGNITO_APP_CLIENT_ID,
-                        Username=user_identifier,
-                        SecretHash=get_secret_hash(
-                            user_identifier,
-                            settings.COGNITO_APP_CLIENT_ID,
-                            settings.COGNITO_APP_CLIENT_SECRET,
-                        ),
-                    )
-                    messages.success(
-                        request, "Password reset code sent. Please check your email."
-                    )
-                    step = "confirm"  # Move to confirmation step
-                except ClientError as e:
-                    logger.error(
-                        f"Error initiating password reset for {user_identifier}: {e}"
-                    )
-                    messages.error(
-                        request,
-                        "Failed to initiate password reset. Please try again later.",
-                    )
-
-        elif "confirm_reset" in request.POST:  # Handling the confirmation step
-            username = request.POST.get("username", "").strip()
-            verification_code = request.POST.get("verification_code", "").strip()
-            new_password = request.POST.get("new_password", "").strip()
-
-            if not username or not verification_code or not new_password:
-                messages.error(request, "All fields are required.")
-            else:
-                try:
-                    client = boto3.client(
-                        "cognito-idp", region_name=settings.COGNITO_AWS_REGION
-                    )
-                    client.confirm_forgot_password(
-                        ClientId=settings.COGNITO_APP_CLIENT_ID,
-                        SecretHash=get_secret_hash(
-                            username,
-                            settings.COGNITO_APP_CLIENT_ID,
-                            settings.COGNITO_APP_CLIENT_SECRET,
-                        ),
-                        Username=username,
-                        ConfirmationCode=verification_code,
-                        Password=new_password,
-                    )
-                    messages.success(
-                        request,
-                        "Your password has been reset successfully. Please log in with your new password.",
-                    )
-                    return redirect("login")
-                except ClientError as e:
-                    logger.error(
-                        f"Failed to reset password for username {username}: {e}"
-                    )
-                    if e.response["Error"]["Code"] == "CodeMismatchException":
-                        messages.error(
-                            request, "Invalid verification code. Please try again."
-                        )
-                    else:
-                        messages.error(
-                            request, "Failed to reset password. Please try again later."
-                        )
-
-    return render(
-        request,
-        "reset.html",
-        {"step": step, "username": user_identifier if step == "confirm" else ""},
-    )
-
-
-def success_view(request):
-    return render(request, "home.html")
-
-
-def confirm_view(request):
-    if request.method == "POST":
-        username = request.POST.get("username", "").strip()
-        confirmation_code = request.POST.get("confirmation_code", "").strip()
-
-        # Basic input validation
-        if not username or not confirmation_code:
-            messages.error(request, "Username and confirmation code are required.")
-            return render(request, "confirm.html")
-
+    def form_valid(self, form):
+        username = form.cleaned_data['username']
+        confirmation_code = form.cleaned_data['confirmation_code']
+        
         try:
-            client = boto3.client(
-                "cognito-idp", region_name=settings.COGNITO_AWS_REGION
-            )
+            client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
             secret_hash = get_secret_hash(
                 username,
                 settings.COGNITO_APP_CLIENT_ID,
@@ -282,34 +186,82 @@ def confirm_view(request):
                 Username=username,
                 ConfirmationCode=confirmation_code,
             )
-            messages.success(request, "Your account has been confirmed. Please log in.")
-            return redirect("login")
+            messages.success(self.request, "Your account has been confirmed. Please log in.")
+            return super().form_valid(form)
         except ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "CodeMismatchException":
-                error_message = "Invalid confirmation code. Please try again."
+                form.add_error('confirmation_code', "Invalid confirmation code. Please try again.")
             elif error_code == "ExpiredCodeException":
-                error_message = "Confirmation code expired. Please request a new code."
+                form.add_error('confirmation_code', "Confirmation code expired. Please request a new code.")
             else:
-                error_message = "Failed to confirm account. Please try again later."
+                messages.error(self.request, "Failed to confirm account. Please try again later.")
+                logger.error(f"Failed to confirm account for username {username}: {e}")
+            return self.form_invalid(form)
 
-            logger.error(f"Failed to confirm account for username {username}: {e}")
-            messages.error(request, error_message)
-            return render(request, "confirm.html")
-    else:
-        return render(request, "confirm.html")
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'reset.html'
+    success_url = reverse_lazy('password_reset_done')
+    email_template_name = 'password_reset_email.html'
+    
+    def form_valid(self, form):
+        email = form.cleaned_data["email"]
+        try:
+            client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
+            client.forgot_password(
+                ClientId=settings.COGNITO_APP_CLIENT_ID,
+                Username=email,
+                SecretHash=get_secret_hash(
+                    email,
+                    settings.COGNITO_APP_CLIENT_ID,
+                    settings.COGNITO_APP_CLIENT_SECRET,
+                ),
+            )
+            logger.debug(f"Password reset requested for email {email}")
+            return super().form_valid(form)
+        except ClientError as e:
+            logger.error(f"Error initiating password reset for {email}: {e}")
+            form.add_error(None, "Failed to initiate password reset. Please try again later.")
+            return self.form_invalid(form)
 
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+    
+    def form_valid(self, form):
+        new_password = form.cleaned_data["new_password1"]
+        uid = self.kwargs.get("uidb64")
+        token = self.kwargs.get("token")
+        
+        try:
+            username = force_str(urlsafe_base64_decode(uid))
+            client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
+            client.confirm_forgot_password(
+                ClientId=settings.COGNITO_APP_CLIENT_ID,
+                SecretHash=get_secret_hash(
+                    username,
+                    settings.COGNITO_APP_CLIENT_ID,
+                    settings.COGNITO_APP_CLIENT_SECRET,
+                ),
+                Username=username,
+                ConfirmationCode=token,
+                Password=new_password,
+            )
+            logger.debug(f"Password reset for username {username}")
+            return super().form_valid(form)
+        except ClientError as e:
+            logger.error(f"Failed to reset password for username {username}: {e}")
+            if e.response["Error"]["Code"] == "CodeMismatchException":
+                form.add_error(None, "Invalid verification code. Please try again.")
+            else:
+                form.add_error(None, "Failed to reset password. Please try again later.")
+            return self.form_invalid(form)
 
-# def profile_view(request):
-#     if not request.user.is_authenticated:
-#         return redirect('/')
-#     return render(request, 'profile.html')
+def home_view(request):
+    return render(request, 'home.html')
 
-
-def logout_view(request):
-    logout(request)
-    return redirect("/")
-
+def success_view(request):
+    return render(request, 'home.html')
 
 @login_required
 def profile_view(request):
@@ -340,32 +292,38 @@ def profile_view(request):
 
     return render(request, "profile.html", context)
 
-
-@login_required
+@login_required  
 def save_profile_view(request):
-    if request.method == "POST":
-        client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
+    if request.method == 'POST':
+        client = boto3.client('cognito-idp', region_name=settings.COGNITO_AWS_REGION)
         cognito_username = request.user.username
-
+        
         updated_attributes = [
-            {"Name": "given_name", "Value": request.POST.get("first_name")},
-            {"Name": "middle_name", "Value": request.POST.get("middle_name")},
-            {"Name": "family_name", "Value": request.POST.get("last_name")},
-            {"Name": "email", "Value": request.POST.get("email")},
-            {"Name": "phone_number", "Value": request.POST.get("phone_number")},
-            {"Name": "address", "Value": request.POST.get("address")},
+            {'Name': 'given_name', 'Value': request.POST.get('first_name')},
+            {'Name': 'middle_name', 'Value': request.POST.get('middle_name')},
+            {'Name': 'family_name', 'Value': request.POST.get('last_name')},
+            {'Name': 'email', 'Value': request.POST.get('email')},
+            {'Name': 'phone_number', 'Value': request.POST.get('phone_number')},
+            {'Name': 'address', 'Value': request.POST.get('address')},
         ]
-
+        
         try:
             client.admin_update_user_attributes(
                 UserPoolId=settings.COGNITO_USER_POOL_ID,
                 Username=cognito_username,
-                UserAttributes=updated_attributes,
+                UserAttributes=updated_attributes
             )
-            messages.success(request, "Profile updated successfully.")
+            messages.success(request, 'Profile updated successfully.')
         except Exception as e:
-            messages.error(request, f"Failed to update profile: {str(e)}")
-
-        return redirect("/profile")
+            messages.error(request, f'Failed to update profile: {str(e)}')
+        
+        return redirect('/profile')
     else:
-        return redirect("/profile")
+        return redirect('/profile')
+
+def get_secret_hash(username, client_id, client_secret):
+    message = username + client_id
+    dig = hmac.new(client_secret.encode('UTF-8'), 
+                   msg=message.encode('UTF-8'),
+                   digestmod=hashlib.sha256).digest()
+    return base64.b64encode(dig).decode()

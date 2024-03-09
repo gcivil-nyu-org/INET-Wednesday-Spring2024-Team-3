@@ -12,19 +12,28 @@ from django.core.exceptions import ObjectDoesNotExist
 
 logger = logging.getLogger(__name__)
 
-
 class CognitoBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None):
-        client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
         try:
-            secret_hash = self.get_secret_hash(username)
-            result = self.initiate_auth(client, username, password, secret_hash)
-            id_token = result["AuthenticationResult"]["IdToken"]
-            claims = self.verify_token(id_token)
-            if claims:
-                return self.get_or_create_user(claims, username)
+            client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
+            secret_hash = self.get_secret_hash(username, settings.COGNITO_APP_CLIENT_ID, settings.COGNITO_APP_CLIENT_SECRET)
+            
+            try:
+                result = self.initiate_auth(client, username, password, secret_hash)
+                id_token = result["AuthenticationResult"]["IdToken"]
+                claims = self.verify_token(id_token)
+                if claims:
+                    return self.get_or_create_user(claims, username)
+            except client.exceptions.NotAuthorizedException:
+                logger.warning(f"Invalid username or password for user: {username}")
+            except client.exceptions.UserNotConfirmedException:
+                logger.warning(f"User not confirmed: {username}")
+            except Exception as e:
+                logger.exception(f"Authentication failed: {str(e)}")
+            
+            return None
         except Exception as e:
-            logger.error(f"Authentication failed: {str(e)}")
+            logger.exception(f"Unexpected error during authentication: {str(e)}")
             return None
 
     def initiate_auth(self, client, username, password, secret_hash):
@@ -40,23 +49,24 @@ class CognitoBackend(BaseBackend):
         )
 
     def verify_token(self, id_token):
-        jwks = requests.get(settings.COGNITO_PUBLIC_KEYS_URL).json()
-        key = JsonWebKey.import_key_set(jwks)
-        claims = jwt.decode(id_token, key)
         try:
+            jwks = requests.get(settings.COGNITO_PUBLIC_KEYS_URL).json()
+            key = JsonWebKey.import_key_set(jwks)
+            claims = jwt.decode(id_token, key)
             claims.validate(leeway=60)  # 60 seconds leeway for clock skew
             return claims
         except Exception as e:
-            logger.error(f"Token validation failed: {str(e)}")
+            logger.exception(f"Token validation failed: {str(e)}")
             return None
 
     def get_or_create_user(self, claims, username):
         email = claims.get("email")
         given_name = claims.get("given_name")
         family_name = claims.get("family_name")
+        
         try:
             user = User.objects.get(username=username)
-        except ObjectDoesNotExist:
+        except User.DoesNotExist:
             user = User.objects.create_user(
                 username=username,
                 email=email,

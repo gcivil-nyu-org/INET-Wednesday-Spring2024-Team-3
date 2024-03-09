@@ -157,61 +157,14 @@
 
 
 </head>
-<!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete" async defer></script> -->
-
-<!-- <script>
-    function initAutocomplete() {
-        var startInput = document.getElementById('start-address');
-        var endInput = document.getElementById('end-address');
-
-
-        var autocompleteStart = new google.maps.places.Autocomplete(startInput, {types: ['geocode']});
-        var autocompleteEnd = new google.maps.places.Autocomplete(endInput, {types: ['geocode']});
-
-        autocompleteStart.addListener('place_changed', function() {
-            var place = autocompleteStart.getPlace();
-            console.log(place.name); 
-        });
-
-        autocompleteEnd.addListener('place_changed', function() {
-            var place = autocompleteEnd.getPlace();
-            console.log(place.name); 
-        });
-    }
-
-            var map, startMarker, endMarker, line;
-
-        // initialize map
-        function initMap() {
-            // Map options
-            var options = {
-                zoom: 8,
-                center: {lat: -34.397, lng: 150.644} // Example center: Change to a relevant location
-            };
-
-            // New map
-            map = new google.maps.Map(document.getElementById('map'), options);
-
-            // Listen for click on map
-            google.maps.event.addListener(map, 'click', function(event) {
-                if (!startMarker) {
-                    startMarker = addMarker(event.latLng, "Start");
-                } else if (!endMarker) {
-                    endMarker = addMarker(event.latLng, "End");
-                    drawLine(); // Draw line when both markers are placed
-                }
-            });
-</script> -->
-
 <!-- <div class="col-md-6">
     <input type="text" id="start-address" class="form-control" placeholder="Start Address">
     <input type="text" id="end-address" class="form-control mt-2" placeholder="End Address">
     <button class="btn btn-primary mt-3" type="submit">Compare Fares</button>
 </div> -->
-
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
-        <a class="navbar-brand" href="/">Taxi Compare</a>
+        <a class="navbar-brand" href="{% url 'home' %}">Taxi Compare</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -223,17 +176,20 @@
                 <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a href="/profile" class="btn btn-outline-success my-2 my-sm-0" role="button">Profile</a>
+                    <a href="{% url 'profile' %}" class="btn btn-outline-success my-2 my-sm-0" role="button">Profile</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/logout" class="btn btn-outline-danger my-2 my-sm-0" role="button">Logout</a>
+                    <form action="{% url 'logout' %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger my-2 my-sm-0">Logout</button>
+                    </form>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a href="/login" class="btn btn-outline-success my-2 my-sm-0" role="button">Login</a>
+                    <a href="{% url 'login' %}" class="btn btn-outline-success my-2 my-sm-0" role="button">Login</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
                 </li>
                 {% endif %}
 
@@ -306,5 +262,29 @@
         © 2024 Taxi Compare. All rights reserved.
     </footer>
 </body>
-
 </html>
+
+<script>
+    document.getElementById('compare-btn').addEventListener('click', function () {
+        var startAddress = document.getElementById('start-address').value;
+        var endAddress = document.getElementById('end-address').value;
+
+        // Make an AJAX request to the Django view
+        fetch('/compare-fares/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: 'start_address=' + encodeURIComponent(startAddress) + '&end_address=' + encodeURIComponent(endAddress)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response data and display the comparison results to the user
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
