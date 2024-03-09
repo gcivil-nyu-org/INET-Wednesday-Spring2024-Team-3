@@ -1,10 +1,12 @@
 <!-- base.html -->
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Your Site Title{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
     <!-- Include CSS, JavaScript here -->
 </head>
 

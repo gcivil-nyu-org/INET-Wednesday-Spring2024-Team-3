@@ -21,7 +21,8 @@ script:
   - coverage report
 after_script:
   - coveralls
-
+before_deploy:
+  - python manage.py collectstatic --noinput
 deploy:
   provider: elasticbeanstalk
   access_key_id: $AWS_KEY
