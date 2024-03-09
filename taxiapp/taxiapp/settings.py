@@ -48,6 +48,7 @@ AUTHENTICATION_BACKENDS = [
 INSTALLED_APPS = [
     "taxiapp",
     "forum",
+    "rideshare",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
