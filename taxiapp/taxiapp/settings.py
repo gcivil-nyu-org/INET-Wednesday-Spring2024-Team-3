@@ -5,7 +5,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+"""
 # ############Uncomment for local development, add secrets.env local file###############
 env = environ.Env()
 environ.Env.read_env(env_file="secrets.env")
@@ -17,8 +17,8 @@ COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
 COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
 COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
 COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
-
 """
+
 # #############Uncomment for travis deployment##############
 SECRET_KEY = os.environ.get("SECRET_KEY")
 COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
@@ -29,7 +29,7 @@ COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
 COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 
 # ##########################################################
-"""
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -106,15 +106,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
 
@@ -136,7 +130,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / "static",
 ]
 
 
@@ -147,17 +141,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-        },
-    },
-    "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
-    },
+    "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler",},},
+    "loggers": {"": {"handlers": ["console"], "level": "DEBUG", "propagate": True,},},
 }
