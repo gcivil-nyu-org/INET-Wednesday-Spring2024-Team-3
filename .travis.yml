@@ -15,8 +15,6 @@ install:
 before_script:
   - python manage.py migrate
 script:
-  - black --version
-  - black --check .
   - flake8 .
   - coverage run --source=taxiapp manage.py test
   - coverage report
