@@ -30,6 +30,6 @@ urlpatterns = [
     path("profile/", views.profile_view, name="profile"),
     path("logout/", views.logout_view, name="logout"),
     path("profile/", views.save_profile_view, name="save_profile"),
-    path('forum/', include('forum.urls')), 
-    path('rideshare/', include('rideshare.urls')), 
+    path("forum/", include("forum.urls")),
+    path("rideshare/", include("rideshare.urls")),
 ]

@@ -7,9 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ############Uncomment for local development, add secrets.env local file###############
-env = environ.Env()
-environ.Env.read_env(env_file="secrets.env")
-SECRET_KEY = env("SECRET_KEY")
+# env = environ.Env()
+# environ.Env.read_env(env_file="secrets.env")
+# SECRET_KEY = env("SECRET_KEY")
 
 # # SECURITY WARNING: keep the secret key used in production secret!
 # COGNITO_DOMAIN = env("COGNITO_DOMAIN")
@@ -17,6 +17,7 @@ SECRET_KEY = env("SECRET_KEY")
 # COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
 # COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
 # COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
+
 
 # #############Uncomment for travis deployment##############
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -105,15 +106,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
 
@@ -135,7 +130,7 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / "static",
 ]
 
 
@@ -146,17 +141,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-        },
-    },
-    "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-            "propagate": True,
-        },
-    },
+    "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler",},},
+    "loggers": {"": {"handlers": ["console"], "level": "DEBUG", "propagate": True,},},
 }

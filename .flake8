@@ -1,6 +1,7 @@
 [flake8]
 max-line-length = 88
-ignore : E301, W292, E302, F401, W293, E501, W503, F841
+extend-ignore : E301, W292, E302, F401, W293, E501, W503, F841, E203, W503, E231
+
 
 exclude =
     .git,
