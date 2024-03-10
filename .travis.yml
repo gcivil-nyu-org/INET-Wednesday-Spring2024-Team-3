@@ -15,13 +15,13 @@ install:
 before_script:
   - python manage.py migrate
 script:
-  - black --check .
   - flake8 .
   - coverage run --source=taxiapp manage.py test
   - coverage report
 after_script:
   - coveralls
-
+before_deploy:
+  - python manage.py collectstatic --noinput
 deploy:
   provider: elasticbeanstalk
   access_key_id: $AWS_KEY

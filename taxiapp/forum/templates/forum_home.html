@@ -1,19 +1,17 @@
-<!-- base.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Your Site Title{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
-    <!-- Include CSS, JavaScript here -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Forum</title>
+    <link rel="stylesheet" href="{% static 'css/forum/forum_home.css' %}">
 </head>
 
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
-        <a class="navbar-brand" href="/">Taxi Compare</a>
+        <a class="navbar-brand" href="/">Home</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -38,22 +36,42 @@
                     <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
                 </li>
                 {% endif %}
-                
             </ul>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <div class="container">
-        {% block content %}
-        {% endblock %}
+    <div class="hero-section">
+        <h1>Welcome to the Forum</h1>
+        <p>Engage in discussions and share your insights on taxi fares.</p>
     </div>
 
-    <!-- Footer -->
-    <!-- Footer content here -->
+    <div class="container-fluid forum-trending">
+        <h3>Trending on the Forum</h3>
+        <div class="forum-post">
+            <h5>Forum Post Title 1</h5>
+            <p>Short excerpt from the post...</p>
+            <a href="#" class="read-more">Read More</a>
+        </div>
+        <div class="forum-post">
+            <h5>Forum Post Title 2</h5>
+            <p>Short excerpt from the post...</p>
+            <a href="#" class="read-more">Read More</a>
+        </div>
+        <div class="forum-post">
+            <h5>Forum Post Title 3</h5>
+            <p>Short excerpt from the post...</p>
+            <a href="#" class="read-more">Read More</a>
+        </div>
+    </div>
 
-    <!-- Scripts -->
-    <!-- Script tags here -->
+    <footer class="footer-container">
+        <div class="footer-links">
+            <a href="#">About Us</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Contact</a>
+        </div>
+        © 2024 Forum. All rights reserved.
+    </footer>
 </body>
 
 </html>
