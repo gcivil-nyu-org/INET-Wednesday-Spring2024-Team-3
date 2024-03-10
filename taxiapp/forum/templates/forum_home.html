@@ -45,24 +45,28 @@
         <p>Engage in discussions and share your insights on taxi fares.</p>
     </div>
 
+    <!-- New Post Form -->
+    <div class="container-fluid new-post-form">
+        <h3>Create a New Post</h3>
+        <form action="{% url 'post_create' %}" method="post">
+            {% csrf_token %}
+            <textarea class="form-control" name="post_content" rows="3" placeholder="Write something..."></textarea>
+            <button type="submit" class="btn btn-primary mt-2">Post</button>
+        </form>
+    </div>
+
     <div class="container-fluid forum-trending">
         <h3>Trending on the Forum</h3>
+        {% for post in posts %}
         <div class="forum-post">
-            <h5>Forum Post Title 1</h5>
-            <p>Short excerpt from the post...</p>
-            <a href="#" class="read-more">Read More</a>
+            <h5>{{ post.title }}</h5>
+            <p>{{ post.content|truncatewords:20 }}</p> <!-- Truncate the content to 20 words -->
+            <a href="{% url 'post_detail' post.id %}" class="read-more">Read More</a>
         </div>
-        <div class="forum-post">
-            <h5>Forum Post Title 2</h5>
-            <p>Short excerpt from the post...</p>
-            <a href="#" class="read-more">Read More</a>
-        </div>
-        <div class="forum-post">
-            <h5>Forum Post Title 3</h5>
-            <p>Short excerpt from the post...</p>
-            <a href="#" class="read-more">Read More</a>
-        </div>
-    </div>
+        {% empty %}
+        <p>No posts yet.</p>
+        {% endfor %}
+    </div>    
 
     <footer class="footer-container">
         <div class="footer-links">
