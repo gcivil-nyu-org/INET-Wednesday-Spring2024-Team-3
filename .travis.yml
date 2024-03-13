@@ -34,4 +34,5 @@ deploy:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
     branch: 
       - master
+      - develop
   cleanup: 'false'
