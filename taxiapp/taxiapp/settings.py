@@ -7,16 +7,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ##########Uncomment for local development, add secrets.env local file###############
-env = environ.Env()
-environ.Env.read_env(env_file="secrets.env")
-SECRET_KEY = env("SECRET_KEY")
+# env = environ.Env()
+# environ.Env.read_env(env_file="secrets.env")
+# SECRET_KEY = env("SECRET_KEY")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-COGNITO_DOMAIN = env("COGNITO_DOMAIN")
-COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
-COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
-COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
-COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
+# # SECURITY WARNING: keep the secret key used in production secret!
+# COGNITO_DOMAIN = env("COGNITO_DOMAIN")
+# COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
+# COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
+# COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
+# COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 
 # # #############Uncomment for travis deployment##############
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -36,7 +36,7 @@ STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["127.0.0.1", "taxiapp-dev2.us-east-1.elasticbeanstalk.com"]
 
