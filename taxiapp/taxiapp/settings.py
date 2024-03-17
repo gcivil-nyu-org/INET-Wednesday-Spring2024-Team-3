@@ -28,7 +28,7 @@ COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
 COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 # ##########################################################
 
-##In the future, add this as travis variables to protect URL.
+# In the future, add this as travis variables to protect URL.
 AWS_STORAGE_BUCKET_NAME = 'taxiapp-static-bucket'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 STATIC_LOCATION = 'static'
