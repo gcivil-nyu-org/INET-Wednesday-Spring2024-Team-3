@@ -7,19 +7,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ##########Uncomment for local development, add secrets.env local file###############
-# env = environ.Env()
-# environ.Env.read_env(env_file="secrets.env")
-# SECRET_KEY = env("SECRET_KEY")
+env = environ.Env()
+environ.Env.read_env(env_file="secrets.env")
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# COGNITO_DOMAIN = env("COGNITO_DOMAIN")
-# COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
-# COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
-# COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
-# COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
+COGNITO_DOMAIN = env("COGNITO_DOMAIN")
+COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
+COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
+COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
+COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 
-
-# #############Uncomment for travis deployment##############
+# # #############Uncomment for travis deployment##############
 SECRET_KEY = os.environ.get("SECRET_KEY")
 COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
 COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
@@ -27,12 +26,17 @@ COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
 COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
 COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
 COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
-
 # ##########################################################
 
+##In the future, add this as travis variables to protect URL.
+AWS_STORAGE_BUCKET_NAME = 'taxiapp-static-bucket'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+STATIC_LOCATION = 'static'
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{STATIC_LOCATION}/'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", "taxiapp-dev2.us-east-1.elasticbeanstalk.com"]
 
