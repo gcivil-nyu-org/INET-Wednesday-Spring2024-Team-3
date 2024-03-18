@@ -22,11 +22,9 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user, backend="taxiapp.cognito_backend.CognitoBackend")
-    #        logger.debug(f"User {username} logged in: {request.user.is_authenticated}")
             return redirect("/")
         else:
             try:
-    #            logger.error(f"Authentication failed for user {username}")
                 client = boto3.client(
                     "cognito-idp", region_name=settings.COGNITO_AWS_REGION
                 )
