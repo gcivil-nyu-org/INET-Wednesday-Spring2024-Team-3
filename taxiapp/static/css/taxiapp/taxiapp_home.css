@@ -1,134 +1,210 @@
-@import url('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 :root {
-    --primary-color: #5D93E1;
-    --secondary-color: #1d86a7;
-    --background-color: #F9FAFB;
-    --text-color: #343A40;
-    --link-color: #007BFF;
-    --font-family: 'Roboto', sans-serif;
+--primary-color: #5D93E1;
+--secondary-color: #1d86a7;
+--background-color: #F9FAFB;
+--text-color: #343A40;
+--link-color: #007BFF;
+--font-family: 'Poppins', sans-serif;
 }
 
 body {
-    font-family: var(--font-family);
-    background: var(--background-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
-    line-height: 1.6;
-    font-size: 18px;
-    padding-bottom: 100px;
+font-family: var(--font-family);
+background: var(--background-color);
+color: var(--text-color);
+margin: 0;
+padding: 0;
+line-height: 1.6;
+font-size: 18px;
+padding-bottom: 100px;
 }
 
 .navbar,
 .footer-container {
-    background-color: var(--primary-color);
-    color: #fff;
+background-color: var(--primary-color);
+color: #fff;
 }
 
 .container-fluid,
 .hero-section {
-    margin-bottom: 60px;
+margin-bottom: 60px;
 }
 
 footer.footer-container {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    text-align: center;
-    background-color: var(--primary-color);
-    padding: 10px 0;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+position: fixed;
+left: 0;
+bottom: 0;
+width: 100%;
+text-align: center;
+background-color: var(--primary-color);
+padding: 10px 0;
+box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand,
 .nav-link,
 .footer-links a {
-    color: inherit;
-    transition: color 0.3s ease;
+color: inherit;
+transition: color 0.3s ease;
 }
 
 .navbar-brand:hover,
 .nav-link:hover,
 .footer-links a:hover {
-    color: var(--secondary-color);
+color: var(--secondary-color);
 }
 
 .hero-section {
-    padding: 50px 20px;
-    text-align: center;
-    max-width: 800px;
-    margin: 40px auto;
-    backdrop-filter: blur(10px);
+padding: 100px 20px;
+text-align: center;
+max-width: 800px;
+margin: 60px auto;
+backdrop-filter: blur(10px);
+position: relative;
+overflow: hidden;
+border-radius: 10px;
+}
+
+.hero-section::before {
+content: '';
+position: absolute;
+top: -50%;
+left: -50%;
+width: 200%;
+height: 200%;
+background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+transform: rotate(45deg);
+z-index: -1;
+opacity: 0.8;
 }
 
 .forum-post {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+transition: transform 0.3s ease, box-shadow 0.3s ease;
+border: none;
+border-radius: 10px;
+overflow: hidden;
+position: relative;
 }
 
 .forum-post:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+transform: translateY(-10px);
+box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.forum-post::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+opacity: 0;
+transition: opacity 0.3s ease;
+}
+
+.forum-post:hover::before {
+opacity: 0.1;
 }
 
 .btn,
 .form-control {
-    border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+border-radius: 30px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+padding: 12px 24px;
+font-size: 16px;
 }
 
 .btn-primary,
 .btn-outline-success {
-    background-color: var(--primary-color);
-    border-color: transparent;
-    color: #fff;
-    padding: 10px 20px;
+background-color: var(--primary-color);
+border-color: transparent;
+color: #fff;
+transition: background-color 0.3s ease;
 }
 
 .btn-primary:hover,
 .btn-outline-success:hover {
-    background-color: var(--secondary-color);
-    color: #fff;
+background-color: var(--secondary-color);
+color: #fff;
 }
 
 .forum-post {
-    background-color: #FFFFFF;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid #e3e3e3;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+background-color: #FFFFFF;
+padding: 30px;
+margin-bottom: 30px;
 }
 
 h3 {
-    color: var(--primary-color);
-    margin-bottom: 30px;
-    text-align: center;
-    font-weight: 700;
-}
-
-.forum-post:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+color: var(--primary-color);
+margin-bottom: 40px;
+text-align: center;
+font-weight: 700;
+font-size: 36px;
+text-transform: uppercase;
+letter-spacing: 2px;
 }
 
 .read-more {
-    color: var(--secondary-color);
-    text-decoration: none;
-    font-weight: 600;
+color: var(--secondary-color);
+text-decoration: none;
+font-weight: 600;
+position: relative;
+transition: color 0.3s ease;
+}
+
+.read-more::after {
+content: '';
+position: absolute;
+bottom: -2px;
+left: 0;
+width: 100%;
+height: 2px;
+background-color: var(--secondary-color);
+transform: scaleX(0);
+transition: transform 0.3s ease;
+transform-origin: left;
 }
 
 .read-more:hover {
-    text-decoration: underline;
+color: var(--primary-color);
+}
+
+.read-more:hover::after {
+transform: scaleX(1);
 }
 
 @media (max-width: 768px) {
-    .container-fluid {
-        margin-bottom: 40px;
-    }
+.container-fluid {
+margin-bottom: 40px;
+}
 
-    .forum-post {
-        padding: 15px;
-    }
+.forum-post {
+padding: 20px;
+}
+
+.hero-section {
+padding: 80px 20px;
+margin: 40px auto;
+}
+
+h3 {
+font-size: 28px;
+margin-bottom: 30px;
+}
+}
+
+.fare-comparison {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+.fare-comparison h3 {
+    margin-bottom: 10px;
+}
+
+.fare-comparison div {
+    margin-bottom: 5px;
 }

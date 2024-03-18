@@ -7,60 +7,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Taxi Compare</title>
     <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
-</head>
-<!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete" async defer></script> -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAutocomplete"
+        async defer></script>
+    <script>
+        var map, startMarker, endMarker, line;
 
-<!-- <script>
-    function initAutocomplete() {
-        var startInput = document.getElementById('start-address');
-        var endInput = document.getElementById('end-address');
+        function initAutocomplete() {
+            var startInput = document.getElementById('start-address');
+            var endInput = document.getElementById('end-address');
 
+            var autocompleteStart = new google.maps.places.Autocomplete(startInput, { types: ['geocode'] });
+            var autocompleteEnd = new google.maps.places.Autocomplete(endInput, { types: ['geocode'] });
 
-        var autocompleteStart = new google.maps.places.Autocomplete(startInput, {types: ['geocode']});
-        var autocompleteEnd = new google.maps.places.Autocomplete(endInput, {types: ['geocode']});
+            autocompleteStart.addListener('place_changed', function () {
+                var place = autocompleteStart.getPlace();
+                console.log(place.name);
+                if (startMarker) {
+                    startMarker.setMap(null); // Remove existing marker
+                }
+                startMarker = addMarker(place.geometry.location, "Start");
+                map.setCenter(place.geometry.location);
+            });
 
-        autocompleteStart.addListener('place_changed', function() {
-            var place = autocompleteStart.getPlace();
-            console.log(place.name); 
-        });
-
-        autocompleteEnd.addListener('place_changed', function() {
-            var place = autocompleteEnd.getPlace();
-            console.log(place.name); 
-        });
-    }
-
-            var map, startMarker, endMarker, line;
+            autocompleteEnd.addListener('place_changed', function () {
+                var place = autocompleteEnd.getPlace();
+                console.log(place.name);
+                if (endMarker) {
+                    endMarker.setMap(null); // Remove existing marker
+                }
+                endMarker = addMarker(place.geometry.location, "End");
+                map.setCenter(place.geometry.location);
+                if (startMarker && endMarker) {
+                    drawLine(); // Draw line when both markers are placed
+                }
+            });
+        }
 
         // initialize map
         function initMap() {
             // Map options
             var options = {
                 zoom: 8,
-                center: {lat: -34.397, lng: 150.644} // Example center: Change to a relevant location
+                center: { lat: 39.8097343, lng: -87.6500523 }
             };
 
             // New map
             map = new google.maps.Map(document.getElementById('map'), options);
+        }
 
-            // Listen for click on map
-            google.maps.event.addListener(map, 'click', function(event) {
-                if (!startMarker) {
-                    startMarker = addMarker(event.latLng, "Start");
-                } else if (!endMarker) {
-                    endMarker = addMarker(event.latLng, "End");
-                    drawLine(); // Draw line when both markers are placed
-                }
+        // Add marker function
+        function addMarker(location, label) {
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                label: label
             });
-</script> -->
+            return marker;
+        }
 
-<!-- <div class="col-md-6">
-    <input type="text" id="start-address" class="form-control" placeholder="Start Address">
-    <input type="text" id="end-address" class="form-control mt-2" placeholder="End Address">
-    <button class="btn btn-primary mt-3" type="submit">Compare Fares</button>
-</div> -->
+        // Draw line function
+        function drawLine() {
+            if (line) {
+                line.setMap(null); // Remove existing line
+            }
+            var lineCoordinates = [
+                startMarker.getPosition(),
+                endMarker.getPosition()
+            ];
 
-<body>
+            line = new google.maps.Polyline({
+                path: lineCoordinates,
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+
+            line.setMap(map);
+        }
+
+        function compareFares() {
+            var startAddress = document.getElementById('start-address').value;
+            var endAddress = document.getElementById('end-address').value;
+
+            fetch('/rideshare/api/compare-fares/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    'start_address': startAddress,
+                    'end_address': endAddress
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Update the fare comparison section with the retrieved data
+                    document.getElementById('uber-fare').textContent = 'Uber Fare: $' + data.uber_fare;
+                    document.getElementById('lyft-fare').textContent = 'Lyft Fare: $' + data.lyft_fare;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</head>
+
+
+<body onload="initMap()">
     <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
         <a class="navbar-brand" href="/">Taxi Compare</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
@@ -87,7 +143,6 @@
                     <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
                 </li>
                 {% endif %}
-
             </ul>
         </div>
     </nav>
@@ -100,15 +155,23 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6">
-                <input type="text" class="form-control" placeholder="Start Address">
-                <input type="text" class="form-control mt-2" placeholder="End Address">
-                <button class="btn btn-primary mt-3" type="submit">Compare Fares</button>
+                <input type="text" id="start-address" class="form-control" placeholder="Start Address">
+                <input type="text" id="end-address" class="form-control mt-2" placeholder="End Address">
+                <button class="btn btn-primary mt-3" onclick="compareFares()">Compare Fares</button>
+                <div class="container-fluid fare-comparison">
+                    <h3>Fare Comparison</h3>
+                    <div id="uber-fare"></div>
+                    <div id="lyft-fare"></div>
+                </div>
             </div>
             <div class="col-md-6 map-container">
-                <!-- Map Placeholder -->
+                <div id="map" style="height: 400px;"></div>
             </div>
+            
         </div>
     </div>
+
+
 
     <div class="container-fluid">
         <h3>What We Do</h3>

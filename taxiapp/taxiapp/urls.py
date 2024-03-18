@@ -26,10 +26,10 @@ urlpatterns = [
     path("confirm/", views.confirm_view, name="confirm"),
     path("reset/", views.reset_view, name="reset"),
     path("success/", views.success_view, name="success"),
-    # path('reset-confirm/', views.reset_confirm_view, name='reset-confirm'), //I think we might not need this
     path("profile/", views.profile_view, name="profile"),
     path("logout/", views.logout_view, name="logout"),
     path("profile/", views.save_profile_view, name="save_profile"),
     path("forum/", include("forum.urls")),
     path("rideshare/", include("rideshare.urls")),
+    
 ]
