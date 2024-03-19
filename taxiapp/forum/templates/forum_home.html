@@ -45,28 +45,26 @@
         <p>Engage in discussions and share your insights on taxi fares.</p>
     </div>
 
-    <!-- New Post Form -->
-    <div class="container-fluid new-post-form">
-        <h3>Create a New Post</h3>
-        <form action="{% url 'post_create' %}" method="post">
-            {% csrf_token %}
-            <textarea class="form-control" name="post_content" rows="3" placeholder="Write something..."></textarea>
-            <button type="submit" class="btn btn-primary mt-2">Post</button>
-        </form>
+    <!-- New Post Button -->
+    {% if user.is_authenticated %}
+    <div class="container-fluid new-post-button">
+        <a href="/forum/new" class="btn btn-primary">Create New Post</a>
+    </div>
+    {% else %}
+    <div class="container-fluid login-message">
+        <p>Please <a href="/login">login</a> to create a new post.</p>
+    </div>
+    {% endif %}
+
+    <!-- Sort Buttons -->
+    <div class="container-fluid sort-buttons">
+        <button class="btn btn-secondary" id="sort-recent">Recent</button>
+        <button class="btn btn-secondary" id="sort-likes">Most Likes</button>
     </div>
 
-    <div class="container-fluid forum-trending">
-        <h3>Trending on the Forum</h3>
-        {% for post in posts %}
-        <div class="forum-post">
-            <h5>{{ post.title }}</h5>
-            <p>{{ post.content|truncatewords:20 }}</p> <!-- Truncate the content to 20 words -->
-            <a href="{% url 'post_detail' post.id %}" class="read-more">Read More</a>
-        </div>
-        {% empty %}
-        <p>No posts yet.</p>
-        {% endfor %}
-    </div>    
+    <div class="container-fluid forum-posts">
+        <!-- Posts will be dynamically loaded here -->
+    </div>
 
     <footer class="footer-container">
         <div class="footer-links">
@@ -76,6 +74,41 @@
         </div>
         © 2024 Forum. All rights reserved.
     </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Load posts on page load
+            loadPosts();
+
+            // Sort buttons click event
+            $('.sort-buttons button').click(function() {
+                var sortBy = $(this).attr('id').replace('sort-', '');
+                loadPosts(sortBy);
+            });
+
+            // Function to load posts from the Django endpoint
+            function loadPosts(sortBy = 'recent') {
+                $.ajax({
+                    url: '/api/posts',
+                    data: { sort_by: sortBy },
+                    success: function(response) {
+                        var postsHtml = '';
+                        response.forEach(function(post) {
+                            postsHtml += `
+                                <div class="forum-post" data-post-id="${post.id}">
+                                    <h5>${post.title}</h5>
+                                    <p>${post.content.substring(0, 100)}...</p>
+                                    <a href="/forum/${post.id}" class="read-more">Read More</a>
+                                </div>
+                            `;
+                        });
+                        $('.forum-posts').html(postsHtml);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

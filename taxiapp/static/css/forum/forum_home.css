@@ -63,33 +63,19 @@ footer.footer-container {
     backdrop-filter: blur(10px);
 }
 
-.forum-post {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.new-post-button,
+.login-message {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.forum-post:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+.sort-buttons {
+    text-align: center;
+    margin-bottom: 20px;
 }
 
-.btn,
-.form-control {
-    border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary,
-.btn-outline-success {
-    background-color: var(--primary-color);
-    border-color: transparent;
-    color: #fff;
-    padding: 10px 20px;
-}
-
-.btn-primary:hover,
-.btn-outline-success:hover {
-    background-color: var(--secondary-color);
-    color: #fff;
+.sort-buttons button {
+    margin: 0 10px;
 }
 
 .forum-post {
@@ -101,16 +87,17 @@ footer.footer-container {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.forum-post:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
 h3 {
     color: var(--primary-color);
     margin-bottom: 30px;
     text-align: center;
     font-weight: 700;
-}
-
-.forum-post:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .read-more {
