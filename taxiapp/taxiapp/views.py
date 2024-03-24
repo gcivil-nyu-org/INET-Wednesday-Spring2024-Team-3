@@ -58,8 +58,6 @@ def login_view(request):
                     django_user,
                     backend="taxiapp.cognito_backend.CognitoBackend",
                 )
-                # login(request, django_user, backend='django.contrib.auth.backends.ModelBackend')
-
                 return redirect("/")
 
             except client.exceptions.UserNotConfirmedException:

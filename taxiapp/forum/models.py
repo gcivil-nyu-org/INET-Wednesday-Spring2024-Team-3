@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
-from django.db import migrations
 
 class Forum(models.Model):
     name = models.CharField(max_length=100)
@@ -16,25 +15,21 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-class Topic(models.Model):
-    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=200)
-    content = models.TextField()
-    views = models.PositiveIntegerField(default=0)
-    sticky = models.BooleanField(default=False)
-    locked = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
 class Post(models.Model):
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, validators=[MinLengthValidator(10)])
     content = models.TextField(validators=[MinLengthValidator(20)])
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    topic = models.ForeignKey('Topic', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+class Topic(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
     
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
@@ -53,4 +48,3 @@ class Vote(models.Model):
 
     class Meta:
         unique_together = [('user', 'post'), ('user', 'comment')]
-        

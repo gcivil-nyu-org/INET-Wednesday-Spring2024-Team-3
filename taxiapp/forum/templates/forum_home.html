@@ -1,31 +1,38 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum_home.css' %}">
+{% endblock %}
+
 {% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script>
-    $(document).ready(function () {
-        // Load posts on page load
+    var $j = jQuery.noConflict();
+    $j(window).on('load', function () {
         loadPosts();
 
-        // Sort button click event
-        $('.sort-button').click(function () {
-            var sortBy = $(this).data('sort');
+        $j('.sort-button').click(function () {
+            var sortBy = $j(this).data('sort');
             loadPosts(sortBy);
         });
 
-        // Function to load posts from the Django endpoint
         function loadPosts(sortBy = 'recent') {
-            $.ajax({
-                url: '/api/posts',
+            $j.ajax({
+                url: 'api/posts',
                 data: { sort_by: sortBy },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+                },
                 success: function (response) {
                     var postsHtml = '';
                     response.forEach(function (post) {
                         postsHtml += `
+                            <div class="col-md-6">
                                 <div class="post" data-post-id="${post.id}">
                                     <div class="post-header">
-                                        <h3><a href="/forum/${post.id}">${post.title}</a></h3>
+                                        <h3><a href="/forum/post/${post.id}">${post.title}</a></h3>
                                         <p class="post-meta">Posted by ${post.author} | ${post.created_at}</p>
                                     </div>
                                     <div class="post-content">
@@ -36,9 +43,10 @@
                                         <span class="likes">${post.likes} Likes</span>
                                     </div>
                                 </div>
-                            `;
+                            </div>
+                        `;
                     });
-                    $('.post-list').html(postsHtml);
+                    $j('.post-list').html(`<div class="row">${postsHtml}</div>`);
                 }
             });
         }
@@ -46,31 +54,36 @@
 </script>
 {% endblock %}
 
-
 {% block content %}
 <main>
-    <div class="container">
-        <h1>Welcome to the Forum</h1>
-        <p>Engage in discussions and share your insights on taxi fares.</p>
+    <section class="hero-section">
+        <div class="container">
+            <h1>Welcome to the Forum</h1>
+            <p>Engage in discussions and share your insights on taxi fares.</p>
+        </div>
+    </section>
 
-        {% if user.is_authenticated %}
-        <div class="new-post">
-            <a href="{% url 'post_create' %}" class="new-post-link">Create a New Post</a>
-        </div>
-        {% else %}
-        <div class="login-message">
-            <p>Please <a href="/login">login</a> to create a new post.</p>
-        </div>
-        {% endif %}
+    <section class="forum-section">
+        <div class="container">
+            {% if user.is_authenticated %}
+            <div class="new-post">
+                <a href="{% url 'post_create' %}" class="new-post-link">Create a New Post</a>
+            </div>
+            {% else %}
+            <div class="login-message">
+                <p>Please <a href="/login">login</a> to create a new post.</p>
+            </div>
+            {% endif %}
 
-        <div class="sort-options">
-            <button class="sort-button" data-sort="recent">Recent</button>
-            <button class="sort-button" data-sort="popular">Most Popular</button>
-        </div>
+            <div class="sort-options">
+                <button class="sort-button" data-sort="recent">Recent</button>
+                <button class="sort-button" data-sort="popular">Most Popular</button>
+            </div>
 
-        <div class="post-list">
-            <!-- Posts will be dynamically loaded here -->
+            <div class="post-list">
+                <!-- Posts will be dynamically loaded here -->
+            </div>
         </div>
-    </div>
+    </section>
 </main>
 {% endblock %}

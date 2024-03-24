@@ -1,4 +1,4 @@
-@import url('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 :root {
     --primary-color: #5D93E1;
@@ -6,7 +6,7 @@
     --background-color: #F9FAFB;
     --text-color: #343A40;
     --link-color: #007BFF;
-    --font-family: 'Roboto', sans-serif;
+    --font-family: 'Poppins', sans-serif;
 }
 
 body {
@@ -19,88 +19,91 @@ body {
     font-size: 18px;
 }
 
-header {
+.navbar {
     background-color: var(--primary-color);
-    padding: 10px 20px;
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo a {
     color: #fff;
-    font-size: 24px;
-    font-weight: bold;
-    text-decoration: none;
+    padding: 20px 0;
 }
 
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 20px;
+.navbar-brand,
+.nav-link {
+    color: inherit;
+    transition: color 0.3s ease;
 }
 
-.nav-links a {
-    color: #fff;
-    text-decoration: none;
-}
-
-.user-actions a {
-    color: #fff;
-    text-decoration: none;
-    margin-left: 20px;
+.navbar-brand:hover,
+.nav-link:hover {
+    color: var(--secondary-color);
 }
 
 .container {
-    max-width: 800px;
+    max-width: 960px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 40px 15px;
 }
 
 h1 {
     color: var(--primary-color);
     margin-bottom: 20px;
+    text-align: center;
+}
+
+p {
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 .new-post {
-    margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 .new-post-link {
     display: inline-block;
     background-color: var(--secondary-color);
     color: #fff;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 5px;
     text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.new-post-link:hover {
+    background-color: #135f7e;
 }
 
 .login-message {
-    margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 .sort-options {
-    margin-bottom: 20px;
+    text-align: center;
+    margin-bottom: 40px;
 }
 
 .sort-button {
+    background-color: #fff;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 8px 16px;
+    margin: 0 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.sort-button:hover {
     background-color: var(--primary-color);
     color: #fff;
-    border: none;
-    padding: 5px 10px;
-    margin-right: 10px;
-    cursor: pointer;
 }
 
 .post {
     background-color: #fff;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .post-header h3 {
@@ -110,12 +113,17 @@ h1 {
 .post-header h3 a {
     color: var(--text-color);
     text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.post-header h3 a:hover {
+    color: var(--primary-color);
 }
 
 .post-meta {
     color: #888;
     font-size: 14px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 .post-content {
@@ -131,6 +139,11 @@ h1 {
 .read-more {
     color: var(--link-color);
     text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.read-more:hover {
+    color: var(--secondary-color);
 }
 
 .likes {
@@ -141,7 +154,7 @@ h1 {
 footer {
     background-color: var(--primary-color);
     color: #fff;
-    padding: 20px;
+    padding: 20px 0;
     text-align: center;
     margin-top: 40px;
 }
@@ -154,4 +167,9 @@ footer {
     color: #fff;
     text-decoration: none;
     margin: 0 10px;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--secondary-color);
 }

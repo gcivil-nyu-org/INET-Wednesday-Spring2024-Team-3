@@ -1,9 +1,12 @@
+import logging
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Post, Comment, Category
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+
+logger = logging.getLogger(__name__)
 
 
 def forum_home(request):
@@ -19,13 +22,15 @@ def post_create(request):
         title = request.POST.get('title')
         content = request.POST.get('content')
         category_id = request.POST.get('category')
-        
         try:
             category = Category.objects.get(id=category_id)
+            # logger.info('cat found')
         except ObjectDoesNotExist:
             messages.error(request, "Selected category does not exist.")
+            # logger.info('cat fail')
             return render(request, 'post_create.html', {'categories': categories})
         if title and content and category:
+            # logger.info('new_post being created')
             new_post = Post(title=title, content=content, user=request.user, category=category)
             new_post.save()
             return redirect('post_detail', post_id=new_post.id)
@@ -37,7 +42,7 @@ def add_comment(request, post_id):
         content = request.POST.get("content")
         if content:
             comment = Comment.objects.create(
-                post=post, content=content, author=request.user
+                post=post, content=content, user=request.user
             )
             comment.save()
         return redirect("post_detail", post_id=post.id)
@@ -49,13 +54,15 @@ def post_detail(request, post_id):
 
 def posts_api(request):
     sort_by = request.GET.get('sort_by', 'recent')
-    posts = Post.objects.all().order_by('-created_at')[:10]  # Adjust the query
+    posts = Post.objects.all().order_by('-created_at')[:10]
+    logger.info(f'posts: {posts}')
     posts_data = [{
         'id': post.id,
         'title': post.title,
         'content': post.content,
-        'author': post.user.username,  
+        'author': post.user.username,
         'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
-        'likes': 0,  # Placeholder
+        'likes': 0,
     } for post in posts]
+    logger.info(f'post_data: {posts_data}')
     return JsonResponse(posts_data, safe=False)
