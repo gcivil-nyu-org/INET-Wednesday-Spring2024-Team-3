@@ -1,114 +1,76 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to the Forum</title>
-    <link rel="stylesheet" href="{% static 'css/forum/forum_home.css' %}">
-</head>
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Load posts on page load
+        loadPosts();
 
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
-        <a class="navbar-brand" href="/">Home</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="/forum">Forum</a></li>
-                <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
-                <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a href="/profile" class="btn btn-outline-success my-2 my-sm-0" role="button">Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/logout" class="btn btn-outline-danger my-2 my-sm-0" role="button">Logout</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a href="/login" class="btn btn-outline-success my-2 my-sm-0" role="button">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-    </nav>
+        // Sort button click event
+        $('.sort-button').click(function () {
+            var sortBy = $(this).data('sort');
+            loadPosts(sortBy);
+        });
 
-    <div class="hero-section">
-        <h1>Welcome to the Forum</h1>
-        <p>Engage in discussions and share your insights on taxi fares.</p>
-    </div>
-
-    <!-- New Post Button -->
-    {% if user.is_authenticated %}
-    <div class="container-fluid new-post-button">
-        <a href="/forum/new" class="btn btn-primary">Create New Post</a>
-    </div>
-    {% else %}
-    <div class="container-fluid login-message">
-        <p>Please <a href="/login">login</a> to create a new post.</p>
-    </div>
-    {% endif %}
-
-    <!-- Sort Buttons -->
-    <div class="container-fluid sort-buttons">
-        <button class="btn btn-secondary" id="sort-recent">Recent</button>
-        <button class="btn btn-secondary" id="sort-likes">Most Likes</button>
-    </div>
-
-    <div class="container-fluid forum-posts">
-        <!-- Posts will be dynamically loaded here -->
-    </div>
-
-    <footer class="footer-container">
-        <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Contact</a>
-        </div>
-        © 2024 Forum. All rights reserved.
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Load posts on page load
-            loadPosts();
-
-            // Sort buttons click event
-            $('.sort-buttons button').click(function() {
-                var sortBy = $(this).attr('id').replace('sort-', '');
-                loadPosts(sortBy);
-            });
-
-            // Function to load posts from the Django endpoint
-            function loadPosts(sortBy = 'recent') {
-                $.ajax({
-                    url: '/api/posts',
-                    data: { sort_by: sortBy },
-                    success: function(response) {
-                        var postsHtml = '';
-                        response.forEach(function(post) {
-                            postsHtml += `
-                                <div class="forum-post" data-post-id="${post.id}">
-                                    <h5>${post.title}</h5>
-                                    <p>${post.content.substring(0, 100)}...</p>
-                                    <a href="/forum/${post.id}" class="read-more">Read More</a>
+        // Function to load posts from the Django endpoint
+        function loadPosts(sortBy = 'recent') {
+            $.ajax({
+                url: '/api/posts',
+                data: { sort_by: sortBy },
+                success: function (response) {
+                    var postsHtml = '';
+                    response.forEach(function (post) {
+                        postsHtml += `
+                                <div class="post" data-post-id="${post.id}">
+                                    <div class="post-header">
+                                        <h3><a href="/forum/${post.id}">${post.title}</a></h3>
+                                        <p class="post-meta">Posted by ${post.author} | ${post.created_at}</p>
+                                    </div>
+                                    <div class="post-content">
+                                        <p>${post.content.substring(0, 200)}...</p>
+                                    </div>
+                                    <div class="post-actions">
+                                        <a href="/forum/${post.id}" class="read-more">Read More</a>
+                                        <span class="likes">${post.likes} Likes</span>
+                                    </div>
                                 </div>
                             `;
-                        });
-                        $('.forum-posts').html(postsHtml);
-                    }
-                });
-            }
-        });
-    </script>
-</body>
+                    });
+                    $('.post-list').html(postsHtml);
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
 
-</html>
+
+{% block content %}
+<main>
+    <div class="container">
+        <h1>Welcome to the Forum</h1>
+        <p>Engage in discussions and share your insights on taxi fares.</p>
+
+        {% if user.is_authenticated %}
+        <div class="new-post">
+            <a href="{% url 'post_create' %}" class="new-post-link">Create a New Post</a>
+        </div>
+        {% else %}
+        <div class="login-message">
+            <p>Please <a href="/login">login</a> to create a new post.</p>
+        </div>
+        {% endif %}
+
+        <div class="sort-options">
+            <button class="sort-button" data-sort="recent">Recent</button>
+            <button class="sort-button" data-sort="popular">Most Popular</button>
+        </div>
+
+        <div class="post-list">
+            <!-- Posts will be dynamically loaded here -->
+        </div>
+    </div>
+</main>
+{% endblock %}

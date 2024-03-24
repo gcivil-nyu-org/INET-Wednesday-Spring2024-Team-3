@@ -1,169 +1,134 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Taxi Compare</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAutocomplete"
-        async defer></script>
-    <script>
-        var map, startMarker, endMarker, line, directionsService, directionsRenderer;
+{% block extra_js %}
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAutocomplete"
+    async defer></script>
+<script>
+    var map, startMarker, endMarker, line, directionsService, directionsRenderer;
 
-        function initMap() {
-            var options = {
-                zoom: 8,
-                center: { lat: 39.8097343, lng: -87.6500523 }
-            };
+    function initMap() {
+        var options = {
+            zoom: 8,
+            center: { lat: 39.8097343, lng: -87.6500523 }
+        };
 
-            map = new google.maps.Map(document.getElementById('map'), options);
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
-        }
+        map = new google.maps.Map(document.getElementById('map'), options);
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+    }
 
-        function initAutocomplete() {
-            var startInput = document.getElementById('start-address');
-            var endInput = document.getElementById('end-address');
+    function initAutocomplete() {
+        var startInput = document.getElementById('start-address');
+        var endInput = document.getElementById('end-address');
 
-            var autocompleteStart = new google.maps.places.Autocomplete(startInput, { types: ['geocode'] });
-            var autocompleteEnd = new google.maps.places.Autocomplete(endInput, { types: ['geocode'] });
+        var autocompleteStart = new google.maps.places.Autocomplete(startInput, { types: ['geocode'] });
+        var autocompleteEnd = new google.maps.places.Autocomplete(endInput, { types: ['geocode'] });
 
-            autocompleteStart.addListener('place_changed', function () {
-                var place = autocompleteStart.getPlace();
-                if (!place.geometry) {
-                    console.error('No location data available for the selected place.');
-                    return;
-                }
-                updateMarker(place.geometry.location, "Start");
-                updateRoute();
-            });
-
-            autocompleteEnd.addListener('place_changed', function () {
-                var place = autocompleteEnd.getPlace();
-                if (!place.geometry) {
-                    console.error('No location data available for the selected place.');
-                    return;
-                }
-                updateMarker(place.geometry.location, "End");
-                updateRoute();
-            });
-        }
-
-        function updateMarker(location, label) {
-            if (label === "Start") {
-                if (startMarker) {
-                    startMarker.setMap(null);
-                }
-                startMarker = new google.maps.Marker({
-                    position: location,
-                    map: map,
-                    label: label
-                });
-            } else if (label === "End") {
-                if (endMarker) {
-                    endMarker.setMap(null);
-                }
-                endMarker = new google.maps.Marker({
-                    position: location,
-                    map: map,
-                    label: label
-                });
-            }
-        }
-
-        function updateRoute() {
-            if (startMarker && endMarker) {
-                var request = {
-                    origin: startMarker.getPosition(),
-                    destination: endMarker.getPosition(),
-                    travelMode: 'DRIVING'
-                };
-
-                directionsService.route(request, function (result, status) {
-                    if (status === 'OK') {
-                        directionsRenderer.setDirections(result);
-                    }
-                });
-            }
-        }
-
-        function compareFares() {
-            var startAddress = document.getElementById('start-address').value;
-            var endAddress = document.getElementById('end-address').value;
-
-            if (!startAddress || !endAddress) {
-                alert('Please enter both start and end addresses.');
+        autocompleteStart.addListener('place_changed', function () {
+            var place = autocompleteStart.getPlace();
+            if (!place.geometry) {
+                console.error('No location data available for the selected place.');
                 return;
             }
+            updateMarker(place.geometry.location, "Start");
+            updateRoute();
+        });
 
-            fetch('/rideshare/api/compare-fares/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({
-                    'start_address': startAddress,
-                    'end_address': endAddress
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('uber-fare').textContent = 'Uber Fare: $' + data.uber_fare;
-                    document.getElementById('lyft-fare').textContent = 'Lyft Fare: $' + data.lyft_fare;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while comparing fares. Please try again.');
-                });
+        autocompleteEnd.addListener('place_changed', function () {
+            var place = autocompleteEnd.getPlace();
+            if (!place.geometry) {
+                console.error('No location data available for the selected place.');
+                return;
+            }
+            updateMarker(place.geometry.location, "End");
+            updateRoute();
+        });
+    }
+
+    function updateMarker(location, label) {
+        if (label === "Start") {
+            if (startMarker) {
+                startMarker.setMap(null);
+            }
+            startMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                label: label
+            });
+        } else if (label === "End") {
+            if (endMarker) {
+                endMarker.setMap(null);
+            }
+            endMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                label: label
+            });
+        }
+    }
+
+    function updateRoute() {
+        if (startMarker && endMarker) {
+            var request = {
+                origin: startMarker.getPosition(),
+                destination: endMarker.getPosition(),
+                travelMode: 'DRIVING'
+            };
+
+            directionsService.route(request, function (result, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
+                }
+            });
+        }
+    }
+
+    function compareFares() {
+        var startAddress = document.getElementById('start-address').value;
+        var endAddress = document.getElementById('end-address').value;
+
+        if (!startAddress || !endAddress) {
+            alert('Please enter both start and end addresses.');
+            return;
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
-            initMap();
-            initAutocomplete();
-        });
-    </script>
-</head>
+        fetch('/rideshare/api/compare-fares/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                'start_address': startAddress,
+                'end_address': endAddress
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('uber-fare').textContent = 'Uber Fare: $' + data.uber_fare;
+                document.getElementById('lyft-fare').textContent = 'Lyft Fare: $' + data.lyft_fare;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while comparing fares. Please try again.');
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        initMap();
+        initAutocomplete();
+    });
+</script>
+{% endblock %}
+
+{% block content %}
 
 <body onload="initMap()">
-    <header>
-        <nav class="navbar navbar-expand-lg">
-            <div class="container">
-                <a class="navbar-brand" href="/">Taxi Compare</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item"><a class="nav-link" href="/forum">Forum</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
-                        {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a href="/profile" class="btn btn-primary">Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/logout" class="btn btn-secondary">Logout</a>
-                        </li>
-                        {% else %}
-                        <li class="nav-item">
-                            <a href="/login" class="btn btn-primary">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/register" class="btn btn-outline-primary">Register</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-
     <main>
         <section class="hero-section">
             <div class="container">
@@ -253,22 +218,4 @@
                 </div>
             </div>
         </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <div class="footer-links">
-                <a href="#">About Us</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Contact</a>
-            </div>
-            <p>&copy; 2024 Taxi Compare. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-
-</html>
+{% endblock %}
