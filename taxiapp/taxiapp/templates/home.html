@@ -1,161 +1,221 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Taxi Compare</title>
-    <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
-</head>
-<!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initAutocomplete" async defer></script> -->
+{% block extra_js %}
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAutocomplete"
+    async defer></script>
+<script>
+    var map, startMarker, endMarker, line, directionsService, directionsRenderer;
 
-<!-- <script>
+    function initMap() {
+        var options = {
+            zoom: 8,
+            center: { lat: 39.8097343, lng: -87.6500523 }
+        };
+
+        map = new google.maps.Map(document.getElementById('map'), options);
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+    }
+
     function initAutocomplete() {
         var startInput = document.getElementById('start-address');
         var endInput = document.getElementById('end-address');
 
+        var autocompleteStart = new google.maps.places.Autocomplete(startInput, { types: ['geocode'] });
+        var autocompleteEnd = new google.maps.places.Autocomplete(endInput, { types: ['geocode'] });
 
-        var autocompleteStart = new google.maps.places.Autocomplete(startInput, {types: ['geocode']});
-        var autocompleteEnd = new google.maps.places.Autocomplete(endInput, {types: ['geocode']});
-
-        autocompleteStart.addListener('place_changed', function() {
+        autocompleteStart.addListener('place_changed', function () {
             var place = autocompleteStart.getPlace();
-            console.log(place.name); 
+            if (!place.geometry) {
+                console.error('No location data available for the selected place.');
+                return;
+            }
+            updateMarker(place.geometry.location, "Start");
+            updateRoute();
         });
 
-        autocompleteEnd.addListener('place_changed', function() {
+        autocompleteEnd.addListener('place_changed', function () {
             var place = autocompleteEnd.getPlace();
-            console.log(place.name); 
+            if (!place.geometry) {
+                console.error('No location data available for the selected place.');
+                return;
+            }
+            updateMarker(place.geometry.location, "End");
+            updateRoute();
         });
     }
 
-            var map, startMarker, endMarker, line;
+    function updateMarker(location, label) {
+        if (label === "Start") {
+            if (startMarker) {
+                startMarker.setMap(null);
+            }
+            startMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                label: label
+            });
+        } else if (label === "End") {
+            if (endMarker) {
+                endMarker.setMap(null);
+            }
+            endMarker = new google.maps.Marker({
+                position: location,
+                map: map,
+                label: label
+            });
+        }
+    }
 
-        // initialize map
-        function initMap() {
-            // Map options
-            var options = {
-                zoom: 8,
-                center: {lat: -34.397, lng: 150.644} // Example center: Change to a relevant location
+    function updateRoute() {
+        if (startMarker && endMarker) {
+            var request = {
+                origin: startMarker.getPosition(),
+                destination: endMarker.getPosition(),
+                travelMode: 'DRIVING'
             };
 
-            // New map
-            map = new google.maps.Map(document.getElementById('map'), options);
-
-            // Listen for click on map
-            google.maps.event.addListener(map, 'click', function(event) {
-                if (!startMarker) {
-                    startMarker = addMarker(event.latLng, "Start");
-                } else if (!endMarker) {
-                    endMarker = addMarker(event.latLng, "End");
-                    drawLine(); // Draw line when both markers are placed
+            directionsService.route(request, function (result, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(result);
                 }
             });
-</script> -->
+        }
+    }
 
-<!-- <div class="col-md-6">
-    <input type="text" id="start-address" class="form-control" placeholder="Start Address">
-    <input type="text" id="end-address" class="form-control mt-2" placeholder="End Address">
-    <button class="btn btn-primary mt-3" type="submit">Compare Fares</button>
-</div> -->
+    function compareFares() {
+        var startAddress = document.getElementById('start-address').value;
+        var endAddress = document.getElementById('end-address').value;
 
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
-        <a class="navbar-brand" href="/">Taxi Compare</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="/forum">Forum</a></li>
-                <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
-                <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
-                {% if user.is_authenticated %}
-                <li class="nav-item">
-                    <a href="/profile" class="btn btn-outline-success my-2 my-sm-0" role="button">Profile</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/logout" class="btn btn-outline-danger my-2 my-sm-0" role="button">Logout</a>
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a href="/login" class="btn btn-outline-success my-2 my-sm-0" role="button">Login</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
-                </li>
-                {% endif %}
+        if (!startAddress || !endAddress) {
+            alert('Please enter both start and end addresses.');
+            return;
+        }
 
-            </ul>
-        </div>
-    </nav>
+        fetch('/rideshare/api/compare-fares/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                'start_address': startAddress,
+                'end_address': endAddress
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('uber-fare').textContent = 'Uber Fare: $' + data.uber_fare;
+                document.getElementById('lyft-fare').textContent = 'Lyft Fare: $' + data.lyft_fare;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while comparing fares. Please try again.');
+            });
+    }
 
-    <div class="hero-section">
-        <h1>Welcome to Taxi Compare</h1>
-        <p>Compare taxi fares easily and make your travel cost-effective.</p>
-    </div>
+    document.addEventListener('DOMContentLoaded', function () {
+        initMap();
+        initAutocomplete();
+    });
+</script>
+{% endblock %}
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-6">
-                <input type="text" class="form-control" placeholder="Start Address">
-                <input type="text" class="form-control mt-2" placeholder="End Address">
-                <button class="btn btn-primary mt-3" type="submit">Compare Fares</button>
+{% block content %}
+
+<body onload="initMap()">
+    <main>
+        <section class="hero-section">
+            <div class="container">
+                <h1>Welcome to Taxi Compare</h1>
+                <p>Compare taxi fares easily and make your travel cost-effective.</p>
             </div>
-            <div class="col-md-6 map-container">
-                <!-- Map Placeholder -->
+        </section>
+
+        <section class="fare-comparison-section">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="text" id="start-address" class="form-control" placeholder="Start Address">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="end-address" class="form-control" placeholder="End Address">
+                        </div>
+                        <button class="btn btn-primary" onclick="compareFares()">Compare Fares</button>
+                        <div class="fare-comparison">
+                            <h3>Fare Comparison</h3>
+                            <div id="uber-fare"></div>
+                            <div id="lyft-fare"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="map"></div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="container-fluid">
-        <h3>What We Do</h3>
-        <p>Taxi Compare provides real-time fare comparisons between different taxi services like Uber and Lyft. Simply
-            enter your start and end locations to see a side-by-side comparison of available services and choose the
-            best option for your journey.</p>
-    </div>
+        <section class="what-we-do-section">
+            <div class="container">
+                <h2>What We Do</h2>
+                <p>Taxi Compare provides real-time fare comparisons between different taxi services like Uber and Lyft.
+                    Simply enter your start and end locations to see a side-by-side comparison of available services and
+                    choose the best option for your journey.</p>
+            </div>
+        </section>
 
-    <div class="container-fluid featured-comparisons">
-        <h3>Featured Comparisons</h3>
-        <div class="comparison-item">
-            <h5>Comparison 1</h5>
-            <p>Insights on the most cost-effective options for popular routes.</p>
-        </div>
-        <div class="comparison-item">
-            <h5>Comparison 2</h5>
-            <p>Updates on seasonal fare changes and how they affect your travel budget.</p>
-        </div>
-    </div>
+        <section class="featured-comparisons-section">
+            <div class="container">
+                <h2>Featured Comparisons</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="comparison-item">
+                            <h3>Comparison 1</h3>
+                            <p>Insights on the most cost-effective options for popular routes.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="comparison-item">
+                            <h3>Comparison 2</h3>
+                            <p>Updates on seasonal fare changes and how they affect your travel budget.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    <div class="container-fluid forum-trending">
-        <h3>Trending on the Forum</h3>
-        <div class="forum-post">
-            <h5>Forum Post Title 1</h5>
-            <p>Short excerpt from the post...</p>
-            <a href="#" class="read-more">Read More</a>
-        </div>
-        <div class="forum-post">
-            <h5>Forum Post Title 2</h5>
-            <p>Short excerpt from the post...</p>
-            <a href="#" class="read-more">Read More</a>
-        </div>
-        <div class="forum-post">
-            <h5>Forum Post Title 3</h5>
-            <p>Short excerpt from the post...</p>
-            <a href="#" class="read-more">Read More</a>
-        </div>
-    </div>
-
-    <footer class="footer-container">
-        <div class="footer-links">
-            <a href="#">About Us</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Contact</a>
-        </div>
-        © 2024 Taxi Compare. All rights reserved.
-    </footer>
-</body>
-
-</html>
+        <section class="forum-trending-section">
+            <div class="container">
+                <h2>Trending on the Forum</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="forum-post">
+                            <h3>Forum Post Title 1</h3>
+                            <p>Short excerpt from the post...</p>
+                            <a href="#" class="btn btn-link">Read More</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="forum-post">
+                            <h3>Forum Post Title 2</h3>
+                            <p>Short excerpt from the post...</p>
+                            <a href="#" class="btn btn-link">Read More</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="forum-post">
+                            <h3>Forum Post Title 3</h3>
+                            <p>Short excerpt from the post...</p>
+                            <a href="#" class="btn btn-link">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+{% endblock %}
