@@ -6,8 +6,8 @@ import django.db.models.deletion
 
 
 def add_category_data(apps, schema_editor):
-    Category = apps.get_model('forum', 'Category')  
-    categories = ['Experience', 'Question', 'Concern', 'News', 'Other'] 
+    Category = apps.get_model('forum', 'Category')
+    categories = ['Experience', 'Question', 'Concern', 'News', 'Other']
     for cat in categories:
         Category.objects.create(name=cat)
 
