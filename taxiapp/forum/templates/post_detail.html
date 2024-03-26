@@ -1,43 +1,33 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="container" style="padding-top: 100px;">
-    <h1>{{ post.title }}</h1>
-    <p class="text-muted">Posted on {{ post.created_at|date:"F d, Y" }}</p>
-    <div class="post-content">
-        {{ post.content|linebreaks }}
-    </div>
-    
+<div class="container">
+    <h2>{{ post.title }}</h2>
+    <p><strong>Category:</strong> {{ post.category.name }}</p>
+    <p><strong>Posted by:</strong> {{ post.user.username }} on {{ post.created_at|date:"F d, Y" }}</p>
     <hr>
-    
-    <h2>Comments</h2>
-    <div class="comments">
-        {% for comment in post.comments.all %}
-            <div class="comment">
-                <p class="comment-content">{{ comment.content }}</p>
-                <p class="text-muted">Posted by {{ comment.author }} on {{ comment.created_at|date:"F d, Y" }}</p>
-            </div>
-        {% empty %}
-            <p>No comments yet.</p>
-        {% endfor %}
-    </div>
-    
+    <div>{{ post.content|safe }}</div>
     <hr>
-    
+    <h3>Comments</h3>
+    {% for comment in post.comments.all %}
+    <div class="comment">
+        <p><strong>{{ comment.user.username }}</strong> commented on {{ comment.created_at|date:"F d, Y H:i" }}</p>
+        <p>{{ comment.content }}</p>
+    </div>
+    {% empty %}
+    <p>No comments yet.</p>
+    {% endfor %}
+    <hr>
     {% if user.is_authenticated %}
-    <h3>Add a comment:</h3>
+    <h4>Add a comment</h4>
     <form method="post" action="{% url 'add_comment' post.id %}">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="comment-content">Your comment:</label>
-            <textarea id="comment-content" name="content" class="form-control" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <textarea name="content" class="form-control" rows="3"></textarea>
+        <br>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
     </form>
     {% else %}
     <p><a href="{% url 'login' %}">Log in</a> to add a comment.</p>
     {% endif %}
-
-    <a href="{% url 'forum_home' %}" class="btn btn-primary">Back to Forum</a>
 </div>
 {% endblock %}

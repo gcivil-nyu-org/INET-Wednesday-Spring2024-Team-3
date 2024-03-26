@@ -4,6 +4,11 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
+def add_category_data(apps, schema_editor):
+    Category = apps.get_model('forum', 'Category')
+    categories = ['Experience', 'Question', 'Concern', 'News', 'Other']
+    for cat in categories:
+        Category.objects.create(name=cat)
 
 class Migration(migrations.Migration):
 
@@ -14,6 +19,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(add_category_data),
         migrations.CreateModel(
             name="ForumPost",
             fields=[

@@ -56,6 +56,12 @@ class CognitoBackend(BaseBackend):
         family_name = claims.get("family_name")
         try:
             user = User.objects.get(username=username)
+            # Update user attributes if they have changed in Cognito
+            if user.email != email or user.first_name != given_name or user.last_name != family_name:
+                user.email = email
+                user.first_name = given_name
+                user.last_name = family_name
+                user.save()
         except ObjectDoesNotExist:
             user = User.objects.create_user(
                 username=username,
@@ -72,10 +78,10 @@ class CognitoBackend(BaseBackend):
             return None
 
     @staticmethod
-    def get_secret_hash(username, client_id, client_secret):
-        message = username + client_id
+    def get_secret_hash(username):
+        message = username + settings.COGNITO_APP_CLIENT_ID
         dig = hmac.new(
-            client_secret.encode("UTF-8"),
+            settings.COGNITO_APP_CLIENT_SECRET.encode("UTF-8"),
             msg=message.encode("UTF-8"),
             digestmod=hashlib.sha256,
         ).digest()

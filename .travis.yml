@@ -35,4 +35,5 @@ deploy:
     branch: 
       - master
       - develop
+      - staticfix
   cleanup: 'false'
