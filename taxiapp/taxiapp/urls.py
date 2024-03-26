@@ -31,5 +31,4 @@ urlpatterns = [
     path("profile/", views.save_profile_view, name="save_profile"),
     path("forum/", include("forum.urls")),
     path("rideshare/", include("rideshare.urls")),
-    
 ]
