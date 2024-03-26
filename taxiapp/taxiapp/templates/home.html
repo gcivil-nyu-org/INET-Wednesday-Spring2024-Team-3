@@ -2,6 +2,13 @@
 {% load static %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
+<style>
+    /* Add custom styles for the map container */
+    #map {
+        height: 400px;
+        width: 100%;
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}

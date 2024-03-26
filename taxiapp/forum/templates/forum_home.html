@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forum_home.css' %}">
+<link rel="stylesheet" href="{% static 'css/forum/forum_home.css' %}">
 {% endblock %}
 
 {% block extra_js %}
@@ -10,6 +10,22 @@
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <script>
     var $j = jQuery.noConflict();
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
     $j(window).on('load', function () {
         loadPosts();
 
@@ -23,7 +39,7 @@
                 url: 'api/posts',
                 data: { sort_by: sortBy },
                 beforeSend: function (xhr) {
-                    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 },
                 success: function (response) {
                     var postsHtml = '';
@@ -32,7 +48,7 @@
                             <div class="col-md-6">
                                 <div class="post" data-post-id="${post.id}">
                                     <div class="post-header">
-                                        <h3><a href="/forum/post/${post.id}">${post.title}</a></h3>
+                                        <h3><a href="/forum/${post.id}">${post.title}</a></h3>
                                         <p class="post-meta">Posted by ${post.author} | ${post.created_at}</p>
                                     </div>
                                     <div class="post-content">
