@@ -8,4 +8,3 @@ urlpatterns = [
     path("post/<int:post_id>/add_comment/", views.add_comment, name="add_comment"),
     path("api/posts", views.posts_api, name='posts_api'),
 ]
-
