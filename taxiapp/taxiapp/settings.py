@@ -31,8 +31,8 @@ COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
 COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
 COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
-UBER_API_KEY = os.environ.get("UBER_API_KEY")
-LYFT_API_KEY = os.environ.get("LYFT_API_KEY")
+# UBER_API_KEY = os.environ.get("UBER_API_KEY")
+# LYFT_API_KEY = os.environ.get("LYFT_API_KEY")
 # ##########################################################
 
 # In the future, add this as travis variables to protect URL.
