@@ -31,6 +31,7 @@ deploy:
   app: taxiapp
   env: taxiapp-dev
   bucket_name: elasticbeanstalk-us-east-1-963295565159
+  edge: true
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
     branch: 
