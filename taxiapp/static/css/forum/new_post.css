@@ -1,4 +1,4 @@
-@import url('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 :root {
     --primary-color: #5D93E1;
@@ -6,7 +6,7 @@
     --background-color: #F9FAFB;
     --text-color: #343A40;
     --link-color: #007BFF;
-    --font-family: 'Roboto', sans-serif;
+    --font-family: 'Poppins', sans-serif;
 }
 
 body {
@@ -51,15 +51,57 @@ textarea.form-control {
 }
 
 .btn-primary {
-    background-color: var(--secondary-color);
+    background-color: var(--primary-color);
     color: #fff;
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
 .btn-primary:hover {
-    background-color: #165d7c;
+    background-color: var(--secondary-color);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-left: 10px;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.ql-editor {
+    min-height: 200px;
+}
+
+.tag-input {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.tag {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 20px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.tag-close {
+    margin-left: 5px;
+    cursor: pointer;
 }

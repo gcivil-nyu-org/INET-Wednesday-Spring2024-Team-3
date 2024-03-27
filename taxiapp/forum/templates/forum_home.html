@@ -3,11 +3,13 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum_home.css' %}">
+<link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script src="{% static 'js/magnific-popup.min.js' %}"></script>
 <script>
     var $j = jQuery.noConflict();
     $j(window).on('load', function () {
@@ -18,38 +20,138 @@
             loadPosts(sortBy);
         });
 
-        function loadPosts(sortBy = 'recent') {
+        $j('.search-input').on('input', function () {
+            var searchQuery = $j(this).val().toLowerCase();
+            filterPosts(searchQuery);
+        });
+
+        $j('.post-list').on('click', '.upvote-button, .downvote-button', function () {
+            var postId = $j(this).closest('.post-card').data('post-id');
+            var voteType = $j(this).hasClass('upvote-button') ? 'upvote' : 'downvote';
+            votePost(postId, voteType);
+        });
+
+        $j('.post-list').on('click', '.reply-button', function () {
+            var commentId = $j(this).closest('.comment').data('comment-id');
+            // Toggle reply form visibility for the specific comment
+            $j(this).siblings('.reply-form').toggle();
+        });
+
+        $j('.post-list').on('click', '.media-link', function (e) {
+            e.preventDefault();
+            var mediaUrl = $j(this).attr('href');
+            openLightbox(mediaUrl);
+        });
+
+        function loadPosts(sortBy = 'recent', page = 1) {
             $j.ajax({
                 url: 'api/posts',
-                data: { sort_by: sortBy },
+                data: { sort_by: sortBy, page: page },
                 beforeSend: function (xhr) {
                     xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
                 },
                 success: function (response) {
                     var postsHtml = '';
-                    response.forEach(function (post) {
+                    response.posts.forEach(function (post) {
                         postsHtml += `
                             <div class="col-md-6">
-                                <div class="post" data-post-id="${post.id}">
+                                <div class="post-card" data-post-id="${post.id}">
                                     <div class="post-header">
                                         <h3><a href="/forum/post/${post.id}">${post.title}</a></h3>
-                                        <p class="post-meta">Posted by ${post.author} | ${post.created_at}</p>
+                                        <p class="post-meta">
+                                            Posted by
+                                            <span class="username">${post.author}
+                                                <span class="user-flair">${post.author_flair}</span>
+                                            </span> |
+                                            ${post.created_at}
+                                        </p>
                                     </div>
                                     <div class="post-content">
                                         <p>${post.content.substring(0, 200)}...</p>
+                                        ${post.media ? `<a href="${post.media}" class="media-link">View Media</a>` : ''}
                                     </div>
                                     <div class="post-actions">
                                         <a href="/forum/${post.id}" class="read-more">Read More</a>
-                                        <span class="likes">${post.likes} Likes</span>
+                                        <div class="vote-buttons">
+                                            <button class="upvote-button">Upvote</button>
+                                            <span class="vote-count">${post.vote_count}</span>
+                                            <button class="downvote-button">Downvote</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         `;
                     });
-                    $j('.post-list').html(`<div class="row">${postsHtml}</div>`);
+
+                    if (page === 1) {
+                        $j('.post-list').html(`<div class="row">${postsHtml}</div>`);
+                    } else {
+                        $j('.post-list .row').append(postsHtml);
+                    }
+
+                    // Update pagination links
+                    var paginationHtml = '';
+                    for (var i = 1; i <= response.total_pages; i++) {
+                        paginationHtml += `<a href="#" class="page-link" data-page="${i}">${i}</a>`;
+                    }
+                    $j('.pagination').html(paginationHtml);
                 }
             });
         }
+
+        function filterPosts(searchQuery) {
+            $j('.post-card').each(function () {
+                var postTitle = $j(this).find('h3 a').text().toLowerCase();
+                var postContent = $j(this).find('.post-content p').text().toLowerCase();
+
+                if (postTitle.includes(searchQuery) || postContent.includes(searchQuery)) {
+                    $j(this).show();
+                } else {
+                    $j(this).hide();
+                }
+            });
+        }
+
+        function votePost(postId, voteType) {
+            $j.ajax({
+                url: `api/posts/${postId}/vote`,
+                method: 'POST',
+                data: { vote_type: voteType },
+                beforeSend: function (xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
+                },
+                success: function (response) {
+                    // Update vote count in the UI
+                    $j(`.post-card[data-post-id="${postId}"] .vote-count`).text(response.vote_count);
+                }
+            });
+        }
+
+        function openLightbox(mediaUrl) {
+            $j.magnificPopup.open({
+                items: {
+                    src: mediaUrl
+                },
+                type: 'image'
+            });
+        }
+
+        // Load more posts when scrolled to the bottom
+        $j(window).scroll(function () {
+            if ($j(window).scrollTop() + $j(window).height() >= $j(document).height()) {
+                var currentPage = parseInt($j('.page-link.active').data('page'));
+                loadPosts(null, currentPage + 1);
+            }
+        });
+
+        // Load posts when pagination link is clicked
+        $j('.pagination').on('click', '.page-link', function (e) {
+            e.preventDefault();
+            var page = $j(this).data('page');
+            loadPosts(null, page);
+            $j('.page-link').removeClass('active');
+            $j(this).addClass('active');
+        });
     });
 </script>
 {% endblock %}
@@ -60,6 +162,9 @@
         <div class="container">
             <h1>Welcome to the Forum</h1>
             <p>Engage in discussions and share your insights on taxi fares.</p>
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search posts...">
+            </div>
         </div>
     </section>
 
@@ -82,6 +187,10 @@
 
             <div class="post-list">
                 <!-- Posts will be dynamically loaded here -->
+            </div>
+
+            <div class="pagination">
+                <!-- Pagination links will be dynamically loaded here -->
             </div>
         </div>
     </section>
