@@ -7,20 +7,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ##########Uncomment for local development, add secrets.env local file###############
-#env = environ.Env()
-#environ.Env.read_env(env_file="secrets.env")
-#ECRET_KEY = env("SECRET_KEY")
+# env = environ.Env()
+# environ.Env.read_env(env_file="secrets.env")
+# ECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#COGNITO_DOMAIN = env("COGNITO_DOMAIN")
-#COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
-#COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
-#COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
-#COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
-#GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY")
-#UBER_CLIENT_ID = env("UBER_CLIENT_ID")
-#UBER_CLIENT_SECRET = env("UBER_CLIENT_SECRET")
-#LYFT_API_KEY = env("LYFT_API_KEY")
+# COGNITO_DOMAIN = env("COGNITO_DOMAIN")
+# COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
+# COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
+# COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
+# COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
+# GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY")
+# UBER_CLIENT_ID = env("UBER_CLIENT_ID")
+# UBER_CLIENT_SECRET = env("UBER_CLIENT_SECRET")
+# LYFT_API_KEY = env("LYFT_API_KEY")
 
 # # # #############Uncomment for travis deployment##############
 SECRET_KEY = os.environ.get("SECRET_KEY")
