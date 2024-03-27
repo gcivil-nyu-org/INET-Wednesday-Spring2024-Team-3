@@ -24,6 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # # # #############Uncomment for travis deployment##############
 SECRET_KEY = os.environ.get("SECRET_KEY")
+PLEASE_WORK = os.environ.get("PLEASE_WORK")
 COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
 COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
 COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
