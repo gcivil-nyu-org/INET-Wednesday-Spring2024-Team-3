@@ -158,9 +158,9 @@ def get_secret_hash(username, client_id, client_secret):
 
 
 def home_view(request):
-    google_maps_api_key = settings.GOOGLE_MAPS_API_KEY
+    google_maps_api_key = 'TEST'
     context = {
-        'google_maps_api_key': 'TEST'
+        'google_maps_api_key': google_maps_api_key
     }
     return render(request, 'home.html', context)
 
