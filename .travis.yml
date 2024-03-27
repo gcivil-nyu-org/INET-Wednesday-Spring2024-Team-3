@@ -37,4 +37,5 @@ deploy:
       - master
       - develop
       - staticfix
+      - devin
   cleanup: 'false'
