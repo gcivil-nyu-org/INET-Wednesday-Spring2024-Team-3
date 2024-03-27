@@ -7,9 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ##########Uncomment for local development, add secrets.env local file###############
-# env = environ.Env()
-# environ.Env.read_env(env_file="secrets.env")
-# SECRET_KEY = env("SECRET_KEY")
+env = environ.Env()
+environ.Env.read_env(env_file="secrets.env")
+SECRET_KEY = env("SECRET_KEY")
 
 # # SECURITY WARNING: keep the secret key used in production secret!
 # COGNITO_DOMAIN = env("COGNITO_DOMAIN")
@@ -29,8 +29,8 @@ COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
 COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
 COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
 COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
-COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
+COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
 UBER_API_KEY = os.environ.get("UBER_API_KEY")
 LYFT_API_KEY = os.environ.get("LYFT_API_KEY")
 # ##########################################################
