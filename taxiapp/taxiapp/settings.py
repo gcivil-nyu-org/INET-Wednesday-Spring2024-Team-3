@@ -7,9 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ##########Uncomment for local development, add secrets.env local file###############
-env = environ.Env()
-environ.Env.read_env(env_file="secrets.env")
-SECRET_KEY = env("SECRET_KEY")
+# env = environ.Env()
+# environ.Env.read_env(env_file="secrets.env")
+# SECRET_KEY = env("SECRET_KEY")
 
 # # SECURITY WARNING: keep the secret key used in production secret!
 # COGNITO_DOMAIN = env("COGNITO_DOMAIN")
