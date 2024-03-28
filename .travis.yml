@@ -1,8 +1,6 @@
 dist: jammy
 language: python
-matrix:
-  include:
-    - python: 3.11
+
 env:
   global:
     - SECRET_KEY=$SECRET_KEY
@@ -20,7 +18,7 @@ before_script:
   - python manage.py migrate
 script:
   - flake8 .
-  - coverage run manage.py test
+  - coverage run --source=taxiapp manage.py test
   - coverage report
 after_script:
   - coveralls
