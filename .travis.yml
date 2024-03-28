@@ -1,5 +1,8 @@
+dist: jammy
 language: python
-
+matrix:
+  include:
+    - python: 3.11
 env:
   global:
     - SECRET_KEY=$SECRET_KEY
