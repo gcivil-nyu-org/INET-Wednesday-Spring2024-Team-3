@@ -20,7 +20,7 @@ before_script:
   - python manage.py migrate
 script:
   - flake8 .
-  - coverage run --source=taxiapp manage.py test
+  - coverage run --source=taxiapp, manage.py test
   - coverage report
 after_script:
   - coveralls
