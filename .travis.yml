@@ -8,13 +8,12 @@ env:
     - GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
 
 install:
-  - cd taxiapp
   - pip install -r requirements.txt
 before_script:
   - python manage.py migrate
 script:
   - flake8 .
-  - coverage run --source=taxiapp manage.py test
+  - coverage run manage.py test --noinput
   - coverage report
 after_script:
   - coveralls
@@ -34,4 +33,4 @@ deploy:
       - master
       - develop
       - devin
-  cleanup: 'false'
+  skip_cleanup: 'true'
