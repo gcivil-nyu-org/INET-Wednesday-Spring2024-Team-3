@@ -371,6 +371,7 @@ def save_profile_view(request):
         return redirect("/profile")
 
 
+
 def faq(request):
     faq_data = [
         {
