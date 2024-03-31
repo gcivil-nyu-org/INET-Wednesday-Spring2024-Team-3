@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forum/forum_home.css' %}">
-{% endblock %}
-
 {% block extra_js %}
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
@@ -36,9 +32,8 @@
                     xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 },
                 success: function(response) {
-                    $j('.score').text(response.score);
+                    $j('.score').text(`Score: ${response.score}`);
                 }
-
             });
         });
 
@@ -51,9 +46,8 @@
                     xhr.setRequestHeader('X-CSRFToken', csrftoken);
                 },
                 success: function(response) {
-                    $j('.score').text(response.score);
+                    $j('.score').text(`Score: ${response.score}`);
                 }
-
             });
         });
     });
@@ -63,14 +57,9 @@
 {% block content %}
 <div class="container">
     <h2>{{ post.title }}</h2>
-    <p><strong>Posted by:</strong> <a href="{% url 'public_user' username=post.user.username %}">{{ post.user.username }}</a> on {{ post.created_at|date:"F d, Y" }}</p>
+    <p><strong>Category:</strong> {{ post.category.name }}</p>
+    <p><strong>Posted by:</strong> {{ post.user.username }} on {{ post.created_at|date:"F d, Y" }}</p>
     <div>{{ post.content|safe }}</div>
-     {% if post.user == request.user or request.user.is_superuser %}
-        <form action="{% url 'post_delete' post.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this post?');">Delete Post</button>
-        </form>
-    {% endif %}
     <p><strong>Score:</strong> <span class="score">{{ post.score }}</span></p>
     <button class="upvote-button btn btn-success">Upvote</button>
     <button class="downvote-button btn btn-danger">Downvote</button>
@@ -78,16 +67,8 @@
     <h3>Comments</h3>
     {% for comment in post.comments.all %}
     <div class="comment">
-        <p><strong><a href="{% url 'public_user' username=comment.user.username %}">{{ comment.user.username }}</a> </strong> commented on {{ comment.created_at|date:"F d, Y H:i" }}</p>
+        <p><strong>{{ comment.user.username }}</strong> commented on {{ comment.created_at|date:"F d, Y H:i" }}</p>
         <p>{{ comment.content }}</p>
-        {% if comment.user == request.user %}
-            <form action="{% url 'delete_comment' post.id comment.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this comment?');">
-                    Delete
-                </button>
-            </form>
-        {% endif %}
     </div>
     {% empty %}
     <p>No comments yet.</p>
