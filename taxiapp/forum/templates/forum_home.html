@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forum/forum_home.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/forum/forum_home.css' %}">
 {% endblock %}
 
 {% block extra_js %}
@@ -56,13 +56,44 @@
                                     </div>
                                     <div class="post-actions">
                                         <a href="/forum/${post.id}" class="read-more">Read More</a>
-                                        <span class="likes">${post.likes} Likes</span>
+                                        <button class="upvote-button" data-post-id="${post.id}">Upvote</button>
+                                        <button class="downvote-button" data-post-id="${post.id}">Downvote</button>
+                                        <span class="score">Score: ${post.score}</span>
                                     </div>
                                 </div>
                             </div>
                         `;
                     });
                     $j('.post-list').html(`<div class="row">${postsHtml}</div>`);
+
+                    // Add event handlers for upvote and downvote buttons
+                    $j('.upvote-button').click(function() {
+                        var postId = $j(this).data('post-id');
+                        $j.ajax({
+                            url: `/forum/${postId}/upvote/`,
+                            method: 'POST',
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                            },
+                            success: function(response) {
+                                $j(`.post[data-post-id="${postId}"] .score`).text(`Score: ${response.score}`);
+                            }
+                        });
+                    });
+
+                    $j('.downvote-button').click(function() {
+                        var postId = $j(this).data('post-id');
+                        $j.ajax({
+                            url: `/forum/${postId}/downvote/`,
+                            method: 'POST',
+                            beforeSend: function(xhr) {
+                                xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                            },
+                            success: function(response) {
+                                $j(`.post[data-post-id="${postId}"] .score`).text(`Score: ${response.score}`);
+                            }
+                        });
+                    });
                 }
             });
         }
