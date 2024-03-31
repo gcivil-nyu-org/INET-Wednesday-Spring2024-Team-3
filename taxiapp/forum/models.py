@@ -23,6 +23,13 @@ class Post(models.Model):
     topic = models.ForeignKey('Topic', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    upvotes = models.IntegerField(default=0)
+    downvotes = models.IntegerField(default=0)
+
+    @property
+    def score(self):
+        return self.upvotes - self.downvotes
+
     
 class Topic(models.Model):
     name = models.CharField(max_length=100)

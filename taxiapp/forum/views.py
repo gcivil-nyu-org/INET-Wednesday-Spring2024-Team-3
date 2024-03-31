@@ -62,7 +62,27 @@ def posts_api(request):
         'content': post.content,
         'author': post.user.username,
         'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
-        'likes': 0,
+        'score': post.score,
     } for post in posts]
     logger.info(f'post_data: {posts_data}')
     return JsonResponse(posts_data, safe=False)
+
+@login_required
+def upvote_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == "POST":
+        # Increment the upvotes count
+        post.upvotes += 1
+        post.save()
+        return JsonResponse({'score': post.score})
+    return redirect('post_detail', post_id=post_id)
+
+@login_required
+def downvote_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == "POST":
+        # Increment the downvotes count
+        post.downvotes += 1
+        post.save()
+        return JsonResponse({'score': post.score})
+    return redirect('post_detail', post_id=post_id)
