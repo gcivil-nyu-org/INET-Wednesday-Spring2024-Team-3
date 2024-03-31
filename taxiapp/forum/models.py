@@ -46,16 +46,6 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-# class Vote(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True, related_name='post_votes')
-#     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True, related_name='comment_votes')
-#     value = models.SmallIntegerField(choices=[(1, 'Upvote'), (-1, 'Downvote')])
-#     created_at = models.DateTimeField(auto_now_add=True)
-
-#     class Meta:
-#         unique_together = [('user', 'post'), ('user', 'comment')]
-
 
 class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
