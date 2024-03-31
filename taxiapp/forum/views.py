@@ -53,19 +53,30 @@ def post_detail(request, post_id):
     return render(request, 'post_detail.html', {'post': post})
 
 def posts_api(request):
-    sort_by = request.GET.get('sort_by', 'recent')
-    posts = Post.objects.all().order_by('-created_at')[:10]
-    logger.info(f'posts: {posts}')
-    posts_data = [{
-        'id': post.id,
-        'title': post.title,
-        'content': post.content,
-        'author': post.user.username,
-        'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
-        'score': post.score,
-    } for post in posts]
-    logger.info(f'post_data: {posts_data}')
-    return JsonResponse(posts_data, safe=False)
+    sort_by = request.GET.get('popular', 'recent')
+    try:
+        if sort_by == 'recent':
+            posts = Post.objects.all().order_by('-created_at')[:10]
+        elif sort_by == 'popular':
+            posts = Post.objects.all().order_by('-score')[:10]
+        else:
+            # Default sorting or handle invalid sort_by value
+            posts = Post.objects.all().order_by('-created_at')[:10]
+
+        posts_data = [{
+            'id': post.id,
+            'title': post.title,
+            'content': post.content,
+            'author': post.user.username,
+            'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
+            'score': post.score,
+        } for post in posts]
+
+        return JsonResponse(posts_data, safe=False)
+
+    except Exception as e:
+        logger.error(f'Error in posts_api: {e}')
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
 
 @login_required
