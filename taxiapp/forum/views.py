@@ -2,7 +2,7 @@ import logging
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Post, Comment, Category
+from .models import Post, Comment, Category, Vote
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
@@ -67,22 +67,31 @@ def posts_api(request):
     logger.info(f'post_data: {posts_data}')
     return JsonResponse(posts_data, safe=False)
 
+
 @login_required
 def upvote_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    if request.method == "POST":
-        # Increment the upvotes count
+    vote, created = Vote.objects.get_or_create(user=request.user, post=post)
+    if vote.vote_type == 'downvote':
+        post.downvotes -= 1
         post.upvotes += 1
-        post.save()
-        return JsonResponse({'score': post.score})
-    return redirect('post_detail', post_id=post_id)
+    elif vote.vote_type != 'upvote':
+        post.upvotes += 1
+    vote.vote_type = 'upvote'
+    vote.save()
+    post.save()
+    return JsonResponse({'score': post.upvotes - post.downvotes})
 
 @login_required
 def downvote_post(request, post_id):
     post = get_object_or_404(Post, id=post_id)
-    if request.method == "POST":
-        # Increment the downvotes count
+    vote, created = Vote.objects.get_or_create(user=request.user, post=post)
+    if vote.vote_type == 'upvote':
+        post.upvotes -= 1
         post.downvotes += 1
-        post.save()
-        return JsonResponse({'score': post.score})
-    return redirect('post_detail', post_id=post_id)
+    elif vote.vote_type != 'downvote':
+        post.downvotes += 1
+    vote.vote_type = 'downvote'
+    vote.save()
+    post.save()
+    return JsonResponse({'score': post.upvotes - post.downvotes})
