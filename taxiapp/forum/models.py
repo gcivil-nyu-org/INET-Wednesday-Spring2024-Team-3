@@ -50,7 +50,7 @@ class Comment(models.Model):
 class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    vote_type = models.CharField(max_length=10, choices=(('upvote', 'Upvote'), ('downvote', 'Downvote')), default='upvote')
+    vote_type = models.CharField(max_length=10, choices=(('upvote', 'Upvote'), ('downvote', 'Downvote')))
 
     class Meta:
         unique_together = ('user', 'post')
