@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import Post, Comment, Category, Vote
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import F, ExpressionWrapper, IntegerField
 
 logger = logging.getLogger(__name__)
 
@@ -53,14 +54,13 @@ def post_detail(request, post_id):
     return render(request, 'post_detail.html', {'post': post})
 
 def posts_api(request):
-    sort_by = request.GET.get('popular', 'recent')
+    sort_by = request.GET.get('sort_by', 'recent')
     try:
-        if sort_by == 'recent':
-            posts = Post.objects.all().order_by('-created_at')[:10]
-        elif sort_by == 'popular':
-            posts = Post.objects.all().order_by('-score')[:10]
+        if sort_by == 'popular':
+            posts = Post.objects.annotate(
+            calculated_score=ExpressionWrapper(F('upvotes') - F('downvotes'), output_field=IntegerField())
+            ).order_by('-calculated_score')[:10]
         else:
-            # Default sorting or handle invalid sort_by value
             posts = Post.objects.all().order_by('-created_at')[:10]
 
         posts_data = [{
