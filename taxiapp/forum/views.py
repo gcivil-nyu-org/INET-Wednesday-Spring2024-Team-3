@@ -69,7 +69,7 @@ def posts_api(request):
             'content': post.content,
             'author': post.user.username,
             'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
-            'score': post.score,
+            'score': getattr(post, 'calculated_score', post.upvotes - post.downvotes),
         } for post in posts]
 
         return JsonResponse(posts_data, safe=False)
