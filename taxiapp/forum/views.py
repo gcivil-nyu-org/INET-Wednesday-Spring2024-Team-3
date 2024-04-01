@@ -58,7 +58,7 @@ def posts_api(request):
     try:
         if sort_by == 'popular':
             posts = Post.objects.annotate(
-            calculated_score=ExpressionWrapper(F('upvotes') - F('downvotes'), output_field=IntegerField())
+                calculated_score=ExpressionWrapper(F('upvotes') - F('downvotes'), output_field=IntegerField())
             ).order_by('-calculated_score')[:10]
         else:
             posts = Post.objects.all().order_by('-created_at')[:10]
