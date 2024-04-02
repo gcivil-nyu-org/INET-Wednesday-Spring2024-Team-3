@@ -1,9 +1,6 @@
-forum_home.html: {% extends 'base.html' %} {% load static %} {% block extra_css
-%}
-
-<link rel="stylesheet" href="{% static 'css/forum_home.css' %}" /> {% endblock
-%} {% block content %}
-
+{% extends 'base.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum_home.css' %}" />
+{% endblock %} {% block content %}
 <main>
   <section class="hero-section">
     <div class="container">
@@ -11,62 +8,53 @@ forum_home.html: {% extends 'base.html' %} {% load static %} {% block extra_css
       <p>Engage in discussions and share your insights on taxi fares.</p>
     </div>
   </section>
-</main>
-<section class="forum-section">
-  <div class="container">
-    {% if user.is_authenticated %}
-    <div class="new-post">
-      <a href="{% url 'post_create' %}" class="new-post-link"
-        >Create a New Post</a
-      >
-    </div>
-    {% else %}
-    <div class="login-message">
-      <p>Please <a href="/login">login</a> to create a new post.</p>
-    </div>
-    {% endif %}
 
-    <div class="sort-options">
-      <button class="sort-button" data-sort="recent">Recent</button>
-      <button class="sort-button" data-sort="popular">Most Popular</button>
-    </div>
-
-    <div class="post-list">
-      <div class="row">
-        {% for post in posts %}
-        <div class="col-md-6">
-          <div class="post-card">
-            <div class="post-header">
-              <h3>
-                <a href="{% url 'post_detail' post.id %}">{{ post.title }}</a>
-              </h3>
-              <p class="post-meta">
-                Posted by
-                <span class="username">{{ post.user.username }}</span> | {{
-                post.created_at|date:"Y-m-d H:i" }}
-              </p>
-            </div>
-            <div class="post-content">
-              <p>{{ post.content|truncatewords:30 }}</p>
-            </div>
-            <div class="post-actions">
-              <a href="{% url 'post_detail' post.id %}" class="read-more"
-                >Read More</a
-              >
-              <div class="likes">
-                <i class="fas fa-heart"></i> {{ post.likes_count }}
-              </div>
-            </div>
-          </div>
-        </div>
-        {% empty %}
-        <div class="col">
-          <p>No posts found.</p>
-        </div>
-        {% endfor %}
+  <section class="forum-section">
+    <div class="container">
+      {% if user.is_authenticated %}
+      <div class="new-post">
+        <a href="{% url 'post_create' %}" class="new-post-link"
+          >Create a New Post</a
+        >
       </div>
+      {% else %}
+      <div class="login-message">
+        <p>Please <a href="/login">login</a> to create a new post.</p>
+      </div>
+      {% endif %}
     </div>
-  </div>
-</section>
+  </section>
 
-</main> {% endblock %}
+  <div class="sort-options">
+    <button class="sort-button" data-sort="recent">Recent</button>
+    <button class="sort-button" data-sort="popular">Most Popular</button>
+  </div>
+
+  <div class="post-list">
+    {% for post in posts %}
+    <a href="{% url 'post_detail' post.id %}" class="post-item-link">
+      <div class="post-item">
+        <div class="post-votes">
+          <i class="fas fa-arrow-up"></i>
+          <span class="votes-count">{{ post.likes_count }}</span>
+          <i class="fas fa-arrow-down"></i>
+        </div>
+        <div class="post-content">
+          <h3>{{ post.title }}</h3>
+          <p class="post-meta">
+            Posted by
+            <a href="/user/{{ post.user.username }}" class="username"
+              >{{ post.user.username }}</a
+            >
+            | {{ post.created_at|date:"Y-m-d H:i" }}
+          </p>
+          <p>{{ post.content|truncatewords:30 }}</p>
+        </div>
+      </div>
+    </a>
+    {% empty %}
+    <p>No posts found.</p>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}
