@@ -159,8 +159,7 @@ def get_secret_hash(username, client_id, client_secret):
 
 
 def home_view(request):
-    google_maps_api_key = os.environ.get('COGNITO_APP_CLIENT_ID')
-    print(google_maps_api_key)
+    google_maps_api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
     context = {
         'google_maps_api_key': google_maps_api_key
     }
