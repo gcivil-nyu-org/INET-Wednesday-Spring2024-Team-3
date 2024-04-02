@@ -11,6 +11,7 @@ import hashlib
 import base64
 import logging
 import re
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +159,7 @@ def get_secret_hash(username, client_id, client_secret):
 
 
 def home_view(request):
-    google_maps_api_key = settings.GOOGLE_MAPS_API_KEY
+    google_maps_api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
     context = {
         'google_maps_api_key': google_maps_api_key
     }

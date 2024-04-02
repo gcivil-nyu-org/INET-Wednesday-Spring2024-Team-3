@@ -1,136 +1,61 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum_home.css' %}" />
+{% endblock %} {% block content %}
 
-{% block extra_css %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/forum/forum_home.css' %}">
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script>
-    var $j = jQuery.noConflict();
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    const csrftoken = getCookie('csrftoken');
-
-    $j(window).on('load', function () {
-        loadPosts();
-
-        $j('.sort-button').click(function () {
-            var sortBy = $j(this).data('sort');
-            loadPosts(sortBy);
-        });
-
-        function loadPosts(sortBy = 'recent') {
-            $j.ajax({
-                url: 'api/posts',
-                data: { sort_by: sortBy },
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                },
-                success: function (response) {
-                    var postsHtml = '';
-                    response.forEach(function (post) {
-                        postsHtml += `
-                            <div class="col-md-6">
-                                <div class="post" data-post-id="${post.id}">
-                                    <div class="post-header">
-                                        <h3><a href="/forum/${post.id}">${post.title}</a></h3>
-                                        <p class="post-meta">Posted by ${post.author} | ${post.created_at}</p>
-                                    </div>
-                                    <div class="post-content">
-                                        <p>${post.content.substring(0, 200)}...</p>
-                                    </div>
-                                    <div class="post-actions">
-                                        <a href="/forum/${post.id}" class="read-more">Read More</a>
-                                        <button class="upvote-button" data-post-id="${post.id}">Upvote</button>
-                                        <button class="downvote-button" data-post-id="${post.id}">Downvote</button>
-                                        <span class="score">Score: ${post.score}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    $j('.post-list').html(`<div class="row">${postsHtml}</div>`);
-
-                    // Add event handlers for upvote and downvote buttons
-                    $j('.upvote-button').click(function() {
-                        var postId = $j(this).data('post-id');
-                        $j.ajax({
-                            url: `/forum/${postId}/upvote/`,
-                            method: 'POST',
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                            },
-                            success: function(response) {
-                                $j(`.post[data-post-id="${postId}"] .score`).text(`Score: ${response.score}`);
-                            }
-                        });
-                    });
-
-                    $j('.downvote-button').click(function() {
-                        var postId = $j(this).data('post-id');
-                        $j.ajax({
-                            url: `/forum/${postId}/downvote/`,
-                            method: 'POST',
-                            beforeSend: function(xhr) {
-                                xhr.setRequestHeader('X-CSRFToken', csrftoken);
-                            },
-                            success: function(response) {
-                                $j(`.post[data-post-id="${postId}"] .score`).text(`Score: ${response.score}`);
-                            }
-                        });
-                    });
-                }
-            });
-        }
-    });
-</script>
-{% endblock %}
-
-{% block content %}
 <main>
-    <section class="hero-section">
-        <div class="container">
-            <h1>Welcome to the Forum</h1>
-            <p>Engage in discussions and share your insights on taxi fares.</p>
+  <section class="hero-section">
+    <div class="container">
+      <h1>Welcome to the Forum</h1>
+      <p>Engage in discussions and share your insights on taxi fares.</p>
+    </div>
+  </section>
+
+  <section class="forum-section">
+    <div class="container">
+      {% if user.is_authenticated %}
+      <div class="new-post">
+        <a href="{% url 'post_create' %}" class="new-post-link"
+          >Create a New Post</a
+        >
+      </div>
+      {% else %}
+      <div class="login-message">
+        <p>Please <a href="/login">login</a> to create a new post.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <div class="sort-options">
+    <button class="sort-button" data-sort="recent">Recent</button>
+    <button class="sort-button" data-sort="popular">Most Popular</button>
+  </div>
+
+  <div class="post-list">
+    {% for post in posts %}
+    <a href="{% url 'post_detail' post.id %}" class="post-item-link">
+      <div class="post-item">
+        <div class="post-votes">
+          <i class="fas fa-arrow-up"></i>
+          <span class="votes-count">{{ post.likes_count }}</span>
+          <i class="fas fa-arrow-down"></i>
         </div>
-    </section>
-
-    <section class="forum-section">
-        <div class="container">
-            {% if user.is_authenticated %}
-            <div class="new-post">
-                <a href="{% url 'post_create' %}" class="new-post-link">Create a New Post</a>
-            </div>
-            {% else %}
-            <div class="login-message">
-                <p>Please <a href="/login">login</a> to create a new post.</p>
-            </div>
-            {% endif %}
-
-            <div class="sort-options">
-                <button class="sort-button" data-sort="recent">Recent</button>
-                <button class="sort-button" data-sort="popular">Most Popular</button>
-            </div>
-
-            <div class="post-list">
-                <!-- Posts will be dynamically loaded here -->
-            </div>
+        <div class="post-content">
+          <h3>{{ post.title }}</h3>
+          <p class="post-meta">
+            Posted by
+            <a href="/user/{{ post.user.username }}" class="username"
+              >{{ post.user.username }}</a
+            >
+            | {{ post.created_at|date:"Y-m-d H:i" }}
+          </p>
+          <p>{{ post.content|truncatewords:30 }}</p>
         </div>
-    </section>
+      </div>
+    </a>
+    {% empty %}
+    <p>No posts found.</p>
+    {% endfor %}
+  </div>
 </main>
 {% endblock %}

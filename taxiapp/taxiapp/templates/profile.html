@@ -1,99 +1,98 @@
-{% extends 'base.html' %}
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_profile.css' %}" />
+{% endblock %} {% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navLinks = document.querySelectorAll('.settings-nav .nav-link');
+    const sections = document.querySelectorAll('.settings-content .section');
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Settings - Taxi Compare</title>
-    <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_profile.css' %}">
-</head>
+    navLinks.forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault();
+            const target = this.getAttribute('href');
 
-<nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
-    <a class="navbar-brand" href="/">Taxi Compare</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a class="nav-link" href="/forum">Forum</a></li>
-            <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
-            <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
-            {% if user.is_authenticated %}
-            <li class="nav-item">
-                <a href="/profile" class="btn btn-outline-success my-2 my-sm-0" role="button">Profile</a>
-            </li>
-            <li class="nav-item">
-                <a href="/logout" class="btn btn-outline-danger my-2 my-sm-0" role="button">Logout</a>
-            </li>
-            {% else %}
-            <li class="nav-item">
-                <a href="/login" class="btn btn-outline-success my-2 my-sm-0" role="button">Login</a>
-            </li>
-            <li class="nav-item">
-                <a href="/register" class="btn btn-outline-success my-2 my-sm-0" role="button">Register</a>
-            </li>
-            {% endif %}
+            navLinks.forEach(link => link.classList.remove('active'));
+            this.classList.add('active');
 
-        </ul>
-    </div>
-</nav>
+            sections.forEach(section => section.classList.remove('active'));
+            document.querySelector(target).classList.add('active');
+        });
+    });
+});
+</script>
+{% endblock %} {% block content %}
+
 <div class="container-fluid mt-5 pt-5">
     <div class="row">
         <div class="col-md-3 settings-nav">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link active" href="#">Profile</a>
+                    <a class="nav-link active" href="#profile">Profile</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Activity</a>
+                    <a class="nav-link" href="#activity">Activity</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Friends</a>
+                    <a class="nav-link" href="#friends">Friends</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Preferences</a>
+                    <a class="nav-link" href="#preferences">Preferences</a>
                 </li>
             </ul>
         </div>
 
         <div class="col-md-9 settings-content">
-            <h2>Edit Profile</h2>
-            <form action="{% url 'save_profile' %}" method="POST">
-                <input type="text" name="first_name" placeholder="First Name" value="{{ first_name }}" required>
-                <input type="text" name="middle_name" placeholder="Middle Name" value="{{ middle_name }}">
-                <input type="text" name="last_name" placeholder="Last Name" value="{{ last_name }}" required>
-                <input type="text" name="username" placeholder="Username" value="{{ username }}" required>
-                <input type="email" name="email" placeholder="Email" value="{{ email }}" required>
-                <input type="tel" name="phone_number" placeholder="Phone Number" value="{{ phone_number }}">
-                <input type="text" name="address" placeholder="Address" value="{{ address }}">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-            </form>
-            {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+            <div id="profile" class="section active">
+                <h2>Edit Profile</h2>
+                <form action="{% url 'save_profile' %}" method="POST">
+                    <div class="form-group">
+                        <input type="text" name="first_name" placeholder="First Name" value="{{ first_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="middle_name" placeholder="Middle Name" value="{{ middle_name }}">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="last_name" placeholder="Last Name" value="{{ last_name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="username" placeholder="Username" value="{{ username }}" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" name="email" placeholder="Email" value="{{ email }}" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" name="phone_number" placeholder="Phone Number" value="{{ phone_number }}">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" name="address" placeholder="Address" value="{{ address }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
                     {% endfor %}
-            </ul>
-            {% endif %}
+                </ul>
+                {% endif %}
+            </div>
+
+            <div id="activity" class="section">
+                <h2>Activity</h2>
+                <!-- Add activity content here -->
+            </div>
+
+            <div id="friends" class="section">
+                <h2>Friends</h2>
+                <!-- Add friends content here -->
+            </div>
+
+            <div id="preferences" class="section">
+                <h2>Preferences</h2>
+                <!-- Add preferences content here -->
+            </div>
         </div>
     </div>
 </div>
 
-<footer class="footer-container">
-    <div class="footer-links">
-        <a href="#">About Us</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Contact</a>
-    </div>
-    © 2024 Taxi Compare. All rights reserved.
-</footer>
-
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-</body>
-
-</html>
+{% endblock %}
