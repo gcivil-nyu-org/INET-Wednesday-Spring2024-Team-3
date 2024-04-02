@@ -58,6 +58,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
 # COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
 # GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY")
+
+# KEEPING THIS?
 # UBER_CLIENT_ID = env("UBER_CLIENT_ID")
 # UBER_CLIENT_SECRET = env("UBER_CLIENT_SECRET")
 # LYFT_API_KEY = env("LYFT_API_KEY")
@@ -77,9 +79,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # In the future, add this as travis variables to protect URL.
 AWS_STORAGE_BUCKET_NAME = 'taxiapp-static-bucket'
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-STATIC_LOCATION = 'static'  # I don't know if we need this
-STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# STATIC_LOCATION = 'static'  # I don't know if we need this
+# STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False

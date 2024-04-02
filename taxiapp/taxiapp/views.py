@@ -370,3 +370,18 @@ def save_profile_view(request):
         return redirect("/profile")
     else:
         return redirect("/profile")
+
+
+def faq(request):
+    faq_data = [
+        {
+            "question": "How do I sign up for an account?",
+            "answer": "You can sign up by clicking the 'Register' button on the homepage and filling in the required information."
+        },
+        {
+            "question": "How can I reset my password?",
+            "answer": "If you've forgotten your password, you can reset it by clicking the 'Forgot Password' link on the login page and following the instructions."
+        },
+    ]
+
+    return render(request, 'faq.html', {'faq_data': faq_data})

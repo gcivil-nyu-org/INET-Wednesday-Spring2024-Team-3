@@ -2,9 +2,10 @@ import logging
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Post, Comment, Category
+from .models import Post, Comment, Category, Vote
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import F, ExpressionWrapper, IntegerField
 
 logger = logging.getLogger(__name__)
 
@@ -81,3 +82,4 @@ def post_delete(request, post_id):
         return redirect("forum_home")
 
     return render(request, "post_delete.html", {"post": post})
+
