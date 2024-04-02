@@ -1,89 +1,60 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/forum_home.css' %}">
-{% endblock %}
-
-{% block extra_js %}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-<script>
-    var $j = jQuery.noConflict();
-    $j(window).on('load', function () {
-        loadPosts();
-
-        $j('.sort-button').click(function () {
-            var sortBy = $j(this).data('sort');
-            loadPosts(sortBy);
-        });
-
-        function loadPosts(sortBy = 'recent') {
-            $j.ajax({
-                url: 'api/posts',
-                data: { sort_by: sortBy },
-                beforeSend: function (xhr) {
-                    xhr.setRequestHeader('X-CSRFToken', '{{ csrf_token }}');
-                },
-                success: function (response) {
-                    var postsHtml = '';
-                    response.forEach(function (post) {
-                        postsHtml += `
-                            <div class="col-md-6">
-                                <div class="post" data-post-id="${post.id}">
-                                    <div class="post-header">
-                                        <h3><a href="/forum/post/${post.id}">${post.title}</a></h3>
-                                        <p class="post-meta">Posted by ${post.author} | ${post.created_at}</p>
-                                    </div>
-                                    <div class="post-content">
-                                        <p>${post.content.substring(0, 200)}...</p>
-                                    </div>
-                                    <div class="post-actions">
-                                        <a href="/forum/${post.id}" class="read-more">Read More</a>
-                                        <span class="likes">${post.likes} Likes</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    $j('.post-list').html(`<div class="row">${postsHtml}</div>`);
-                }
-            });
-        }
-    });
-</script>
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum_home.css' %}" />
+{% endblock %} {% block content %}
 <main>
-    <section class="hero-section">
-        <div class="container">
-            <h1>Welcome to the Forum</h1>
-            <p>Engage in discussions and share your insights on taxi fares.</p>
+  <section class="hero-section">
+    <div class="container">
+      <h1>Welcome to the Forum</h1>
+      <p>Engage in discussions and share your insights on taxi fares.</p>
+    </div>
+  </section>
+
+  <section class="forum-section">
+    <div class="container">
+      {% if user.is_authenticated %}
+      <div class="new-post">
+        <a href="{% url 'post_create' %}" class="new-post-link"
+          >Create a New Post</a
+        >
+      </div>
+      {% else %}
+      <div class="login-message">
+        <p>Please <a href="/login">login</a> to create a new post.</p>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <div class="sort-options">
+    <button class="sort-button" data-sort="recent">Recent</button>
+    <button class="sort-button" data-sort="popular">Most Popular</button>
+  </div>
+
+  <div class="post-list">
+    {% for post in posts %}
+    <a href="{% url 'post_detail' post.id %}" class="post-item-link">
+      <div class="post-item">
+        <div class="post-votes">
+          <i class="fas fa-arrow-up"></i>
+          <span class="votes-count">{{ post.likes_count }}</span>
+          <i class="fas fa-arrow-down"></i>
         </div>
-    </section>
-
-    <section class="forum-section">
-        <div class="container">
-            {% if user.is_authenticated %}
-            <div class="new-post">
-                <a href="{% url 'post_create' %}" class="new-post-link">Create a New Post</a>
-            </div>
-            {% else %}
-            <div class="login-message">
-                <p>Please <a href="/login">login</a> to create a new post.</p>
-            </div>
-            {% endif %}
-
-            <div class="sort-options">
-                <button class="sort-button" data-sort="recent">Recent</button>
-                <button class="sort-button" data-sort="popular">Most Popular</button>
-            </div>
-
-            <div class="post-list">
-                <!-- Posts will be dynamically loaded here -->
-            </div>
+        <div class="post-content">
+          <h3>{{ post.title }}</h3>
+          <p class="post-meta">
+            Posted by
+            <a href="/user/{{ post.user.username }}" class="username"
+              >{{ post.user.username }}</a
+            >
+            | {{ post.created_at|date:"Y-m-d H:i" }}
+          </p>
+          <p>{{ post.content|truncatewords:30 }}</p>
         </div>
-    </section>
+      </div>
+    </a>
+    {% empty %}
+    <p>No posts found.</p>
+    {% endfor %}
+  </div>
 </main>
 {% endblock %}

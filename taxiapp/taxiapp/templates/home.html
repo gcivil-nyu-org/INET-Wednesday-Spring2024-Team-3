@@ -1,221 +1,253 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
-{% endblock %}
-
-{% block extra_js %}
+{% extends 'base.html' %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}" />
+{% endblock %} {% block extra_js %}
 <script
-    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAutocomplete"
-    async defer></script>
+  src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&libraries=places&v=weekly"
+  defer
+></script>
 <script>
-    var map, startMarker, endMarker, line, directionsService, directionsRenderer;
+  let map, startMarker, endMarker, directionsService, directionsRenderer;
 
-    function initMap() {
-        var options = {
-            zoom: 8,
-            center: { lat: 39.8097343, lng: -87.6500523 }
-        };
+  function initMap() {
+    var mapStyles = [
+      {
+        featureType: "landscape",
+        stylers: [
+          { saturation: -100 },
+          { lightness: 65 },
+          { visibility: "on" },
+        ],
+      },
+      {
+        featureType: "poi",
+        stylers: [
+          { saturation: -100 },
+          { lightness: 51 },
+          { visibility: "simplified" },
+        ],
+      },
+    ];
 
-        map = new google.maps.Map(document.getElementById('map'), options);
-        directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
-    }
+    var options = {
+      zoom: 12,
+      center: { lat: 40.7128, lng: -74.006 },
+      styles: mapStyles,
+    };
+    map = new google.maps.Map(document.getElementById("map"), options);
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+    initAutocomplete();
+  }
 
-    function initAutocomplete() {
-        var startInput = document.getElementById('start-address');
-        var endInput = document.getElementById('end-address');
-
-        var autocompleteStart = new google.maps.places.Autocomplete(startInput, { types: ['geocode'] });
-        var autocompleteEnd = new google.maps.places.Autocomplete(endInput, { types: ['geocode'] });
-
-        autocompleteStart.addListener('place_changed', function () {
-            var place = autocompleteStart.getPlace();
-            if (!place.geometry) {
-                console.error('No location data available for the selected place.');
-                return;
-            }
-            updateMarker(place.geometry.location, "Start");
-            updateRoute();
-        });
-
-        autocompleteEnd.addListener('place_changed', function () {
-            var place = autocompleteEnd.getPlace();
-            if (!place.geometry) {
-                console.error('No location data available for the selected place.');
-                return;
-            }
-            updateMarker(place.geometry.location, "End");
-            updateRoute();
-        });
-    }
-
-    function updateMarker(location, label) {
-        if (label === "Start") {
-            if (startMarker) {
-                startMarker.setMap(null);
-            }
-            startMarker = new google.maps.Marker({
-                position: location,
-                map: map,
-                label: label
-            });
-        } else if (label === "End") {
-            if (endMarker) {
-                endMarker.setMap(null);
-            }
-            endMarker = new google.maps.Marker({
-                position: location,
-                map: map,
-                label: label
-            });
-        }
-    }
-
-    function updateRoute() {
-        if (startMarker && endMarker) {
-            var request = {
-                origin: startMarker.getPosition(),
-                destination: endMarker.getPosition(),
-                travelMode: 'DRIVING'
-            };
-
-            directionsService.route(request, function (result, status) {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(result);
-                }
-            });
-        }
-    }
-
-    function compareFares() {
-        var startAddress = document.getElementById('start-address').value;
-        var endAddress = document.getElementById('end-address').value;
-
-        if (!startAddress || !endAddress) {
-            alert('Please enter both start and end addresses.');
-            return;
-        }
-
-        fetch('/rideshare/api/compare-fares/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({
-                'start_address': startAddress,
-                'end_address': endAddress
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('uber-fare').textContent = 'Uber Fare: $' + data.uber_fare;
-                document.getElementById('lyft-fare').textContent = 'Lyft Fare: $' + data.lyft_fare;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while comparing fares. Please try again.');
-            });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        initMap();
-        initAutocomplete();
+  function initAutocomplete() {
+    var startInput = document.getElementById("start-address");
+    var endInput = document.getElementById("end-address");
+    var autocompleteStart = new google.maps.places.Autocomplete(startInput, {
+      types: ["geocode"],
     });
-</script>
-{% endblock %}
+    var autocompleteEnd = new google.maps.places.Autocomplete(endInput, {
+      types: ["geocode"],
+    });
+    autocompleteStart.addListener("place_changed", function () {
+      var place = autocompleteStart.getPlace();
+      if (!place.geometry) {
+        console.error("No location data available for the selected place.");
+        return;
+      }
+      updateMarker(place.geometry.location, "Start");
+      updateRoute();
+    });
+    autocompleteEnd.addListener("place_changed", function () {
+      var place = autocompleteEnd.getPlace();
+      if (!place.geometry) {
+        console.error("No location data available for the selected place.");
+        return;
+      }
+      updateMarker(place.geometry.location, "End");
+      updateRoute();
+    });
+  }
 
-{% block content %}
+  function updateMarker(location, label) {
+    if (label === "Start") {
+      if (startMarker) {
+        startMarker.setMap(null);
+      }
+      startMarker = new google.maps.Marker({
+        map: map,
+        position: location,
+        title: label,
+      });
+    } else if (label === "End") {
+      if (endMarker) {
+        endMarker.setMap(null);
+      }
+      endMarker = new google.maps.Marker({
+        map: map,
+        position: location,
+        title: label,
+      });
+    }
+  }
+
+  function updateRoute() {
+    if (startMarker && endMarker) {
+      var request = {
+        origin: startMarker.getPosition(),
+        destination: endMarker.getPosition(),
+        travelMode: "DRIVING",
+      };
+      directionsService.route(request, function (result, status) {
+        if (status === "OK") {
+          directionsRenderer.setDirections(result);
+        }
+      });
+    }
+  }
+
+  function compareFares() {
+    var startAddress = document.getElementById("start-address").value;
+    var endAddress = document.getElementById("end-address").value;
+    if (!startAddress || !endAddress) {
+      alert("Please enter both start and end addresses.");
+      return;
+    }
+    fetch("/rideshare/api/compare-fares/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}",
+      },
+      body: JSON.stringify({
+        start_address: startAddress,
+        end_address: endAddress,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        document.getElementById("uber-fare").textContent =
+          "Uber Fare: $" + data.uber_fare;
+        document.getElementById("lyft-fare").textContent =
+          "Lyft Fare: $" + data.lyft_fare;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("An error occurred while comparing fares. Please try again.");
+      });
+  }
+</script>
+{% endblock %} {% block content %}
 
 <body onload="initMap()">
-    <main>
-        <section class="hero-section">
-            <div class="container">
-                <h1>Welcome to Taxi Compare</h1>
-                <p>Compare taxi fares easily and make your travel cost-effective.</p>
-            </div>
-        </section>
+  <main>
+    <section class="hero-section">
+      <div class="container">
+        <h1>Welcome to Taxi Compare</h1>
+        <p>Compare taxi fares easily and make your travel cost-effective.</p>
+      </div>
+    </section>
 
-        <section class="fare-comparison-section">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <input type="text" id="start-address" class="form-control" placeholder="Start Address">
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="end-address" class="form-control" placeholder="End Address">
-                        </div>
-                        <button class="btn btn-primary" onclick="compareFares()">Compare Fares</button>
-                        <div class="fare-comparison">
-                            <h3>Fare Comparison</h3>
-                            <div id="uber-fare"></div>
-                            <div id="lyft-fare"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div id="map"></div>
-                    </div>
-                </div>
+    <section class="fare-comparison-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <input
+                type="text"
+                id="start-address"
+                class="form-control"
+                placeholder="Start Address"
+              />
             </div>
-        </section>
+            <div class="form-group">
+              <input
+                type="text"
+                id="end-address"
+                class="form-control"
+                placeholder="End Address"
+              />
+            </div>
+            <button class="btn btn-primary" onclick="compareFares()">
+              Compare Fares
+            </button>
+            <div class="fare-comparison">
+              <h3>Fare Comparison</h3>
+              <div id="uber-fare"></div>
+              <div id="lyft-fare"></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div id="map"></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <section class="what-we-do-section">
-            <div class="container">
-                <h2>What We Do</h2>
-                <p>Taxi Compare provides real-time fare comparisons between different taxi services like Uber and Lyft.
-                    Simply enter your start and end locations to see a side-by-side comparison of available services and
-                    choose the best option for your journey.</p>
-            </div>
-        </section>
+    <section class="what-we-do-section">
+      <div class="container">
+        <h2>What We Do</h2>
+        <p>
+          Taxi Compare provides real-time fare comparisons between different
+          taxi services like Uber and Lyft. Simply enter your start and end
+          locations to see a side-by-side comparison of available services and
+          choose the best option for your journey.
+        </p>
+      </div>
+    </section>
 
-        <section class="featured-comparisons-section">
-            <div class="container">
-                <h2>Featured Comparisons</h2>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="comparison-item">
-                            <h3>Comparison 1</h3>
-                            <p>Insights on the most cost-effective options for popular routes.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="comparison-item">
-                            <h3>Comparison 2</h3>
-                            <p>Updates on seasonal fare changes and how they affect your travel budget.</p>
-                        </div>
-                    </div>
-                </div>
+    <section class="featured-comparisons-section">
+      <div class="container">
+        <h2>Featured Comparisons</h2>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="comparison-item">
+              <h3>Comparison 1</h3>
+              <p>
+                Insights on the most cost-effective options for popular routes.
+              </p>
             </div>
-        </section>
+          </div>
+          <div class="col-md-6">
+            <div class="comparison-item">
+              <h3>Comparison 2</h3>
+              <p>
+                Updates on seasonal fare changes and how they affect your travel
+                budget.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        <section class="forum-trending-section">
-            <div class="container">
-                <h2>Trending on the Forum</h2>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="forum-post">
-                            <h3>Forum Post Title 1</h3>
-                            <p>Short excerpt from the post...</p>
-                            <a href="#" class="btn btn-link">Read More</a>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="forum-post">
-                            <h3>Forum Post Title 2</h3>
-                            <p>Short excerpt from the post...</p>
-                            <a href="#" class="btn btn-link">Read More</a>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="forum-post">
-                            <h3>Forum Post Title 3</h3>
-                            <p>Short excerpt from the post...</p>
-                            <a href="#" class="btn btn-link">Read More</a>
-                        </div>
-                    </div>
-                </div>
+    <section class="forum-trending-section">
+      <div class="container">
+        <h2>Trending on the Forum</h2>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="forum-post">
+              <h3>Forum Post Title 1</h3>
+              <p>Short excerpt from the post...</p>
+              <a href="#" class="btn btn-link">Read More</a>
             </div>
-        </section>
+          </div>
+          <div class="col-md-4">
+            <div class="forum-post">
+              <h3>Forum Post Title 2</h3>
+              <p>Short excerpt from the post...</p>
+              <a href="#" class="btn btn-link">Read More</a>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="forum-post">
+              <h3>Forum Post Title 3</h3>
+              <p>Short excerpt from the post...</p>
+              <a href="#" class="btn btn-link">Read More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
 {% endblock %}

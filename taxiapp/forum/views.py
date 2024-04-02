@@ -66,3 +66,18 @@ def posts_api(request):
     } for post in posts]
     logger.info(f'post_data: {posts_data}')
     return JsonResponse(posts_data, safe=False)
+
+@login_required
+def post_delete(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.user != post.user:
+        messages.error(request, "You are not authorized to delete this post.")
+        return redirect("post_detail", post_id=post.id)
+
+    if request.method == "POST":
+        post.delete()
+        messages.success(request, "Post deleted successfully.")
+        return redirect("forum_home")
+
+    return render(request, "post_delete.html", {"post": post})
