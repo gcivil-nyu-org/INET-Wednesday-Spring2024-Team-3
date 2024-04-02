@@ -12,7 +12,6 @@
   let map, startMarker, endMarker, directionsService, directionsRenderer;
   function initMap() {
     var apiKey = "{{ google_maps_api_key }}";
-    console.log("Google Maps API Key:", apiKey);
     var options = { zoom: 8, center: { lat: 39.8097343, lng: -87.6500523 } };
     map = new google.maps.Map(document.getElementById("map"), options);
     directionsService = new google.maps.DirectionsService();
