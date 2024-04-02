@@ -66,3 +66,22 @@ def posts_api(request):
     } for post in posts]
     logger.info(f'post_data: {posts_data}')
     return JsonResponse(posts_data, safe=False)
+
+@login_required
+def delete_comment(request, post_id, comment_id): #comment ID is needed to find necessary comment to delete
+    post = get_object_or_404(Post, id=post_id)
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.user != comment.user and not request.user.is_superuser:
+        messages.error(request, "You are not authorized to delete this comment.")
+        return redirect("post_detail", post_id=post.id)
+    if request.method == "POST":
+        comment.delete()
+        messages.success(request, "Comment deleted successfully.")
+        return redirect("post_detail", post_id=post.id)
+
+    context = {
+        'comment': comment,
+        'post': post
+    }
+    return redirect("post_detail", post_id=post_id)
