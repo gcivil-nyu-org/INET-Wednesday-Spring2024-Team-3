@@ -82,4 +82,3 @@ def post_delete(request, post_id):
         return redirect("forum_home")
 
     return render(request, "post_delete.html", {"post": post})
-
