@@ -31,33 +31,33 @@ def get_secret(name):
     return api_key
 
 
-# SECRET_KEY = get_secret("SECRET_KEY")
-# COGNITO_DOMAIN = get_secret("COGNITO_DOMAIN")
-# COGNITO_APP_CLIENT_SECRET = get_secret("COGNITO_APP_CLIENT_SECRET")
-# COGNITO_USER_POOL_ID = "us-east-1_xjtJDp8bd"
-# os.environ[COGNITO_USER_POOL_ID] = COGNITO_USER_POOL_ID
-# COGNITO_APP_CLIENT_ID = get_secret("COGNITO_APP_CLIENT_ID")
-# COGNITO_AWS_REGION = get_secret("COGNITO_AWS_REGION")
-# COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
-# os.environ[COGNITO_PUBLIC_KEYS_URL] = COGNITO_PUBLIC_KEYS_URL
-# GOOGLE_MAPS_API_KEY = get_secret("GOOGLE_MAPS_API_KEY")
+SECRET_KEY = get_secret("SECRET_KEY")
+COGNITO_DOMAIN = get_secret("COGNITO_DOMAIN")
+COGNITO_APP_CLIENT_SECRET = get_secret("COGNITO_APP_CLIENT_SECRET")
+COGNITO_USER_POOL_ID = "us-east-1_xjtJDp8bd"
+os.environ[COGNITO_USER_POOL_ID] = COGNITO_USER_POOL_ID
+COGNITO_APP_CLIENT_ID = get_secret("COGNITO_APP_CLIENT_ID")
+COGNITO_AWS_REGION = get_secret("COGNITO_AWS_REGION")
+COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
+os.environ[COGNITO_PUBLIC_KEYS_URL] = COGNITO_PUBLIC_KEYS_URL
+GOOGLE_MAPS_API_KEY = get_secret("GOOGLE_MAPS_API_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ##########Uncomment for local development, add secrets.env local file###############
-env = environ.Env()
-environ.Env.read_env(env_file="secrets.env")
-SECRET_KEY = env("SECRET_KEY")
+# env = environ.Env()
+# environ.Env.read_env(env_file="secrets.env")
+# SECRET_KEY = env("SECRET_KEY")
 
 # # SECURITY WARNING: keep the secret key used in production secret!
-COGNITO_DOMAIN = env("COGNITO_DOMAIN")
-COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
-COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
-COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
-COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
-GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY")
+# COGNITO_DOMAIN = env("COGNITO_DOMAIN")
+# COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
+# COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
+# COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
+# COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
+# GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY")
 
 # KEEPING THIS?
 # UBER_CLIENT_ID = env("UBER_CLIENT_ID")
@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     "taxiapp",
     "forum",
     "rideshare",
+    "user_profile.apps.UserProfileConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
