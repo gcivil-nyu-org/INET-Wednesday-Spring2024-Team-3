@@ -1,23 +1,44 @@
 {% extends 'base.html' %} {% load static %} {% block extra_css %}
-
 <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}" />
 {% endblock %} {% block extra_js %}
-
-<script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
 <script
   src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&libraries=places&v=weekly"
   defer
 ></script>
 <script>
   let map, startMarker, endMarker, directionsService, directionsRenderer;
+
   function initMap() {
-    var apiKey = "{{ google_maps_api_key }}";
-    var options = { zoom: 8, center: { lat: 39.8097343, lng: -87.6500523 } };
+    var mapStyles = [
+      {
+        featureType: "landscape",
+        stylers: [
+          { saturation: -100 },
+          { lightness: 65 },
+          { visibility: "on" },
+        ],
+      },
+      {
+        featureType: "poi",
+        stylers: [
+          { saturation: -100 },
+          { lightness: 51 },
+          { visibility: "simplified" },
+        ],
+      },
+    ];
+
+    var options = {
+      zoom: 12,
+      center: { lat: 40.7128, lng: -74.006 },
+      styles: mapStyles,
+    };
     map = new google.maps.Map(document.getElementById("map"), options);
     directionsService = new google.maps.DirectionsService();
     directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
     initAutocomplete();
   }
+
   function initAutocomplete() {
     var startInput = document.getElementById("start-address");
     var endInput = document.getElementById("end-address");
@@ -46,12 +67,13 @@
       updateRoute();
     });
   }
+
   function updateMarker(location, label) {
     if (label === "Start") {
       if (startMarker) {
         startMarker.setMap(null);
       }
-      startMarker = new google.maps.marker.AdvancedMarkerElement({
+      startMarker = new google.maps.Marker({
         map: map,
         position: location,
         title: label,
@@ -60,18 +82,19 @@
       if (endMarker) {
         endMarker.setMap(null);
       }
-      endMarker = new google.maps.marker.AdvancedMarkerElement({
+      endMarker = new google.maps.Marker({
         map: map,
         position: location,
         title: label,
       });
     }
   }
+
   function updateRoute() {
     if (startMarker && endMarker) {
       var request = {
-        origin: startMarker.position,
-        destination: endMarker.position,
+        origin: startMarker.getPosition(),
+        destination: endMarker.getPosition(),
         travelMode: "DRIVING",
       };
       directionsService.route(request, function (result, status) {
@@ -81,6 +104,7 @@
       });
     }
   }
+
   function compareFares() {
     var startAddress = document.getElementById("start-address").value;
     var endAddress = document.getElementById("end-address").value;
@@ -111,7 +135,6 @@
         alert("An error occurred while comparing fares. Please try again.");
       });
   }
-  window.initMap = initMap;
 </script>
 {% endblock %} {% block content %}
 
@@ -225,6 +248,6 @@
         </div>
       </div>
     </section>
-    {% endblock %}
   </main>
 </body>
+{% endblock %}

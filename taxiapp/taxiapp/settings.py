@@ -12,15 +12,12 @@ def get_secret(name):
     secret_name = "taxiapp_secrets"
     region_name = "us-east-1"
 
-    # Create a Secrets Manager client
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=region_name)
 
     try:
         get_secret_value_response = client.get_secret_value(SecretId=secret_name)
     except ClientError as e:
-        # For a list of exceptions thrown, see
-        # https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_GetSecretValue.html
         print(f"Failed to retrieve secret '{secret_name}': {e}")
         return None
 
@@ -31,7 +28,6 @@ def get_secret(name):
     secret_dict = json.loads(secret)
     api_key = secret_dict.get(name)
     os.environ[name] = api_key
-    print(f"Retrieved {name}:", api_key)  # Add this line for debugging
     return api_key
 
 
