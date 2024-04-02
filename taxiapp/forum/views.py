@@ -55,18 +55,28 @@ def post_detail(request, post_id):
 
 def posts_api(request):
     sort_by = request.GET.get('sort_by', 'recent')
-    posts = Post.objects.all().order_by('-created_at')[:10]
-    logger.info(f'posts: {posts}')
-    posts_data = [{
-        'id': post.id,
-        'title': post.title,
-        'content': post.content,
-        'author': post.user.username,
-        'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
-        'likes': 0,
-    } for post in posts]
-    logger.info(f'post_data: {posts_data}')
-    return JsonResponse(posts_data, safe=False)
+    try:
+        if sort_by == 'popular':
+            posts = Post.objects.annotate(
+                calculated_score=ExpressionWrapper(F('upvotes') - F('downvotes'), output_field=IntegerField())
+            ).order_by('-calculated_score')[:10]
+        else:
+            posts = Post.objects.all().order_by('-created_at')[:10]
+
+        posts_data = [{
+            'id': post.id,
+            'title': post.title,
+            'content': post.content,
+            'author': post.user.username,
+            'created_at': post.created_at.strftime('%Y-%m-%d %H:%M'),
+            'score': getattr(post, 'calculated_score', post.upvotes - post.downvotes),
+        } for post in posts]
+
+        return JsonResponse(posts_data, safe=False)
+
+    except Exception as e:
+        logger.error(f'Error in posts_api: {e}')
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
 @login_required
 def post_delete(request, post_id):
@@ -82,3 +92,31 @@ def post_delete(request, post_id):
         return redirect("forum_home")
 
     return render(request, "post_delete.html", {"post": post})
+
+@login_required
+def upvote_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    vote, created = Vote.objects.get_or_create(user=request.user, post=post)
+    if vote.vote_type == 'downvote':
+        post.downvotes -= 1
+        post.upvotes += 1
+    elif vote.vote_type != 'upvote':
+        post.upvotes += 1
+    vote.vote_type = 'upvote'
+    vote.save()
+    post.save()
+    return JsonResponse({'score': post.upvotes - post.downvotes})
+
+@login_required
+def downvote_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    vote, created = Vote.objects.get_or_create(user=request.user, post=post)
+    if vote.vote_type == 'upvote':
+        post.upvotes -= 1
+        post.downvotes += 1
+    elif vote.vote_type != 'downvote':
+        post.downvotes += 1
+    vote.vote_type = 'downvote'
+    vote.save()
+    post.save()
+    return JsonResponse({'score': post.upvotes - post.downvotes})
