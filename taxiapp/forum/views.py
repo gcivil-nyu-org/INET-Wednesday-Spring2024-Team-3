@@ -36,6 +36,7 @@ def post_create(request):
             return redirect('post_detail', post_id=new_post.id)
     return render(request, 'post_create.html', {'categories': categories})
 
+
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.method == "POST":
@@ -48,9 +49,11 @@ def add_comment(request, post_id):
         return redirect("post_detail", post_id=post.id)
     return redirect("forum_home")
 
+
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     return render(request, 'post_detail.html', {'post': post})
+
 
 def posts_api(request):
     sort_by = request.GET.get('sort_by', 'recent')
@@ -67,8 +70,9 @@ def posts_api(request):
     logger.info(f'post_data: {posts_data}')
     return JsonResponse(posts_data, safe=False)
 
+
 @login_required
-def delete_comment(request, post_id, comment_id): #comment ID is needed to find necessary comment to delete
+def delete_comment(request, post_id, comment_id):
     post = get_object_or_404(Post, id=post_id)
     comment = get_object_or_404(Comment, id=comment_id)
 
@@ -77,7 +81,7 @@ def delete_comment(request, post_id, comment_id): #comment ID is needed to find 
         return redirect("post_detail", post_id=post.id)
     if request.method == "POST":
         comment.delete()
-        messages.success(request, "Comment deleted successfully.")
+
         return redirect("post_detail", post_id=post.id)
 
     context = {
