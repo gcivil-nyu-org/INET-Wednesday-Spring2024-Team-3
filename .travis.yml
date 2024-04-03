@@ -24,5 +24,4 @@ deploy:
     branch: 
       - master
       - develop
-      - importmodels
   cleanup: 'false'
