@@ -8,10 +8,9 @@
     <title>TaxiApp Forms</title>
     <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_confirm.css' %}">
 </head>
-{% block content %}
 <body>
 
-    <form method="post" action="{% url 'confirm' %}"> 
+    <form method="post" action="{% url 'confirm' %}">
         {% csrf_token %}
         <input type="text" name="username" placeholder="Username" required>
         <input type="text" name="confirmation_code" placeholder="Confirmation Code" required>
@@ -24,8 +23,7 @@
         </ul>
         {% endif %}
     </form>
-    
+
 
 </body>
-{% endblock %}
 </html>
