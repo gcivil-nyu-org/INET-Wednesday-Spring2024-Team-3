@@ -1,5 +1,6 @@
 language: python
-
+python:
+  - "3.9"
 install:
   - cd taxiapp
   - python3 -m pip install --upgrade pip
