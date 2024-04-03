@@ -2,6 +2,7 @@ language: python
 
 install:
   - cd taxiapp
+  - python3.11 -m pip install --upgrade pip
   - pip install -r requirements.txt
 before_script:
   - python manage.py migrate
