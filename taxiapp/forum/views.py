@@ -120,3 +120,22 @@ def downvote_post(request, post_id):
     vote.save()
     post.save()
     return JsonResponse({'score': post.upvotes - post.downvotes})
+
+@login_required
+def delete_comment(request, post_id, comment_id):
+    post = get_object_or_404(Post, id=post_id)
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if request.user != comment.user and not request.user.is_superuser:
+        messages.error(request, "You are not authorized to delete this comment.")
+        return redirect("post_detail", post_id=post.id)
+    if request.method == "POST":
+        comment.delete()
+
+        return redirect("post_detail", post_id=post.id)
+
+    context = {
+        'comment': comment,
+        'post': post
+    }
+    return redirect("post_detail", post_id=post_id)

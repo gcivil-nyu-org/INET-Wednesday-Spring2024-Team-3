@@ -73,6 +73,14 @@
     <div class="comment">
         <p><strong>{{ comment.user.username }}</strong> commented on {{ comment.created_at|date:"F d, Y H:i" }}</p>
         <p>{{ comment.content }}</p>
+        {% if comment.user == request.user %}
+            <form action="{% url 'delete_comment' post.id comment.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this comment?');">
+                    Delete
+                </button>
+            </form>
+        {% endif %}
     </div>
     {% empty %}
     <p>No comments yet.</p>
