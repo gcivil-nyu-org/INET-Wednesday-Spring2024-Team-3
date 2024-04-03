@@ -8,6 +8,7 @@
     <title>TaxiApp Forms</title>
     <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_confirm.css' %}">
 </head>
+{% block content %}
 <body>
 
     <form method="post" action="{% url 'confirm' %}"> 
@@ -26,4 +27,5 @@
     
 
 </body>
+{% endblock %}
 </html>

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
+
+
 <html lang="en">
 
 <head>
@@ -26,33 +27,32 @@
         }
     </script>
 </head>
+{% block content %}
+    <body>
+        <form method="post" action="{% url 'login' %}" onsubmit="return validatePassword()">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </form>
 
-<body>
+        <p id="error-message" style="color: red;"></p> <!-- Error message display -->
 
-    <form method="post" action="{% url 'login' %}" onsubmit="return validatePassword()">
-        {% csrf_token %}
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" id="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-        {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-    </form>
+        <div class="footer-links">
+            <a href="{% url 'reset' %}">Reset Password</a>
+            <a href="{% url 'register' %}">Don't have an account? Signup</a>
+        </div>
 
-    <p id="error-message" style="color: red;"></p> <!-- Error message display -->
-
-    <div class="footer-links">
-        <a href="{% url 'reset' %}">Reset Password</a>
-        <a href="{% url 'register' %}">Don't have an account? Signup</a>
-    </div>
-
-    <footer>
-        <p>NYU Tandon School of Engineering</p>
-    </footer>
-</body>
-
+        <footer>
+            <p>NYU Tandon School of Engineering</p>
+        </footer>
+    </body>
+{% endblock %}
 </html>
