@@ -83,7 +83,7 @@ STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["127.0.0.1", "taxiapp2.us-east-1.elasticbeanstalk.com"]
 
