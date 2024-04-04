@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}FAQ{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-bottom: 200px;">
+    <h1 class="my-4">FAQ</h1>
+    <div class="faq-container">
+        {% for item in faq_data %}
+            <div class="faq-item mb-3">
+                <h3>{{ item.question }}</h3>
+                <p>{{ item.answer }}</p>
+            </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endblock %}
