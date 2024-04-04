@@ -106,34 +106,58 @@
   }
 
   function compareFares() {
-    var startAddress = document.getElementById("start-address").value;
-    var endAddress = document.getElementById("end-address").value;
-    if (!startAddress || !endAddress) {
-      alert("Please enter both start and end addresses.");
-      return;
-    }
-    fetch("/rideshare/api/compare-fares/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token }}",
-      },
-      body: JSON.stringify({
-        start_address: startAddress,
-        end_address: endAddress,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        document.getElementById("uber-fare").textContent =
-          "Uber Fare: $" + data.uber_fare;
-        document.getElementById("lyft-fare").textContent =
-          "Lyft Fare: $" + data.lyft_fare;
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        alert("An error occurred while comparing fares. Please try again.");
-      });
+    var startAddress = document.getElementById('start-address').value;
+    var endAddress = document.getElementById('end-address').value;
+
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ 'address': startAddress }, function (results, status) {
+        if (status === 'OK') {
+            var startlat = results[0].geometry.location.lat();
+            var startlng = results[0].geometry.location.lng();
+
+            geocoder.geocode({ 'address': endAddress }, function (results, status) {
+                if (status === 'OK') {
+                    var endlat = results[0].geometry.location.lat();
+                    var endlng = results[0].geometry.location.lng();
+
+                    var num_passengers = parseInt(document.getElementById('num_passengers').value);
+
+                    if (!num_passengers || num_passengers <= 0) {
+                        alert('Please enter a valid number of passengers.');
+                        return;
+                    }
+
+                    fetch('/rideshare/api/compare-fares/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            'startlat': startlat,
+                            'startlng': startlng,
+                            'endlat': endlat,
+                            'endlng': endlng,
+                            'num_passengers': num_passengers
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('uber-fare').textContent = 'Uber Fare: $' + data.uber_fare;
+                            document.getElementById('taxi-fare').textContent = 'Taxi Fare: $' + data.taxi_fare;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while comparing fares. Please try again.');
+                        });
+                } else {
+                    alert('Geocode was not successful for the following reason: ' + status);
+                }
+            });
+        } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+        }
+    });
   }
 </script>
 {% endblock %} {% block content %}
@@ -167,13 +191,20 @@
                 placeholder="End Address"
               />
             </div>
+            <div class="form-group">
+              <input 
+                type="text" 
+                id="num_passengers" 
+                class="form-control" 
+                placeholder="Number of Passengers">
+          </div>
             <button class="btn btn-primary" onclick="compareFares()">
               Compare Fares
             </button>
             <div class="fare-comparison">
               <h3>Fare Comparison</h3>
               <div id="uber-fare"></div>
-              <div id="lyft-fare"></div>
+              <div id="taxi-fare"></div>
             </div>
           </div>
           <div class="col-md-6">
