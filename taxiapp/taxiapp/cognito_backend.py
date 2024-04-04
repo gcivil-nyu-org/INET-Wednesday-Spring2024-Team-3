@@ -57,7 +57,11 @@ class CognitoBackend(BaseBackend):
         try:
             user = User.objects.get(username=username)
             # Update user attributes if they have changed in Cognito
-            if user.email != email or user.first_name != given_name or user.last_name != family_name:
+            if (
+                user.email != email
+                or user.first_name != given_name
+                or user.last_name != family_name
+            ):
                 user.email = email
                 user.first_name = given_name
                 user.last_name = family_name
