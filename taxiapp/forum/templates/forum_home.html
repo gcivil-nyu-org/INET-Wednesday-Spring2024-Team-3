@@ -1,6 +1,51 @@
 {% extends 'base.html' %} {% load static %} {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum_home.css' %}" />
 {% endblock %} {% block content %}
+<script>
+  function upvote(postId) {
+    fetch(`${postId}/upvote/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.querySelector(`.votes-count[data-post-id="${postId}"]`).textContent = data.score;
+    });
+}
+
+function downvote(postId) {
+    fetch(`${postId}/downvote/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.querySelector(`.votes-count[data-post-id="${postId}"]`).textContent = data.score;
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+</script>
 <main>
   <section class="hero-section">
     <div class="container">
@@ -13,9 +58,7 @@
     <div class="container">
       {% if user.is_authenticated %}
       <div class="new-post">
-        <a href="{% url 'post_create' %}" class="new-post-link"
-          >Create a New Post</a
-        >
+        <a href="{% url 'post_create' %}" class="new-post-link">Create a New Post</a>
       </div>
       {% else %}
       <div class="login-message">
@@ -32,26 +75,21 @@
 
   <div class="post-list">
     {% for post in posts %}
-    <a href="{% url 'post_detail' post.id %}" class="post-item-link">
-      <div class="post-item">
-        <div class="post-votes">
-          <i class="fas fa-arrow-up"></i>
-          <span class="votes-count">{{ post.likes_count }}</span>
-          <i class="fas fa-arrow-down"></i>
-        </div>
-        <div class="post-content">
-          <h3>{{ post.title }}</h3>
-          <p class="post-meta">
-            Posted by
-            <a href="/user/{{ post.user.username }}" class="username"
-              >{{ post.user.username }}</a
-            >
-            | {{ post.created_at|date:"Y-m-d H:i" }}
-          </p>
-          <p>{{ post.content|truncatewords:30 }}</p>
-        </div>
+    <div class="post-item">
+      <div class="post-content">
+        <h3><a href="{% url 'post_detail' post.id %}" class="post-title">{{ post.title }}</a></h3>
+        <p class="post-meta">
+          Posted by <a href="/user/{{ post.user.username }}" class="username">{{ post.user.username }}</a>
+          | {{ post.created_at|date:"Y-m-d H:i" }}
+        </p>
+        <p>{{ post.content|truncatewords:30|safe }}</p>
       </div>
-    </a>
+      <div class="post-votes">
+        <span class="score-label">Score: <span class="votes-count" data-post-id="{{ post.id }}">{{ post.score }}</span></span>
+        <button class="upvote-button" onclick="upvote({{ post.id }})">Upvote</button>
+        <button class="downvote-button" onclick="downvote({{ post.id }})">Downvote</button>
+      </div>
+    </div>
     {% empty %}
     <p>No posts found.</p>
     {% endfor %}

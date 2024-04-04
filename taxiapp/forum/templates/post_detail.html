@@ -1,12 +1,74 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/forum/forum_home.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+<script>
+    var $j = jQuery.noConflict();
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    $j(document).ready(function() {
+        $j('.upvote-button').click(function() {
+            var postId = {{ post.id }};
+            $j.ajax({
+                url: `/forum/${postId}/upvote/`,  // Update the URL to match the URL pattern
+                method: 'POST',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                },
+                success: function(response) {
+                    $j('.score').text(response.score);
+                }
+
+            });
+        });
+
+        $j('.downvote-button').click(function() {
+            var postId = {{ post.id }};
+            $j.ajax({
+                url: `/forum/${postId}/downvote/`,  // Update the URL to match the URL pattern
+                method: 'POST',
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                },
+                success: function(response) {
+                    $j('.score').text(response.score);
+                }
+
+            });
+        });
+    });
+</script>
+{% endblock %}
 
 {% block content %}
 <div class="container">
     <h2>{{ post.title }}</h2>
     <p><strong>Category:</strong> {{ post.category.name }}</p>
     <p><strong>Posted by:</strong> {{ post.user.username }} on {{ post.created_at|date:"F d, Y" }}</p>
-    <hr>
     <div>{{ post.content|safe }}</div>
+    <p><strong>Score:</strong> <span class="score">{{ post.score }}</span></p>
+    <button class="upvote-button btn btn-success">Upvote</button>
+    <button class="downvote-button btn btn-danger">Downvote</button>
     <hr>
     <h3>Comments</h3>
     {% for comment in post.comments.all %}

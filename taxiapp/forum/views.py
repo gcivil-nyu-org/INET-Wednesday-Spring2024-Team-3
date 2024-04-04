@@ -2,7 +2,7 @@ import logging
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
-from .models import Post, Comment, Category
+from .models import Post, Comment, Category, Vote
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
@@ -81,3 +81,44 @@ def post_delete(request, post_id):
         return redirect("forum_home")
 
     return render(request, "post_delete.html", {"post": post})
+
+
+def upvote_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    user = request.user
+
+    vote, created = Vote.objects.get_or_create(user=user, post=post)
+    if created and vote.vote_type == 'upvote':
+        post.upvotes += 1
+        post.save()
+    elif vote and vote.vote_type == 'upvote':
+        pass
+    elif vote and vote.vote_type == 'downvote':
+        post.upvotes +=1
+        post.save()
+    
+    vote.vote_type = 'upvote'
+    vote.save()
+
+    post_score = post.score
+    return JsonResponse({'score': post_score})
+
+def downvote_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    user = request.user
+
+    vote, created = Vote.objects.get_or_create(user=user, post=post)
+    if created and vote.vote_type == 'downvote':
+        post.downvotes +=1
+        post.save()
+    elif vote and vote.vote_type == 'downvote':
+        pass
+    elif vote and vote.vote_type == 'upvote':
+        post.downvotes +=1
+        post.save()
+
+    vote.vote_type = 'downvote'
+    vote.save()
+
+    post_score = post.score
+    return JsonResponse({'score': post_score})

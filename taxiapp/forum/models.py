@@ -23,6 +23,12 @@ class Post(models.Model):
     topic = models.ForeignKey('Topic', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    upvotes = models.IntegerField(default=0)
+    downvotes = models.IntegerField(default=0)
+
+    @property
+    def score(self):
+        return self.upvotes - self.downvotes
     
 class Topic(models.Model):
     name = models.CharField(max_length=100)
@@ -41,10 +47,8 @@ class Comment(models.Model):
 
 class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True, related_name='post_votes')
-    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True, related_name='comment_votes')
-    value = models.SmallIntegerField(choices=[(1, 'Upvote'), (-1, 'Downvote')])
-    created_at = models.DateTimeField(auto_now_add=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    vote_type = models.CharField(max_length=10, choices=(('upvote', 'Upvote'), ('downvote', 'Downvote')), default='upvote')
 
     class Meta:
-        unique_together = [('user', 'post'), ('user', 'comment')]
+        unique_together = ('user', 'post')
