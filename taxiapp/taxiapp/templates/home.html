@@ -255,30 +255,20 @@
       <div class="container">
         <h2>Trending on the Forum</h2>
         <div class="row">
-          <div class="col-md-4">
-            <div class="forum-post">
-              <h3>Forum Post Title 1</h3>
-              <p>Short excerpt from the post...</p>
-              <a href="#" class="btn btn-link">Read More</a>
+          {% for post in latest_posts %}
+            <div class="col-md-4">
+              <div class="forum-post">
+                <h3><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h3>
+                <p>{{ post.content|truncatewords:20 }}</p>
+                <a href="{% url 'post_detail' post.id %}" class="btn btn-link">Read More</a>
+              </div>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="forum-post">
-              <h3>Forum Post Title 2</h3>
-              <p>Short excerpt from the post...</p>
-              <a href="#" class="btn btn-link">Read More</a>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="forum-post">
-              <h3>Forum Post Title 3</h3>
-              <p>Short excerpt from the post...</p>
-              <a href="#" class="btn btn-link">Read More</a>
-            </div>
-          </div>
+          {% empty %}
+            <p>No posts found.</p>
+          {% endfor %}
         </div>
       </div>
-    </section>
+    </section>    
   </main>
 </body>
 {% endblock %}

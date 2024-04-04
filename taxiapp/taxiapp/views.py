@@ -6,6 +6,7 @@ import boto3
 from django.conf import settings
 from django.contrib import messages
 from botocore.exceptions import ClientError
+from forum.models import Post
 import hmac
 import hashlib
 import base64
@@ -160,8 +161,10 @@ def get_secret_hash(username, client_id, client_secret):
 
 def home_view(request):
     google_maps_api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
+    latest_posts = Post.objects.all().order_by('-created_at')[:3]
     context = {
-        'google_maps_api_key': google_maps_api_key
+        'google_maps_api_key': google_maps_api_key,
+        'latest_posts': latest_posts,
     }
     return render(request, 'home.html', context)
 
