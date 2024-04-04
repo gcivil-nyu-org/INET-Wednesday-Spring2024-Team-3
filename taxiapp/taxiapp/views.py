@@ -370,3 +370,33 @@ def save_profile_view(request):
         return redirect("/profile")
     else:
         return redirect("/profile")
+    
+def faq(request):
+    faq_data = [
+        {
+            "question": "How do I sign up for an account?",
+            "answer": "You can sign up by clicking the 'Register' button on the homepage and filling in the required information."
+        },
+        {
+            "question": "How can I reset my password?",
+            "answer": "If you've forgotten your password, you can reset it by clicking the 'Forgot Password' link on the login page and following the instructions."
+        },
+        {
+            "question": "How do I compare taxi fares?",
+            "answer": "Enter your starting and destination addresses in the fare comparison section on the homepage to see a comparison of fares from different taxi services."
+        },
+        {
+            "question": "Can I share my ride experiences?",
+            "answer": "Yes, you can share your ride experiences, reviews, and tips on the forum section of the site."
+        },
+        {
+            "question": "Is my personal information safe on this site?",
+            "answer": "We take your privacy seriously. Your personal information is stored securely and is not shared with third parties without your consent."
+        },
+        {
+            "question": "How do I contact customer support?",
+            "answer": "You can reach out to our customer support team via the 'Contact' link at the bottom of the page."
+        }
+    ]
+
+    return render(request, 'faq.html', {'faq_data': faq_data})
