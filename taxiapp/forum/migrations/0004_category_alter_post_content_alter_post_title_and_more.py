@@ -8,31 +8,48 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('forum', '0003_forum_rename_author_comment_user_and_more'),
+        ("forum", "0003_forum_rename_author_comment_user_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('description', models.TextField(blank=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("description", models.TextField(blank=True)),
             ],
         ),
         migrations.AlterField(
-            model_name='post',
-            name='content',
-            field=models.TextField(validators=[django.core.validators.MinLengthValidator(20)]),
+            model_name="post",
+            name="content",
+            field=models.TextField(
+                validators=[django.core.validators.MinLengthValidator(20)]
+            ),
         ),
         migrations.AlterField(
-            model_name='post',
-            name='title',
-            field=models.CharField(max_length=200, validators=[django.core.validators.MinLengthValidator(10)]),
+            model_name="post",
+            name="title",
+            field=models.CharField(
+                max_length=200,
+                validators=[django.core.validators.MinLengthValidator(10)],
+            ),
         ),
         migrations.AddField(
-            model_name='post',
-            name='category',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='forum.category'),
+            model_name="post",
+            name="category",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="forum.category",
+            ),
         ),
     ]

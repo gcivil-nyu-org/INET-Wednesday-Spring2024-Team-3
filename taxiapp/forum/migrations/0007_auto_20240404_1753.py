@@ -4,53 +4,47 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
+
 def handle_existing_votes(apps, schema_editor):
-    Vote = apps.get_model('forum', 'Vote')
+    Vote = apps.get_model("forum", "Vote")
     Vote.objects.filter(post__isnull=True).delete()
+
 
 class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('forum', '0006_remove_topic_content_remove_topic_created_at_and_more'),
+        ("forum", "0006_remove_topic_content_remove_topic_created_at_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='post',
-            name='downvotes',
-            field=models.IntegerField(default=0),
+            model_name="post", name="downvotes", field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='post',
-            name='upvotes',
-            field=models.IntegerField(default=0),
+            model_name="post", name="upvotes", field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='vote',
-            name='vote_type',
-            field=models.CharField(choices=[('upvote', 'Upvote'), ('downvote', 'Downvote')], default='upvote', max_length=10),
+            model_name="vote",
+            name="vote_type",
+            field=models.CharField(
+                choices=[("upvote", "Upvote"), ("downvote", "Downvote")],
+                default="upvote",
+                max_length=10,
+            ),
         ),
         migrations.AlterField(
-            model_name='vote',
-            name='post',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='forum.post'),
+            model_name="vote",
+            name="post",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="forum.post"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='vote',
-            unique_together={('user', 'post')},
+            name="vote", unique_together={("user", "post")},
         ),
-        migrations.RemoveField(
-            model_name='vote',
-            name='comment',
-        ),
-        migrations.RemoveField(
-            model_name='vote',
-            name='created_at',
-        ),
-        migrations.RemoveField(
-            model_name='vote',
-            name='value',
-        ),
+        migrations.RemoveField(model_name="vote", name="comment",),
+        migrations.RemoveField(model_name="vote", name="created_at",),
+        migrations.RemoveField(model_name="vote", name="value",),
         migrations.RunPython(handle_existing_votes),
     ]
