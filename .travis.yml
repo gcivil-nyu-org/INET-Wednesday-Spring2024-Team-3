@@ -1,19 +1,29 @@
 language: python
+
 python:
-  - "3.9"  
+  - "3.9"
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install -y python3-pip
+  - sudo pip3 install awsebcli --upgrade
+
 install:
   - cd taxiapp
   - python3 -m pip install --upgrade pip
   - pip install -r requirements.txt
+
 before_script:
   - python manage.py migrate
+
 script:
   - flake8 .
   - coverage run --source=taxiapp manage.py test
   - coverage report
+
 after_script:
   - coveralls
-  - eb logs
+
 deploy:
   provider: elasticbeanstalk
   access_key_id: $AWS_KEY
@@ -24,8 +34,11 @@ deploy:
   bucket_name: elasticbeanstalk-us-east-1-963295565159
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
-    branch: 
+    branch:
       - master
       - develop
       - importmodels
   cleanup: 'false'
+
+after_deploy:
+  - eb logs
