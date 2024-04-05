@@ -6,8 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('taxiapp', '0001_initial'),
+        ("taxiapp", "0001_initial"),
     ]
 
-    operations = [
-    ]
+    operations = []
