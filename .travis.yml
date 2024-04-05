@@ -33,6 +33,7 @@ deploy:
       - master
       - develop
       - importmodels
+      - voting
   cleanup: 'false'
 
 after_deploy:
