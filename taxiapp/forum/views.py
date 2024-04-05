@@ -5,15 +5,21 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import Post, Comment, Category, Vote
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
+from django.db.models import F, ExpressionWrapper, IntegerField
 logger = logging.getLogger(__name__)
 
 
 def forum_home(request):
-    posts = Post.objects.all().order_by("-created_at")
-    context = {"posts": posts}
-    return render(request, "forum_home.html", context)
+    sort_by = request.GET.get('sort_by', 'recent')
 
+    if sort_by == 'popular':
+        posts = Post.objects.annotate(
+            calculated_score=ExpressionWrapper(F('upvotes') - F('downvotes'), output_field=IntegerField())
+        ).order_by('-calculated_score')
+    else:
+        posts = Post.objects.all().order_by('-created_at')
+
+    return render(request, 'forum_home.html', {'posts': posts})
 
 @login_required
 def post_create(request):

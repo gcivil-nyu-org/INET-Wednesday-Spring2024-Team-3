@@ -1,6 +1,11 @@
-{% extends 'base.html' %} {% load static %} {% block extra_css %}
+{% extends 'base.html' %} 
+{% load static %} 
+
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/forum/forum_home.css' %}" />
-{% endblock %} {% block content %}
+{% endblock %} 
+
+{% block content %}
 <script>
   function upvote(postId) {
     fetch(`${postId}/upvote/`, {
@@ -45,6 +50,27 @@ function getCookie(name) {
     return cookieValue;
 }
 
+function sortPosts(sortBy) {
+    var posts = document.querySelectorAll('.post-item');
+    var postsArray = Array.from(posts);
+
+    if (sortBy === 'recent') {
+        postsArray.sort(function(a, b) {
+            return b.getAttribute('data-timestamp') - a.getAttribute('data-timestamp');
+        });
+    } else if (sortBy === 'popular') {
+        postsArray.sort(function(a, b) {
+            return b.getAttribute('data-score') - a.getAttribute('data-score');
+        });
+    }
+
+    var postList = document.querySelector('.post-list');
+    postList.innerHTML = '';
+
+    postsArray.forEach(function(post) {
+        postList.appendChild(post);
+    });
+}
 </script>
 <main>
   <section class="hero-section">
@@ -69,13 +95,14 @@ function getCookie(name) {
   </section>
 
   <div class="sort-options">
-    <button class="sort-button" data-sort="recent">Recent</button>
-    <button class="sort-button" data-sort="popular">Most Popular</button>
+    <a href="?sort_by=recent" class="sort-button">Recent</a>
+    <a href="?sort_by=popular" class="sort-button">Most Popular</a>
   </div>
+
 
   <div class="post-list">
     {% for post in posts %}
-    <div class="post-item">
+    <div class="post-item" data-timestamp="{{ post.created_at|date:'U' }}" data-score="{{ post.score }}">
       <div class="post-content">
         <h3><a href="{% url 'post_detail' post.id %}" class="post-title">{{ post.title }}</a></h3>
         <p class="post-meta">
