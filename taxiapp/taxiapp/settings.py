@@ -1,7 +1,5 @@
 from pathlib import Path
-import environ
 import os
-import botocore
 import botocore.session
 import boto3
 from botocore.exceptions import ClientError
@@ -45,34 +43,6 @@ GOOGLE_MAPS_API_KEY = get_secret("GOOGLE_MAPS_API_KEY")
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# ##########Uncomment for local development, add secrets.env local file###############
-# env = environ.Env()
-# environ.Env.read_env(env_file="secrets.env")
-# SECRET_KEY = env("SECRET_KEY")
-
-# # SECURITY WARNING: keep the secret key used in production secret!
-# COGNITO_DOMAIN = env("COGNITO_DOMAIN")
-# COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
-# COGNITO_USER_POOL_ID = env("COGNITO_USER_POOL_ID")
-# COGNITO_APP_CLIENT_ID = env("COGNITO_APP_CLIENT_ID")
-# COGNITO_AWS_REGION = env("COGNITO_AWS_REGION")
-# GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY")
-# UBER_CLIENT_ID = env("UBER_CLIENT_ID")
-# UBER_CLIENT_SECRET = env("UBER_CLIENT_SECRET")
-# LYFT_API_KEY = env("LYFT_API_KEY")
-
-# # # #############Uncomment for travis deployment##############
-# SECRET_KEY = os.environ.get("SECRET_KEY")
-# COGNITO_DOMAIN = os.environ.get("COGNITO_DOMAIN")
-# COGNITO_APP_CLIENT_SECRET = os.environ.get("COGNITO_APP_CLIENT_SECRET")
-# OGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID")
-# COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID")
-# COGNITO_AWS_REGION = os.environ.get("COGNITO_AWS_REGION")
-# GOOGLE_MAPS_API_KEY = os.environ.get("GOOGLE_MAPS_API_KEY")
-# COGNITO_PUBLIC_KEYS_URL = f"https://cognito-idp.{COGNITO_AWS_REGION}.amazonaws.com/{COGNITO_USER_POOL_ID}/.well-known/jwks.json"
-
-# ##########################################################
 
 # In the future, add this as travis variables to protect URL.
 AWS_STORAGE_BUCKET_NAME = "taxiapp-static-bucket"
