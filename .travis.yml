@@ -13,6 +13,7 @@ script:
   - coverage report
 after_script:
   - coveralls
+  - eb logs
 deploy:
   provider: elasticbeanstalk
   access_key_id: $AWS_KEY
