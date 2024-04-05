@@ -3,11 +3,6 @@ language: python
 python:
   - "3.9"
 
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y python3-pip
-  - sudo pip3 install awsebcli --upgrade
-
 install:
   - cd taxiapp
   - python3 -m pip install --upgrade pip
