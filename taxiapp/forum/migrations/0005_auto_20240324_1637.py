@@ -6,8 +6,8 @@ import django.db.models.deletion
 
 
 def add_category_data(apps, schema_editor):
-    Category = apps.get_model("forum", "Category")
-    categories = ["Experience", "Question", "Concern", "News", "Other"]
+    Category = apps.get_model('forum', 'Category')
+    categories = ['Experience', 'Question', 'Concern', 'News', 'Other']
     for cat in categories:
         Category.objects.create(name=cat)
 
@@ -15,7 +15,8 @@ def add_category_data(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("forum", "0004_category_alter_post_content_alter_post_title_and_more"),
+        ('forum', '0004_category_alter_post_content_alter_post_title_and_more'),
+        
     ]
 
     operations = [
