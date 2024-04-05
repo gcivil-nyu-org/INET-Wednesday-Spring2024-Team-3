@@ -21,54 +21,48 @@ def google_maps_api_key(request):
 
 @csrf_exempt
 def compare_fares(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         data = json.loads(request.body)
-        
-        startlat = data.get('startlat')
-        startlng = data.get('startlng')
+
+        startlat = data.get("startlat")
+        startlng = data.get("startlng")
         startCoord = [startlat, startlng]
-        endlat = data.get('endlat')
-        endlng = data.get('endlng')
+        endlat = data.get("endlat")
+        endlng = data.get("endlng")
         endCoord = [endlat, endlng]
-        passengers = data.get('num_passengers')
+        passengers = data.get("num_passengers")
         dis = geopy.distance.geodesic(startCoord, endCoord).km
-        
+
         # Call the ML models to retrieve estimated Uber and Taxi fares
         uber_fare = get_uber_fare(dis, passengers)
         taxi_fare = get_taxi_fare(dis, passengers)
-        
+
         # Prepare the response data
         fare_data = {
-            'uber_fare': round(uber_fare*1.2, 2),
-            'taxi_fare': round(taxi_fare*1.2, 2),
+            "uber_fare": round(uber_fare * 1.2, 2),
+            "taxi_fare": round(taxi_fare * 1.2, 2),
         }
-        
+
         return JsonResponse(fare_data)
-    
-    return JsonResponse({'error': 'Invalid request method'})
+
+    return JsonResponse({"error": "Invalid request method"})
 
 
 def get_uber_fare(dis, passengers):
-    uber_model = joblib.load('rideshare/models/Uber_Linear_Regression.joblib')
+    uber_model = joblib.load("rideshare/models/Uber_Linear_Regression.joblib")
 
-    params = {
-        'distance': dis,
-        'passenger_count': passengers
-    }
+    params = {"distance": dis, "passenger_count": passengers}
 
-    input_features = [[params['distance'], params['passenger_count']]]
+    input_features = [[params["distance"], params["passenger_count"]]]
     estFare = uber_model.predict(input_features)
     return estFare[0]
-    
+
 
 def get_taxi_fare(dis, passengers):
-    taxi_model = joblib.load('rideshare/models/Taxi_Linear_Regression.joblib')
+    taxi_model = joblib.load("rideshare/models/Taxi_Linear_Regression.joblib")
 
-    params = {
-        'distance': dis,
-        'passenger_count': passengers
-    }
+    params = {"distance": dis, "passenger_count": passengers}
 
-    input_features = [[params['distance'], params['passenger_count']]]
+    input_features = [[params["distance"], params["passenger_count"]]]
     estFare = taxi_model.predict(input_features)
     return estFare[0]
