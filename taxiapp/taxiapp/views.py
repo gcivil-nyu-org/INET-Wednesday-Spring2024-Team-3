@@ -160,13 +160,13 @@ def get_secret_hash(username, client_id, client_secret):
 
 
 def home_view(request):
-    google_maps_api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
-    latest_posts = Post.objects.all().order_by("-created_at")[:3]
+    google_maps_api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
+    latest_posts = Post.objects.all().order_by('-created_at')[:3]
     context = {
-        "google_maps_api_key": google_maps_api_key,
-        "latest_posts": latest_posts,
+        'google_maps_api_key': google_maps_api_key,
+        'latest_posts': latest_posts,
     }
-    return render(request, "home.html", context)
+    return render(request, 'home.html', context)
 
 
 def reset_view(request):
@@ -373,34 +373,33 @@ def save_profile_view(request):
         return redirect("/profile")
     else:
         return redirect("/profile")
-
-
+    
 def faq(request):
     faq_data = [
         {
             "question": "How do I sign up for an account?",
-            "answer": "You can sign up by clicking the 'Register' button on the homepage and filling in the required information.",
+            "answer": "You can sign up by clicking the 'Register' button on the homepage and filling in the required information."
         },
         {
             "question": "How can I reset my password?",
-            "answer": "If you've forgotten your password, you can reset it by clicking the 'Forgot Password' link on the login page and following the instructions.",
+            "answer": "If you've forgotten your password, you can reset it by clicking the 'Forgot Password' link on the login page and following the instructions."
         },
         {
             "question": "How do I compare taxi fares?",
-            "answer": "Enter your starting and destination addresses in the fare comparison section on the homepage to see a comparison of fares from different taxi services.",
+            "answer": "Enter your starting and destination addresses in the fare comparison section on the homepage to see a comparison of fares from different taxi services."
         },
         {
             "question": "Can I share my ride experiences?",
-            "answer": "Yes, you can share your ride experiences, reviews, and tips on the forum section of the site.",
+            "answer": "Yes, you can share your ride experiences, reviews, and tips on the forum section of the site."
         },
         {
             "question": "Is my personal information safe on this site?",
-            "answer": "We take your privacy seriously. Your personal information is stored securely and is not shared with third parties without your consent.",
+            "answer": "We take your privacy seriously. Your personal information is stored securely and is not shared with third parties without your consent."
         },
         {
             "question": "How do I contact customer support?",
-            "answer": "You can reach out to our customer support team via the 'Contact' link at the bottom of the page.",
-        },
+            "answer": "You can reach out to our customer support team via the 'Contact' link at the bottom of the page."
+        }
     ]
 
-    return render(request, "faq.html", {"faq_data": faq_data})
+    return render(request, 'faq.html', {'faq_data': faq_data})

@@ -75,11 +75,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ##########################################################
 
 # In the future, add this as travis variables to protect URL.
-AWS_STORAGE_BUCKET_NAME = "taxiapp-static-bucket"
-AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
-STATIC_LOCATION = "static"  # I don't know if we need this
-STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
-STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+AWS_STORAGE_BUCKET_NAME = 'taxiapp-static-bucket'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+STATIC_LOCATION = 'static'  # I don't know if we need this
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -183,7 +183,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
