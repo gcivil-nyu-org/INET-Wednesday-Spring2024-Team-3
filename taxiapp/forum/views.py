@@ -90,8 +90,8 @@ def post_delete(request, post_id):
         post.delete()
         messages.success(request, "Post deleted successfully.")
         return redirect("forum_home")
-
-    return render(request, "post_delete.html", {"post": post})
+    else:
+        return render(request, "post_delete.html", {"post": post})
 
 @login_required
 def upvote_post(request, post_id):
