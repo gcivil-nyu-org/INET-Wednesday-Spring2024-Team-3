@@ -1,0 +1,76 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tools/tools_home.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<main>
+  <section class="hero-section">
+    <div class="container">
+      <h1>Taxi Driver Salary Estimator</h1>
+      <p>Calculate your potential earnings as a taxi driver.</p>
+    </div>
+  </section>
+
+  <section class="estimator-section">
+    <div class="container">
+      <form id="estimator-form">
+        <div class="form-group">
+          <label for="hours-per-week">Hours Worked Per Week:</label>
+          <input type="number" id="hours-per-week" name="hours-per-week" class="form-control" required>
+        </div>
+        
+        <div class="form-group">  
+          <label for="hourly-rate">Average Hourly Rate ($):</label>
+          <input type="number" id="hourly-rate" name="hourly-rate" class="form-control" required>
+        </div>
+
+        <div class="form-group">  
+          <label for="gas-expense">Monthly Gas Expense ($):</label>
+          <input type="number" id="gas-expense" name="gas-expense" class="form-control" value="200">
+        </div>
+
+        <div class="form-group">
+          <label for="vehicle-expense">Monthly Vehicle Expenses ($):</label>   
+          <input type="number" id="vehicle-expense" name="vehicle-expense" class="form-control" value="300">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Calculate Earnings</button>
+      </form>
+
+      <div id="results" class="mt-4">
+        <h2>Estimated Earnings</h2>
+        <p><strong>Weekly:</strong> $<span id="weekly-earnings">0</span></p>
+        <p><strong>Monthly:</strong> $<span id="monthly-earnings">0</span></p>
+        <p><strong>Annually:</strong> $<span id="annual-earnings">0</span></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+document.getElementById('estimator-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const hoursPerWeek = parseFloat(document.getElementById('hours-per-week').value);
+  const hourlyRate = parseFloat(document.getElementById('hourly-rate').value);
+  const gasExpense = parseFloat(document.getElementById('gas-expense').value);
+  const vehicleExpense = parseFloat(document.getElementById('vehicle-expense').value);
+
+  const grossWeekly = hoursPerWeek * hourlyRate;
+  const grossMonthly = grossWeekly * 4;
+  const grossAnnual = grossMonthly * 12;
+
+  const netMonthly = grossMonthly - gasExpense - vehicleExpense;
+  const netAnnual = netMonthly * 12;
+
+  document.getElementById('weekly-earnings').textContent = grossWeekly.toFixed(2);
+  document.getElementById('monthly-earnings').textContent = netMonthly.toFixed(2); 
+  document.getElementById('annual-earnings').textContent = netAnnual.toFixed(2);
+
+  document.getElementById('results').style.display = 'block';
+});
+</script>
+{% endblock %}
