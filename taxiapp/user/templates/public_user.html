@@ -24,7 +24,7 @@
                 {% for post in posts %}
                 <div class="post-item">
                     <h4><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h4>
-                    <p>{{ post.content|truncatewords:20 }}</p>
+                    <p>{{ post.content|truncatewords:20|safe }}</p>
                     <p class="post-meta">Posted on {{ post.created_at|date:"Y-m-d H:i" }}</p>
                 </div>
                 {% empty %}
