@@ -6,15 +6,14 @@ import boto3
 from django.conf import settings
 from django.contrib import messages
 from botocore.exceptions import ClientError
-from forum.models import Post
 import hmac
 import hashlib
 import base64
 import logging
 import re
 import os
-
-logger = logging.getLogger(__name__)
+from forum.models import Post, Comment
+from user.models import FriendRequest, Friendship
 
 
 def login_view(request):
@@ -201,9 +200,6 @@ def reset_view(request):
                     )
                     step = "confirm"  # Move to confirmation step
                 except ClientError as e:
-                    logger.error(
-                        f"Error initiating password reset for {user_identifier}: {e}"
-                    )
                     messages.error(
                         request,
                         "Failed to initiate password reset. Please try again later.",
@@ -238,9 +234,6 @@ def reset_view(request):
                     )
                     return redirect("login")
                 except ClientError as e:
-                    logger.error(
-                        f"Failed to reset password for username {username}: {e}"
-                    )
                     if e.response["Error"]["Code"] == "CodeMismatchException":
                         messages.error(
                             request, "Invalid verification code. Please try again."
@@ -297,17 +290,10 @@ def confirm_view(request):
             else:
                 error_message = "Failed to confirm account. Please try again later."
 
-            logger.error(f"Failed to confirm account for username {username}: {e}")
             messages.error(request, error_message)
             return render(request, "confirm.html")
     else:
         return render(request, "confirm.html")
-
-
-# def profile_view(request):
-#     if not request.user.is_authenticated:
-#         return redirect('/')
-#     return render(request, 'profile.html')
 
 
 def logout_view(request):
@@ -319,16 +305,23 @@ def logout_view(request):
 def profile_view(request):
     if not request.user.is_authenticated:
         return redirect("/")
+
     client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
     cognito_username = request.user.username
 
     try:
         response = client.admin_get_user(
-            UserPoolId=settings.COGNITO_USER_POOL_ID, Username=cognito_username
+            UserPoolId=settings.COGNITO_USER_POOL_ID,
+            Username=cognito_username
         )
-        user_attributes = {
-            attr["Name"]: attr["Value"] for attr in response["UserAttributes"]
-        }
+        user_attributes = {attr["Name"]: attr["Value"] for attr in response["UserAttributes"]}
+
+        user = request.user
+        posts = Post.objects.filter(user=user).order_by('-created_at')
+        comments = Comment.objects.filter(user=user).order_by('-created_at')
+        friend_requests = FriendRequest.objects.filter(to_user=user, status='pending')
+        friends = User.objects.filter(friendships1__user2=user) | User.objects.filter(friendships2__user1=user)
+
         context = {
             "first_name": user_attributes.get("given_name", ""),
             "middle_name": user_attributes.get("middle_name", ""),
@@ -337,13 +330,16 @@ def profile_view(request):
             "email": user_attributes.get("email", ""),
             "phone_number": user_attributes.get("phone_number", ""),
             "address": user_attributes.get("address", ""),
+            "posts": posts,
+            "comments": comments,
+            "friend_requests": friend_requests,
+            "friends": friends,
         }
     except Exception as e:
         messages.error(request, f"Failed to retrieve profile information: {str(e)}")
         context = {}
 
     return render(request, "profile.html", context)
-
 
 @login_required
 def save_profile_view(request):
