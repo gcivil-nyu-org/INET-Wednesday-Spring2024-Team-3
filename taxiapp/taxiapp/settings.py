@@ -99,6 +99,8 @@ INSTALLED_APPS = [
     "taxiapp",
     "forum",
     "rideshare",
+    "users",
+    "tools",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

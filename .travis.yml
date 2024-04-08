@@ -26,5 +26,5 @@ deploy:
     branch: 
       - master
       - develop
-      - importmodels
+      - user_feature
   cleanup: 'false'
