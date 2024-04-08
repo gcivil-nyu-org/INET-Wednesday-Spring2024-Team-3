@@ -11,17 +11,46 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="topic", name="content",),
-        migrations.RemoveField(model_name="topic", name="created_at",),
-        migrations.RemoveField(model_name="topic", name="forum",),
-        migrations.RemoveField(model_name="topic", name="locked",),
-        migrations.RemoveField(model_name="topic", name="sticky",),
-        migrations.RemoveField(model_name="topic", name="title",),
-        migrations.RemoveField(model_name="topic", name="updated_at",),
-        migrations.RemoveField(model_name="topic", name="user",),
-        migrations.RemoveField(model_name="topic", name="views",),
+        migrations.RemoveField(
+            model_name="topic",
+            name="content",
+        ),
+        migrations.RemoveField(
+            model_name="topic",
+            name="created_at",
+        ),
+        migrations.RemoveField(
+            model_name="topic",
+            name="forum",
+        ),
+        migrations.RemoveField(
+            model_name="topic",
+            name="locked",
+        ),
+        migrations.RemoveField(
+            model_name="topic",
+            name="sticky",
+        ),
+        migrations.RemoveField(
+            model_name="topic",
+            name="title",
+        ),
+        migrations.RemoveField(
+            model_name="topic",
+            name="updated_at",
+        ),
+        migrations.RemoveField(
+            model_name="topic",
+            name="user",
+        ),
+        migrations.RemoveField(
+            model_name="topic",
+            name="views",
+        ),
         migrations.AddField(
-            model_name="topic", name="description", field=models.TextField(blank=True),
+            model_name="topic",
+            name="description",
+            field=models.TextField(blank=True),
         ),
         migrations.AddField(
             model_name="topic",

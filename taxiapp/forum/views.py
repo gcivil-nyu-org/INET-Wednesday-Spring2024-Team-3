@@ -6,20 +6,24 @@ from .models import Post, Comment, Category, Vote
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import F, ExpressionWrapper, IntegerField
+
 logger = logging.getLogger(__name__)
 
 
 def forum_home(request):
-    sort_by = request.GET.get('sort_by', 'recent')
+    sort_by = request.GET.get("sort_by", "recent")
 
-    if sort_by == 'popular':
+    if sort_by == "popular":
         posts = Post.objects.annotate(
-            calculated_score=ExpressionWrapper(F('upvotes') - F('downvotes'), output_field=IntegerField())
-        ).order_by('-calculated_score')
+            calculated_score=ExpressionWrapper(
+                F("upvotes") - F("downvotes"), output_field=IntegerField()
+            )
+        ).order_by("-calculated_score")
     else:
-        posts = Post.objects.all().order_by('-created_at')
+        posts = Post.objects.all().order_by("-created_at")
 
-    return render(request, 'forum_home.html', {'posts': posts})
+    return render(request, "forum_home.html", {"posts": posts})
+
 
 @login_required
 def post_create(request):
@@ -139,6 +143,7 @@ def downvote_post(request, post_id):
     post_score = post.score
     return JsonResponse({"score": post_score})
 
+
 @login_required
 def delete_comment(request, post_id, comment_id):
     post = get_object_or_404(Post, id=post_id)
@@ -152,8 +157,5 @@ def delete_comment(request, post_id, comment_id):
 
         return redirect("post_detail", post_id=post.id)
 
-    context = {
-        'comment': comment,
-        'post': post
-    }
+    context = {"comment": comment, "post": post}
     return redirect("post_detail", post_id=post_id)
