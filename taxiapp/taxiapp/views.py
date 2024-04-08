@@ -13,6 +13,8 @@ import base64
 import logging
 import re
 import os
+from forum.models import Post, Comment
+from user.models import FriendRequest, Friendship
 
 logger = logging.getLogger(__name__)
 
@@ -304,12 +306,6 @@ def confirm_view(request):
         return render(request, "confirm.html")
 
 
-# def profile_view(request):
-#     if not request.user.is_authenticated:
-#         return redirect('/')
-#     return render(request, 'profile.html')
-
-
 def logout_view(request):
     logout(request)
     return redirect("/")
@@ -319,16 +315,23 @@ def logout_view(request):
 def profile_view(request):
     if not request.user.is_authenticated:
         return redirect("/")
+
     client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
     cognito_username = request.user.username
 
     try:
         response = client.admin_get_user(
-            UserPoolId=settings.COGNITO_USER_POOL_ID, Username=cognito_username
+            UserPoolId=settings.COGNITO_USER_POOL_ID,
+            Username=cognito_username
         )
-        user_attributes = {
-            attr["Name"]: attr["Value"] for attr in response["UserAttributes"]
-        }
+        user_attributes = {attr["Name"]: attr["Value"] for attr in response["UserAttributes"]}
+
+        user = request.user
+        posts = Post.objects.filter(user=user).order_by('-created_at')
+        comments = Comment.objects.filter(user=user).order_by('-created_at')
+        friend_requests = FriendRequest.objects.filter(to_user=user, status='pending')
+        friends = User.objects.filter(friendships1__user2=user) | User.objects.filter(friendships2__user1=user)
+
         context = {
             "first_name": user_attributes.get("given_name", ""),
             "middle_name": user_attributes.get("middle_name", ""),
@@ -337,13 +340,16 @@ def profile_view(request):
             "email": user_attributes.get("email", ""),
             "phone_number": user_attributes.get("phone_number", ""),
             "address": user_attributes.get("address", ""),
+            "posts": posts,
+            "comments": comments,
+            "friend_requests": friend_requests,
+            "friends": friends,
         }
     except Exception as e:
         messages.error(request, f"Failed to retrieve profile information: {str(e)}")
         context = {}
 
     return render(request, "profile.html", context)
-
 
 @login_required
 def save_profile_view(request):
