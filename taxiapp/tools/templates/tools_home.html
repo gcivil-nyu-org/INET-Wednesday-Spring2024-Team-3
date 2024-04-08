@@ -1,4 +1,4 @@
-{% extends 'base.html' %} 
+{% extends 'base.html' %}
 {% load static %}
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/tools/tools_home.css' %}" />
@@ -17,34 +17,72 @@
   <section class="estimator-section">
     <div class="container">
       <form id="estimator-form">
+        <h2>Revenue</h2>
         <div class="form-group">
-          <label for="hours-per-week">Hours Worked Per Week:</label>
+          <label for="hours-per-week">Working hours per week:</label>
           <input type="number" id="hours-per-week" name="hours-per-week" class="form-control" required>
         </div>
-        
-        <div class="form-group">  
-          <label for="hourly-rate">Average Hourly Rate ($):</label>
+
+        <div class="form-group">
+          <label for="hourly-rate">Average rate per hour: <small>(average is $12)</small></label>
           <input type="number" id="hourly-rate" name="hourly-rate" class="form-control" required>
         </div>
 
-        <div class="form-group">  
-          <label for="gas-expense">Monthly Gas Expense ($):</label>
-          <input type="number" id="gas-expense" name="gas-expense" class="form-control" value="200">
+        <h2>Expenses</h2>
+        <div class="form-group">
+          <label for="gas-expense">Gas per month:</label>
+          <input type="number" id="gas-expense" name="gas-expense" class="form-control" value="90">
         </div>
 
         <div class="form-group">
-          <label for="vehicle-expense">Monthly Vehicle Expenses ($):</label>   
-          <input type="number" id="vehicle-expense" name="vehicle-expense" class="form-control" value="300">
+          <label for="insurance-expense">Car Insurance per month:</label>
+          <input type="number" id="insurance-expense" name="insurance-expense" class="form-control" value="250">
         </div>
 
-        <button type="submit" class="btn btn-primary">Calculate Earnings</button>
+        <div class="form-group">
+          <label for="maintenance-expense">Car maintenance and repairs per month:</label>
+          <input type="number" id="maintenance-expense" name="maintenance-expense" class="form-control" value="100">
+        </div>
+
+        <div class="form-group">
+          <label for="extras-expense">Extras (cleaning, parking, etc) per month:</label>
+          <input type="number" id="extras-expense" name="extras-expense" class="form-control" value="10">
+        </div>
+        
+        <div class="form-group">
+          <label for="tax-rate">Self-employment tax rate: <small>(15.3% is standard)</small></label>
+          <input type="number" id="tax-rate" name="tax-rate" class="form-control" value="15.3" step="0.1">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" id="calculate-btn">
+          <span id="btn-text">Calculate Earnings</span>
+          <div id="loading-spinner" class="spinner-border spinner-border-sm text-light ml-2" role="status" style="display: none;">
+            <span class="sr-only">Calculating...</span>
+          </div>
+        </button>
       </form>
 
-      <div id="results" class="mt-4">
+      <div id="results">
         <h2>Estimated Earnings</h2>
-        <p><strong>Weekly:</strong> $<span id="weekly-earnings">0</span></p>
-        <p><strong>Monthly:</strong> $<span id="monthly-earnings">0</span></p>
-        <p><strong>Annually:</strong> $<span id="annual-earnings">0</span></p>
+        <div id="revenue">
+          <h3>Revenue</h3>
+          <p>Total monthly revenue: $<span id="revenue-monthly">1,440.00</span></p>
+        </div>
+        <div id="expenses">
+          <h3>Expenses</h3>
+          <p>Total monthly expenses: $<span id="expenses-monthly">450.00</span></p>
+        </div>
+        <div id="earnings">
+          <h3>Earnings*</h3>
+          <p>Monthly: $<span id="earnings-monthly">838.53</span></p>
+          <p>Annual: $<span id="earnings-annual">10,062.36</span></p>
+          <small>*Assuming a self-employment tax rate of <span id="tax-rate-output">15.3</span>%</small>
+        </div>
+        <div id="share">
+          <p>Share your results:</p>
+          <a href="#" id="twitter-share">Twitter</a>
+          <a href="#" id="facebook-share">Facebook</a>
+        </div>
       </div>
     </div>
   </section>
@@ -53,24 +91,43 @@
 <script>
 document.getElementById('estimator-form').addEventListener('submit', function(e) {
   e.preventDefault();
+  
+  document.getElementById('btn-text').style.display = 'none';
+  document.getElementById('loading-spinner').style.display = 'inline-block';
 
-  const hoursPerWeek = parseFloat(document.getElementById('hours-per-week').value);
-  const hourlyRate = parseFloat(document.getElementById('hourly-rate').value);
-  const gasExpense = parseFloat(document.getElementById('gas-expense').value);
-  const vehicleExpense = parseFloat(document.getElementById('vehicle-expense').value);
+  setTimeout(() => {
+    const hoursPerWeek = parseFloat(document.getElementById('hours-per-week').value);
+    const hourlyRate = parseFloat(document.getElementById('hourly-rate').value);
+    const gasExpense = parseFloat(document.getElementById('gas-expense').value);
+    const insuranceExpense = parseFloat(document.getElementById('insurance-expense').value);
+    const maintenanceExpense = parseFloat(document.getElementById('maintenance-expense').value);
+    const extrasExpense = parseFloat(document.getElementById('extras-expense').value);
+    const taxRate = parseFloat(document.getElementById('tax-rate').value);
 
-  const grossWeekly = hoursPerWeek * hourlyRate;
-  const grossMonthly = grossWeekly * 4;
-  const grossAnnual = grossMonthly * 12;
+    const grossMonthly = hoursPerWeek * hourlyRate * 4;
+    const expensesMonthly = gasExpense + insuranceExpense + maintenanceExpense + extrasExpense;
+    
+    const netMonthly = grossMonthly - expensesMonthly;
+    const netAnnual = netMonthly * 12;
+    
+    const earningsMonthly = netMonthly * (1 - taxRate / 100);
+    const earningsAnnual = earningsMonthly * 12;
 
-  const netMonthly = grossMonthly - gasExpense - vehicleExpense;
-  const netAnnual = netMonthly * 12;
+    document.getElementById('revenue-monthly').textContent = grossMonthly.toFixed(2);
+    document.getElementById('expenses-monthly').textContent = expensesMonthly.toFixed(2);
+    document.getElementById('earnings-monthly').textContent = earningsMonthly.toFixed(2);
+    document.getElementById('earnings-annual').textContent = earningsAnnual.toFixed(2);
+    document.getElementById('tax-rate-output').textContent = taxRate.toFixed(1);
 
-  document.getElementById('weekly-earnings').textContent = grossWeekly.toFixed(2);
-  document.getElementById('monthly-earnings').textContent = netMonthly.toFixed(2); 
-  document.getElementById('annual-earnings').textContent = netAnnual.toFixed(2);
+    document.getElementById('btn-text').style.display = 'inline';
+    document.getElementById('loading-spinner').style.display = 'none';
+    
+    document.getElementById('results').style.display = 'block';
 
-  document.getElementById('results').style.display = 'block';
+    const shareText = encodeURIComponent(`I calculated my potential earnings as a taxi driver using this tool. My monthly earnings could be $${earningsMonthly.toFixed(2)}! See yours at...`);
+    document.getElementById('twitter-share').href = `https://twitter.com/intent/tweet?text=${shareText}`;
+    document.getElementById('facebook-share').href = `https://www.facebook.com/sharer/sharer.php?quote=${shareText}`;
+  }, 1000);
 });
 </script>
 {% endblock %}
