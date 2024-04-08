@@ -32,4 +32,6 @@ urlpatterns = [
     path("faq/", views.faq, name="faq"),
     path("forum/", include("forum.urls")),
     path("rideshare/", include("rideshare.urls")),
+    path("tools/", include("tools.urls")),
+    path("user/", include("user.urls")),
 ]

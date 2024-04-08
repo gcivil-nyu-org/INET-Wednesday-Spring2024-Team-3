@@ -32,7 +32,9 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.RenameField(
-            model_name="comment", old_name="author", new_name="user",
+            model_name="comment",
+            old_name="author",
+            new_name="user",
         ),
         migrations.AddField(
             model_name="comment",
@@ -170,7 +172,11 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"unique_together": {("user", "comment"), ("user", "post")},},
+            options={
+                "unique_together": {("user", "comment"), ("user", "post")},
+            },
         ),
-        migrations.DeleteModel(name="ForumPost",),
+        migrations.DeleteModel(
+            name="ForumPost",
+        ),
     ]

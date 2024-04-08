@@ -19,10 +19,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="post", name="downvotes", field=models.IntegerField(default=0),
+            model_name="post",
+            name="downvotes",
+            field=models.IntegerField(default=0),
         ),
         migrations.AddField(
-            model_name="post", name="upvotes", field=models.IntegerField(default=0),
+            model_name="post",
+            name="upvotes",
+            field=models.IntegerField(default=0),
         ),
         migrations.AddField(
             model_name="vote",
@@ -41,10 +45,20 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name="vote", unique_together={("user", "post")},
+            name="vote",
+            unique_together={("user", "post")},
         ),
-        migrations.RemoveField(model_name="vote", name="comment",),
-        migrations.RemoveField(model_name="vote", name="created_at",),
-        migrations.RemoveField(model_name="vote", name="value",),
+        migrations.RemoveField(
+            model_name="vote",
+            name="comment",
+        ),
+        migrations.RemoveField(
+            model_name="vote",
+            name="created_at",
+        ),
+        migrations.RemoveField(
+            model_name="vote",
+            name="value",
+        ),
         migrations.RunPython(handle_existing_votes),
     ]

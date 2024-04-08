@@ -1,12 +1,13 @@
 @import url('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css');
 
 :root {
-    --primary-color: #5D93E1;
-    --secondary-color: #1d86a7;
-    --background-color: #F9FAFB;
-    --text-color: #343A40;
+
+    --primary-color: #1E88E5;
+    --secondary-color: #1565C0;
+    --background-color: #F5F5F5;
+    --text-color: #333;
+    --font-family: 'Poppins', sans-serif;
     --link-color: #007BFF;
-    --font-family: 'Roboto', sans-serif;
 }
 
 body {
@@ -190,6 +191,7 @@ h3 {
 
 
 }
+
 .settings-nav .nav-link:hover {
     background-color: rgba(0, 0, 0, 0.1);
     color: var(--primary-color);
