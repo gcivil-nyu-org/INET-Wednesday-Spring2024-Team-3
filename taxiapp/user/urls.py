@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import *
+from user.views import public_user_profile, send_friend_request, accept_friend_request, unfriend, friend_requests
 
 urlpatterns = [
     path('<str:username>/', public_user_profile, name='public_user'),

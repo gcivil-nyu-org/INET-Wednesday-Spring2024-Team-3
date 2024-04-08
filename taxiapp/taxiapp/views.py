@@ -6,7 +6,6 @@ import boto3
 from django.conf import settings
 from django.contrib import messages
 from botocore.exceptions import ClientError
-from forum.models import Post
 import hmac
 import hashlib
 import base64
@@ -15,8 +14,6 @@ import re
 import os
 from forum.models import Post, Comment
 from user.models import FriendRequest, Friendship
-
-logger = logging.getLogger(__name__)
 
 
 def login_view(request):
@@ -203,9 +200,6 @@ def reset_view(request):
                     )
                     step = "confirm"  # Move to confirmation step
                 except ClientError as e:
-                    logger.error(
-                        f"Error initiating password reset for {user_identifier}: {e}"
-                    )
                     messages.error(
                         request,
                         "Failed to initiate password reset. Please try again later.",
@@ -240,9 +234,6 @@ def reset_view(request):
                     )
                     return redirect("login")
                 except ClientError as e:
-                    logger.error(
-                        f"Failed to reset password for username {username}: {e}"
-                    )
                     if e.response["Error"]["Code"] == "CodeMismatchException":
                         messages.error(
                             request, "Invalid verification code. Please try again."
@@ -299,7 +290,6 @@ def confirm_view(request):
             else:
                 error_message = "Failed to confirm account. Please try again later."
 
-            logger.error(f"Failed to confirm account for username {username}: {e}")
             messages.error(request, error_message)
             return render(request, "confirm.html")
     else:
