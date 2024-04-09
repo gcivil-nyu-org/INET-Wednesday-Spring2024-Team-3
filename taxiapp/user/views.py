@@ -55,7 +55,6 @@ def send_friend_request(request, user_id):
         if request.user == to_user:
             return HttpResponseForbidden("cannot send friend request to yourself")
 
-        #Check existing friendship
         if FriendRequest.objects.filter(from_user=request.user, to_user=to_user).exists() or \
                 Friendship.objects.filter(Q(user1=request.user, user2=to_user) |
                                           Q(user1=to_user, user2=request.user)).exists():
