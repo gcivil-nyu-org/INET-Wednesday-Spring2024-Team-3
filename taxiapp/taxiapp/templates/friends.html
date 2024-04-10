@@ -7,6 +7,10 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Accept</button>
         </form>
+         <form method="POST" action="{% url 'reject_friend_request' friend_request.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Reject</button>
+        </form>
     </div>
     {% empty %}
     <p>No pending friend requests.</p>

@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, include
 from user.views import public_user_profile, send_friend_request, accept_friend_request, unfriend, friend_requests, reject_friend_request
+
 
 urlpatterns = [
     path('<str:username>/', public_user_profile, name='public_user'),
