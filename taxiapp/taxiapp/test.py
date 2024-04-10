@@ -58,7 +58,6 @@ class ViewsTestCase(TestCase):
         response = self.client.get('/profile/')
         self.assertRedirects(response, '/login/?next=/profile/')
 
-
     def tearDown(self):
         self.user.delete()
 
@@ -92,7 +91,6 @@ class CognitoBackendTestCase(TestCase):
         )
         mock_verify_token.assert_called_once_with('dummy_token')
         mock_get_or_create_user.assert_called_once_with({"username": "testuser", "email": "test@example.com"}, 'testuser')
-
 
     @patch('taxiapp.cognito_backend.boto3.client')
     def test_authenticate_failure(self, mock_boto3_client):
