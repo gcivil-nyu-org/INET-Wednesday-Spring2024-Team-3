@@ -48,4 +48,3 @@ class FriendModelTests(TestCase):
     def tearDown(self):
         # Your teardown logic, if you have any
         pass
-
