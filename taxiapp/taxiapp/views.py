@@ -301,7 +301,7 @@ def logout_view(request):
     return redirect("/")
 
 
-@login_required
+@login_required(login_url='/login/')
 def profile_view(request):
     if not request.user.is_authenticated:
         return redirect("/")
