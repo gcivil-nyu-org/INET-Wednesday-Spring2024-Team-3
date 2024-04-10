@@ -15,12 +15,28 @@
                 {% if request.user.is_authenticated and request.user != user %}
                 <div class="user-actions">
                     {% if not is_friend %}
+                    {% if has_received_request %}
+                    <form method="POST" action="{% url 'accept_friend_request' received_request_id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Accept Friend Request</button>
+                    </form>
+                    {% elif has_sent_request %}
+                    <form method="POST" action="{% url 'cancel_friend_request' user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">Cancel Friend Request</button>
+                    </form>
+                    {% else %}
                     <form method="POST" action="{% url 'send_friend_request' user.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary">Send Friend Request</button>
                     </form>
                     {% endif %}
-                    <a href="{% url 'chat' user.id %}" class="btn btn-secondary">Chat</a>
+                    {% else %}
+                    <form method="POST" action="{% url 'unfriend' user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Unfriend</button>
+                    </form>
+                    {% endif %}
                 </div>
                 {% elif not request.user.is_authenticated %}
                 <p class="login-message">Login to send a friend request and chat.</p>

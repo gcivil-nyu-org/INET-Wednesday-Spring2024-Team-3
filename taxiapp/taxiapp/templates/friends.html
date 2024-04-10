@@ -2,10 +2,14 @@
 <div class="friend-request-list">
     {% for friend_request in friend_requests %}
     <div class="friend-request-item">
-        <p>{{ friend_request.from_user.username }}</p>
-        <form method="POST" action="{% url 'accept_friend_request' friend_request.id %}">
+        <p><a href="{% url 'public_user' friend_request.from_user.username %}">{{ friend_request.from_user.username }}</a></p>
+        <form method="POST" action="{% url 'accept_friend_request' friend_request.id %}" class="accept-form">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary">Accept</button>
+        </form>
+        <form method="POST" action="{% url 'reject_friend_request' friend_request.id %}" class="reject-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Reject</button>
         </form>
     </div>
     {% empty %}
@@ -17,12 +21,11 @@
 <div class="friend-list">
     {% for friend in friends %}
     <div class="friend-item">
-        <p>{{ friend.username }}</p>
+        <p><a href="{% url 'public_user' friend.username %}">{{ friend.username }}</a></p>
         <form method="POST" action="{% url 'unfriend' friend.id %}">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Remove Friend</button>
         </form>
-        <a href="{% url 'chat' friend.id %}" class="btn btn-secondary">Chat</a>
     </div>
     {% empty %}
     <p>You have no friends yet.</p>
