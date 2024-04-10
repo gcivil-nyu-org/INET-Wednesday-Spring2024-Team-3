@@ -19,24 +19,13 @@
                             {% csrf_token %}
                             <button type="submit" class="btn btn-primary">Send Friend Request</button>
                         </form>
-                        {% elif has_pending_request %}
-                            <div class="friend-request-actions">
-                                <form method="POST" action="{% url 'accept_friend_request' pending_request_id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-success">Accept Friend Request</button>
-                                </form>
-                                <form method="POST" action="{% url 'reject_friend_request' pending_request_id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-warning">Reject Friend Request</button>
-                                </form>
-                            </div>
                         {% else %}
                         <form method="POST" action="{% url 'unfriend' user.id %}">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Unfriend</button>
                         </form>
                         {% endif %}
-                        <a href="{% url 'chat' user.id %}" class="btn btn-secondary">Chat</a>
+
                     </div>
                 {% elif not request.user.is_authenticated %}
                 <p class="login-message">Login to send a friend request and chat.</p>
