@@ -22,21 +22,35 @@ def public_user_profile(request, username):
     page_obj_comments = paginator_comments.get_page(page_number)
 
     is_friend = False
+    has_sent_request = False
 
     if request.user.is_authenticated and request.user != user:
         is_friend = Friendship.objects.filter(
             (Q(user1=request.user, user2=user) | Q(user1=user, user2=request.user))
         ).exists()
-
+        has_sent_request = FriendRequest.objects.filter(from_user=request.user, to_user=user, status='pending').exists()
+        has_received_request = FriendRequest.objects.filter(from_user=user, to_user=request.user, status='pending').exists()
+        received_request_id = None
+        if has_received_request:
+            received_request = FriendRequest.objects.filter(from_user=user, to_user=request.user, status='pending').first()
+            received_request_id = received_request.id
     context = {
         'user': user,
         'posts': page_obj_posts,
         'comments': page_obj_comments,
         'is_friend': is_friend,
-
+        'has_sent_request': has_sent_request,
+        'has_received_request': has_received_request,
+        'received_request_id': received_request_id,
     }
     return render(request, 'public_user.html', context)
 
+@login_required
+def cancel_friend_request(request, user_id):
+    to_user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        FriendRequest.objects.filter(from_user=request.user, to_user=to_user, status='pending').delete()
+    return redirect('public_user', username=to_user.username)
 
 @login_required
 def send_friend_request(request, user_id):
