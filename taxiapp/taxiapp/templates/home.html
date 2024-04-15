@@ -114,15 +114,23 @@
         if (status === 'OK') {
             var startlat = results[0].geometry.location.lat();
             var startlng = results[0].geometry.location.lng();
-
+            // Check if start address is in NYC
+            if (!isInNYC(startlat, startlng)) {
+              alert('Start address is not in NYC.');
+              return;
+          }
             geocoder.geocode({ 'address': endAddress }, function (results, status) {
                 if (status === 'OK') {
                     var endlat = results[0].geometry.location.lat();
                     var endlng = results[0].geometry.location.lng();
-
+                    // Check if end address is in NYC
+                    if (!isInNYC(endlat, endlng)) {
+                      alert('End address is not in NYC.');
+                      return;
+                  }
                     var num_passengers = parseInt(document.getElementById('num_passengers').value);
 
-                    if (!num_passengers || num_passengers <= 0) {
+                    if (!num_passengers || num_passengers <= 0 || num_passengers > 6) {
                         alert('Please enter a valid number of passengers.');
                         return;
                     }
@@ -158,6 +166,18 @@
             alert('Geocode was not successful for the following reason: ' + status);
         }
     });
+
+    function isInNYC(lat, lng) {
+      // Define the boundaries of NYC
+      var nycBounds = {
+          north: 40.92,
+          south: 40.49,
+          west: -74.27,
+          east: -73.68
+      };
+      // Check if the coordinates are within NYC boundaries
+      return lat >= nycBounds.south && lat <= nycBounds.north && lng >= nycBounds.west && lng <= nycBounds.east;
+  }
   }
 </script>
 {% endblock %} {% block content %}
