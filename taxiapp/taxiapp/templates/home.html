@@ -108,7 +108,10 @@
   function compareFares() {
     var startAddress = document.getElementById('start-address').value;
     var endAddress = document.getElementById('end-address').value;
-
+    if (startAddress == endAddress){
+      alert('Start and end addresses must not be the same.');
+      return;
+    }
     var geocoder = new google.maps.Geocoder();
     geocoder.geocode({ 'address': startAddress }, function (results, status) {
         if (status === 'OK') {
