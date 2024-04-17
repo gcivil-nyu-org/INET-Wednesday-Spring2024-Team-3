@@ -1,6 +1,6 @@
 from django.shortcuts import redirect
 from django.urls import reverse
-from .models import Post  
+from .models import Post
 
 class RedirectIfPostNotFoundMiddleware:
     def __init__(self, get_response):
@@ -17,6 +17,6 @@ class RedirectIfPostNotFoundMiddleware:
             # Check if the Post exists
             if not Post.objects.filter(pk=post_id).exists():
                 # Redirect to the forum home page
-                return redirect(reverse('forum_home')) 
+                return redirect(reverse('forum_home'))
 
         return None
