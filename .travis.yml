@@ -26,5 +26,4 @@ deploy:
     branch: 
       - master
       - develop
-      - user_feature
   cleanup: 'false'
