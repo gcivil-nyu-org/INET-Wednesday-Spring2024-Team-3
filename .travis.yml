@@ -26,4 +26,5 @@ deploy:
     branch: 
       - master
       - develop
+      - masterfix
   cleanup: 'false'
