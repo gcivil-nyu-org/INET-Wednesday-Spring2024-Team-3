@@ -347,13 +347,53 @@ def save_profile_view(request):
         client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
         cognito_username = request.user.username
 
+        first_name = request.POST.get("first_name")
+        middle_name = request.POST.get("middle_name")
+        last_name = request.POST.get("last_name")
+        email = request.POST.get("email")
+        phone_number = request.POST.get("phone_number")
+        address = request.POST.get("address")
+
+        # Input validation
+        if not first_name or not last_name:
+            messages.error(request, "First name and last name are required.")
+            return redirect("/profile")
+
+        if len(first_name) > 50 or len(last_name) > 50:
+            messages.error(request, "First name and last name should not exceed 50 characters.")
+            return redirect("/profile")
+
+        if middle_name and len(middle_name) > 50:
+            messages.error(request, "Middle name should not exceed 50 characters.")
+            return redirect("/profile")
+
+        if not email or not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            messages.error(request, "Please enter a valid email address.")
+            return redirect("/profile")
+
+        if len(email) > 64:
+            messages.error(request, "Email should not exceed 64 characters.")
+            return redirect("/profile")
+
+        if phone_number and not re.match(r"^\+?1?\d{9,15}$", phone_number):
+            messages.error(request, "Please enter a valid phone number.")
+            return redirect("/profile")
+
+        if phone_number and len(phone_number) > 15:
+            messages.error(request, "Phone number should not exceed 15 characters.")
+            return redirect("/profile")
+
+        if address and len(address) > 200:
+            messages.error(request, "Address should not exceed 200 characters.")
+            return redirect("/profile")
+
         updated_attributes = [
-            {"Name": "given_name", "Value": request.POST.get("first_name")},
-            {"Name": "middle_name", "Value": request.POST.get("middle_name")},
-            {"Name": "family_name", "Value": request.POST.get("last_name")},
-            {"Name": "email", "Value": request.POST.get("email")},
-            {"Name": "phone_number", "Value": request.POST.get("phone_number")},
-            {"Name": "address", "Value": request.POST.get("address")},
+            {"Name": "given_name", "Value": first_name},
+            {"Name": "middle_name", "Value": middle_name},
+            {"Name": "family_name", "Value": last_name},
+            {"Name": "email", "Value": email},
+            {"Name": "phone_number", "Value": phone_number},
+            {"Name": "address", "Value": address},
         ]
 
         try:
