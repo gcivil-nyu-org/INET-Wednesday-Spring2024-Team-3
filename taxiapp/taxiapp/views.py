@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 import boto3
 from django.conf import settings
@@ -9,11 +10,10 @@ from botocore.exceptions import ClientError
 import hmac
 import hashlib
 import base64
-import logging
 import re
 import os
 from forum.models import Post, Comment
-from user.models import FriendRequest, Friendship
+from user.models import FriendRequest
 
 
 def login_view(request):
@@ -342,6 +342,7 @@ def profile_view(request):
     return render(request, "profile.html", context)
 
 @login_required
+@csrf_protect
 def save_profile_view(request):
     if request.method == "POST":
         client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
