@@ -1,68 +1,90 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}">
-    {% block extra_css %}{% endblock %}
-    {% block extra_js %}{% endblock %}
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="{% static 'css/taxiapp/taxiapp_home.css' %}" />
+    {% block extra_css %}{% endblock %} {% block extra_js %}{% endblock %}
+  </head>
+  <body>
     <header>
-        <nav class="navbar navbar-expand-lg">
-            <div class="container">
-                <a class="navbar-brand" href="/">Taxi Compare</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item"><a class="nav-link" href="/forum">Forum</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/user/search">People</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/tools">Tools</a></li>
-                        <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
-                        {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a href="/profile" class="btn btn-primary">Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/logout" class="btn btn-secondary">Logout</a>
-                        </li>
-                        {% else %}
-                        <li class="nav-item">
-                            <a href="/login" class="btn btn-primary">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="/register" class="btn btn-outline-primary">Register</a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer>
+      <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <div class="footer-links">
-                <a href="#">About Us</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Contact</a>
-            </div>
-            <p>&copy; 2024 Taxi Compare. All rights reserved.</p>
+          <a class="navbar-brand" href="/">Taxi Compare</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="/forum">Forum</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/tools">Tools</a>
+              </li>
+              <li class="nav-item"><a class="nav-link" href="/faq">FAQ</a></li>
+              {% if user.is_authenticated %}
+              <li class="nav-item">
+                <a href="/profile" class="btn btn-primary">Profile</a>
+              </li>
+              <li class="nav-item">
+                <a href="/logout" class="btn btn-secondary">Logout</a>
+              </li>
+              {% else %}
+              <li class="nav-item">
+                <a href="/login" class="btn btn-primary">Login</a>
+              </li>
+              <li class="nav-item">
+                <a href="/register" class="btn btn-outline-primary">Register</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
         </div>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
+      </nav>
+    </header>
+  </body>
 </html>
+<main>
+  {% if messages %}
+  <div class="container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+  {% endif %} {% block content %}{% endblock %}
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-links">
+      <a href="#">About Us</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Contact</a>
+    </div>
+    <p>&copy; 2024 Taxi Compare. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body> </html> 
