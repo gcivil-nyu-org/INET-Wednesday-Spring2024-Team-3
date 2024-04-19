@@ -346,25 +346,6 @@ def profile_view(request):
 @login_required
 @csrf_protect
 def save_profile_view(request):
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    logger.info("TESTING")
-    
-@login_required
-@csrf_protect
-def save_profile_view(request):
     if request.method == "POST":
         client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
         cognito_username = request.user.username
