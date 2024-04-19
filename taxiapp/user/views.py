@@ -97,3 +97,25 @@ def unfriend(request, user_id):
 def friend_requests(request):
     friend_requests = FriendRequest.objects.filter(to_user=request.user, status='pending')
     return redirect('taxiapp:profile')
+
+
+def search_people(request):
+    query = request.GET.get('query')
+    users = User.objects.filter(username__icontains=query) if query else User.objects.none()
+    
+    if request.user.is_authenticated:
+        friendships = Friendship.objects.filter(user1=request.user) | Friendship.objects.filter(user2=request.user)
+        friends = [friendship.user2 if friendship.user1 == request.user else friendship.user1 for friendship in friendships]
+        has_sent_request = {}
+        for user in users:
+            has_sent_request[user] = FriendRequest.objects.filter(from_user=request.user, to_user=user, status='pending').exists()
+    else:
+        friends = []
+        has_sent_request = {}
+        
+    context = {
+        'users': users,
+        'friends': friends,
+        'has_sent_request': has_sent_request,
+    }
+    return render(request, 'search_user.html', context)

@@ -14,7 +14,9 @@ import re
 import os
 from forum.models import Post, Comment
 from user.models import FriendRequest
+import logging
 
+logger = logging.getLogger(__name__)
 
 def login_view(request):
     if request.method == "POST":
@@ -344,6 +346,25 @@ def profile_view(request):
 @login_required
 @csrf_protect
 def save_profile_view(request):
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    logger.info("TESTING")
+    
+@login_required
+@csrf_protect
+def save_profile_view(request):
     if request.method == "POST":
         client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
         cognito_username = request.user.username
@@ -387,7 +408,6 @@ def save_profile_view(request):
         if address and len(address) > 200:
             messages.error(request, "Address should not exceed 200 characters.")
             return redirect("/profile")
-
         updated_attributes = [
             {"Name": "given_name", "Value": first_name},
             {"Name": "middle_name", "Value": middle_name},
@@ -403,15 +423,20 @@ def save_profile_view(request):
                 Username=cognito_username,
                 UserAttributes=updated_attributes,
             )
+            # Update the local Django user model
+            request.user.first_name = first_name
+            request.user.last_name = last_name
+            request.user.email = email
+            request.user.save()
+
+            # Refresh the user session with the specified backend
+            login(request, request.user, backend='taxiapp.cognito_backend.CognitoBackend')
             messages.success(request, "Profile updated successfully.")
         except Exception as e:
             messages.error(request, f"Failed to update profile: {str(e)}")
-
         return redirect("/profile")
     else:
         return redirect("/profile")
-
-
 def faq(request):
     faq_data = [
         {
@@ -441,3 +466,22 @@ def faq(request):
     ]
 
     return render(request, "faq.html", {"faq_data": faq_data})
+
+
+def sync_user_from_cognito(user):
+    client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
+    cognito_username = user.username
+
+    try:
+        response = client.admin_get_user(
+            UserPoolId=settings.COGNITO_USER_POOL_ID,
+            Username=cognito_username
+        )
+        user_attributes = {attr["Name"]: attr["Value"] for attr in response["UserAttributes"]}
+
+        user.first_name = user_attributes.get("given_name", "")
+        user.last_name = user_attributes.get("family_name", "")
+        user.email = user_attributes.get("email", "")
+        user.save()
+    except Exception as e:
+        logger.error(f"Failed to sync user from Cognito: {str(e)}")

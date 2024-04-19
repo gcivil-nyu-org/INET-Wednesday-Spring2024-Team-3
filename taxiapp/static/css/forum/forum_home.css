@@ -1,13 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
 :root {
-    --primary-color: #ff4500;
-    --secondary-color: #1a1a1b;
-    --background-color: #dae0e6;
-    --text-color: #1a1a1b;
-    --link-color: #0079d3;
-    --font-family: "Poppins", sans-serif;
-}
+    --primary-color: #1E88E5;
+    --secondary-color: #1565C0;
+    --background-color: #F5F5F5;
+    --text-color: #333;
+    --font-family: 'Poppins', sans-serif;
+  }
 
 body {
     font-family: var(--font-family);
@@ -16,28 +15,41 @@ body {
     margin: 0;
     padding: 0;
     line-height: 1.6;
-    font-size: 16px;
+    font-size: 18px;
 }
 
-.container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 20px;
+.navbar {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 20px 0;
+}
+
+.navbar-brand,
+.nav-link {
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+.navbar-brand:hover,
+.nav-link:hover {
+    color: var(--secondary-color);
 }
 
 .hero-section {
+    padding: 100px 0;
     text-align: center;
-    margin-bottom: 40px;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: #fff;
 }
 
 .hero-section h1 {
-    color: var(--primary-color);
-    font-size: 36px;
-    margin-bottom: 10px;
+    font-size: 48px;
+    margin-bottom: 20px;
 }
 
 .hero-section p {
-    font-size: 18px;
+    font-size: 24px;
+    margin-bottom: 0;
 }
 
 .new-post {
@@ -152,4 +164,15 @@ body {
 
 .username:hover {
     color: var(--primary-color);
+}
+
+@media (max-width: 767px) {
+    .hero-section h1 {
+        font-size: 36px;
+    }
+
+    .hero-section p {
+        font-size: 18px;
+    }
+
 }
