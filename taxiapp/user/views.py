@@ -8,7 +8,6 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 
-
 def public_user_profile(request, username):
     user = get_object_or_404(User, username=username)
     posts = Post.objects.filter(user=user).order_by('-created_at')
@@ -16,24 +15,26 @@ def public_user_profile(request, username):
 
     paginator_posts = Paginator(posts, 5)
     paginator_comments = Paginator(comments, 5)
-
     page_number = request.GET.get('page')
     page_obj_posts = paginator_posts.get_page(page_number)
     page_obj_comments = paginator_comments.get_page(page_number)
 
     is_friend = False
     has_sent_request = False
+    has_received_request = False
+    received_request_id = None
 
-    if request.user.is_authenticated and request.user != user:
-        is_friend = Friendship.objects.filter(
-            (Q(user1=request.user, user2=user) | Q(user1=user, user2=request.user))
-        ).exists()
-        has_sent_request = FriendRequest.objects.filter(from_user=request.user, to_user=user, status='pending').exists()
-        has_received_request = FriendRequest.objects.filter(from_user=user, to_user=request.user, status='pending').exists()
-        received_request_id = None
-        if has_received_request:
-            received_request = FriendRequest.objects.filter(from_user=user, to_user=request.user, status='pending').first()
-            received_request_id = received_request.id
+    if request.user.is_authenticated:
+        if request.user != user:
+            is_friend = Friendship.objects.filter(
+                (Q(user1=request.user, user2=user) | Q(user1=user, user2=request.user))
+            ).exists()
+            has_sent_request = FriendRequest.objects.filter(from_user=request.user, to_user=user, status='pending').exists()
+            has_received_request = FriendRequest.objects.filter(from_user=user, to_user=request.user, status='pending').exists()
+            if has_received_request:
+                received_request = FriendRequest.objects.filter(from_user=user, to_user=request.user, status='pending').first()
+                received_request_id = received_request.id
+
     context = {
         'user': user,
         'posts': page_obj_posts,

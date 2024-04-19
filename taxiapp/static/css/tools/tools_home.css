@@ -1,25 +1,57 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
 :root {
-  --primary-color: #1E88E5;
-  --secondary-color: #1565C0;
-  --background-color: #F5F5F5;
-  --text-color: #333;
-  --font-family: 'Poppins', sans-serif;
-}
+    --primary-color: #1E88E5;
+    --secondary-color: #1565C0;
+    --background-color: #F5F5F5;
+    --text-color: #333;
+    --font-family: 'Poppins', sans-serif;
+  }
 
 body {
-  font-family: var(--font-family);
-  background: var(--background-color);
-  color: var(--text-color);
+    font-family: var(--font-family);
+    background: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    font-size: 18px;
+}
+
+.navbar {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 20px 0;
+}
+
+.navbar-brand,
+.nav-link {
+    color: inherit;
+    transition: color 0.3s ease;
+}
+
+.navbar-brand:hover,
+.nav-link:hover {
+    color: var(--secondary-color);
 }
 
 .hero-section {
-  padding: 100px 0;
-  text-align: center;
-  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-  color: #fff;
+    padding: 100px 0;
+    text-align: center;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: #fff;
 }
+
+.hero-section h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.hero-section p {
+    font-size: 24px;
+    margin-bottom: 0;
+}
+
 
 .estimator-section {
   padding: 80px 0;
