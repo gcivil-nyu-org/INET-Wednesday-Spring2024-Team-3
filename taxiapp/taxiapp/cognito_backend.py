@@ -23,7 +23,7 @@ class CognitoBackend(BaseBackend):
             claims = self.verify_token(id_token)
             if claims:
                 return self.get_or_create_user(claims, username)
-        except ClientError as e:
+        except botocore.exceptions.ClientError as e:
             error_code = e.response["Error"]["Code"]
             if error_code == "UserNotConfirmedException":
                 logger.warning(f"User {username} is not confirmed.")
