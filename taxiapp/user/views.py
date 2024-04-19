@@ -50,17 +50,14 @@ def cancel_friend_request(request, user_id):
     to_user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         FriendRequest.objects.filter(from_user=request.user, to_user=to_user, status='pending').delete()
-    return redirect('public_user', username=to_user.username)
-
+        return redirect(request.META.get('HTTP_REFERER', '/'))
+    
 @login_required
 def send_friend_request(request, user_id):
     to_user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         friend_request, created = FriendRequest.objects.get_or_create(from_user=request.user, to_user=to_user)
-        if created:
-            return redirect('public_user', username=to_user.username)
-    return redirect('public_user', username=to_user.username)
-
+        return redirect(request.META.get('HTTP_REFERER', '/'))
 
 @login_required
 def accept_friend_request(request, request_id):
@@ -70,18 +67,17 @@ def accept_friend_request(request, request_id):
             friend_request.status = 'accepted'
             friend_request.save()
             Friendship.objects.create(user1=friend_request.from_user, user2=friend_request.to_user)
-    return redirect('public_user', username=friend_request.from_user.username)
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required
 def reject_friend_request(request, request_id):
     friend_request = get_object_or_404(FriendRequest, id=request_id)
-
     if request.method == 'POST':
         if friend_request.to_user == request.user and friend_request.status == 'pending':
             friend_request.status = 'rejected'
             friend_request.delete()
-    return redirect('public_user', username=friend_request.from_user.username)
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required
@@ -90,7 +86,7 @@ def unfriend(request, user_id):
     user2 = get_object_or_404(User, id=user_id)
     Friendship.objects.filter(user1__in=[user1, user2], user2__in=[user1, user2]).delete()
     FriendRequest.objects.filter(from_user__in=[user1, user2], to_user__in=[user1, user2]).delete()
-    return redirect('public_user', username=user2.username)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 @login_required
