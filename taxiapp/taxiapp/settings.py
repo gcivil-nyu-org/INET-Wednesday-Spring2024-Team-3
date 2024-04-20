@@ -51,6 +51,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # environ.Env.read_env(env_file="secrets.env")
 # SECRET_KEY = env("SECRET_KEY")
 
+
 # # SECURITY WARNING: keep the secret key used in production secret!
 # COGNITO_DOMAIN = env("COGNITO_DOMAIN")
 # COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
@@ -117,6 +118,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "forum.middleware.RedirectIfPostNotFoundMiddleware",
 ]
 
 ROOT_URLCONF = "taxiapp.urls"

@@ -31,6 +31,12 @@ def compare_fares(request):
         endlng = data.get("endlng")
         endCoord = [endlat, endlng]
         passengers = data.get("num_passengers")
+        if passengers <= 4:
+            passengers = 1
+        elif passengers <= 6:
+            passengers = 6
+        else:
+            passengers = passengers
         dis = geopy.distance.geodesic(startCoord, endCoord).km
 
         # Call the ML models to retrieve estimated Uber and Taxi fares
@@ -39,8 +45,8 @@ def compare_fares(request):
 
         # Prepare the response data
         fare_data = {
-            "uber_fare": round(uber_fare * 1.2, 2),
-            "taxi_fare": round(taxi_fare * 1.2, 2),
+            "uber_fare": round(uber_fare * 2, 2),
+            "taxi_fare": round(taxi_fare * 2, 2),
         }
 
         return JsonResponse(fare_data)

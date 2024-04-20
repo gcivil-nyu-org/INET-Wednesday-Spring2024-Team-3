@@ -26,5 +26,5 @@ deploy:
     branch: 
       - master
       - develop
-      - user_feature
+      - masterfix
   cleanup: 'false'
