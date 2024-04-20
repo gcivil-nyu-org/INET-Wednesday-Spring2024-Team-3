@@ -134,4 +134,3 @@ def search_people(request):
         'has_sent_request': has_sent_request,
     }
     return render(request, 'search_user.html', context)
-
