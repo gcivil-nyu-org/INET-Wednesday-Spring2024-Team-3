@@ -58,8 +58,8 @@ class Vote(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     vote_type = models.CharField(
         max_length=10,
-        choices=(("upvote", "Upvote"), ("downvote", "Downvote")),
-        default="upvote",
+        choices=(("upvote", "Upvote"), ("downvote", "Downvote"), ("neutral", "Neutral")),
+        default="neutral",
     )
 
     class Meta:
