@@ -104,6 +104,35 @@ document.getElementById('estimator-form').addEventListener('submit', function(e)
     const extrasExpense = parseFloat(document.getElementById('extras-expense').value);
     const taxRate = parseFloat(document.getElementById('tax-rate').value);
 
+    // Validate inputs
+    if (hoursPerWeek <= 0){
+      alert('Working hours per week must be greater than zero.');
+      return;
+    }
+    if (hourlyRate <= 0){
+      alert('Hourly rate must be greater than zero.');
+      return;
+    }
+    if (gasExpense < 0){
+      alert('Gas expense must be positive.');
+      return;
+    }
+    if (insuranceExpense < 0){
+      alert('Insurance expense must be positive.');
+      return;
+    }
+    if (maintenanceExpense < 0){
+      alert('Maintenance expense must be positive.');
+      return;
+    }
+    if (extrasExpense < 0){
+      alert('Extra expense must be positive.');
+      return;
+    }
+    if (taxRate < 0){
+      alert('Tax rate must be positive.');
+      return;
+    }
     const grossMonthly = hoursPerWeek * hourlyRate * 4;
     const expensesMonthly = gasExpense + insuranceExpense + maintenanceExpense + extrasExpense;
     
