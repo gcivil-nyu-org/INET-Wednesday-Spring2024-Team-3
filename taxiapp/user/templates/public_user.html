@@ -37,6 +37,7 @@
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Unfriend</button>
                     </form>
+                    <a href="{% url 'chat' user.username %}" class="btn btn-info">Chat with {{ user.username }}</a>
                     {% endif %}
                     {% endif %}
                 </div>

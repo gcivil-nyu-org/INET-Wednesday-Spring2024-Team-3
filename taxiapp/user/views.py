@@ -3,7 +3,7 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User
 from forum.models import Post, Comment
-from .models import FriendRequest, Friendship
+from .models import FriendRequest, Friendship, ChatMessage
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
@@ -87,13 +87,31 @@ def unfriend(request, user_id):
     user2 = get_object_or_404(User, id=user_id)
     Friendship.objects.filter(user1__in=[user1, user2], user2__in=[user1, user2]).delete()
     FriendRequest.objects.filter(from_user__in=[user1, user2], to_user__in=[user1, user2]).delete()
+    ChatMessage.objects.filter((Q(sender=user1, receiver=user2) |
+                                Q(sender=user2, receiver=user1))).delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
 
 
 @login_required
 def friend_requests(request):
     friend_requests = FriendRequest.objects.filter(to_user=request.user, status='pending')
     return redirect('taxiapp:profile')
+
+@login_required
+def chat_view(request, username):
+    other_user = get_object_or_404(User, username=username)
+    if request.method == 'POST':
+        message = request.POST.get('message', '')
+        if message:
+            ChatMessage.objects.create(sender=request.user, receiver=other_user, message=message)
+            return redirect('chat', username=username)
+
+    messages = ChatMessage.objects.filter(
+        (Q(sender=request.user, receiver=other_user) | Q(sender=other_user, receiver=request.user))
+    ).order_by('timestamp')
+
+    return render(request, 'chat.html', {'other_user': other_user, 'messages': messages})
 
 
 def search_people(request):
@@ -116,3 +134,4 @@ def search_people(request):
         'has_sent_request': has_sent_request,
     }
     return render(request, 'search_user.html', context)
+
