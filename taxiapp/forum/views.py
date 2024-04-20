@@ -9,10 +9,11 @@ from django.db.models import F, ExpressionWrapper, IntegerField
 
 logger = logging.getLogger(__name__)
 
-
 def forum_home(request):
-    sort_by = request.GET.get("sort_by", "recent")
+    user = request.user
 
+    # Handle sorting
+    sort_by = request.GET.get("sort_by", "recent")
     if sort_by == "popular":
         posts = Post.objects.annotate(
             calculated_score=ExpressionWrapper(
@@ -22,8 +23,13 @@ def forum_home(request):
     else:
         posts = Post.objects.all().order_by("-created_at")
 
-    return render(request, "forum_home.html", {"posts": posts})
-
+    # Prepare the vote_dict if the user is authenticated
+    vote_dict = {}
+    if user.is_authenticated:
+        votes = Vote.objects.filter(user=user, post__in=posts).values('post_id', 'vote_type')
+        vote_dict = {vote['post_id']: vote['vote_type'] for vote in votes}
+    print(vote_dict)
+    return render(request, "forum_home.html", {'posts': posts, 'vote_dict': vote_dict})
 
 @login_required
 def post_create(request):
@@ -56,7 +62,6 @@ def post_create(request):
 
     return render(request, "post_create.html", {"categories": categories})
 
-
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
@@ -75,11 +80,9 @@ def add_comment(request, post_id):
 
     return redirect("forum_home")
 
-
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     return render(request, "post_detail.html", {"post": post})
-
 
 def posts_api(request):
     sort_by = request.GET.get("sort_by", "recent")
@@ -99,7 +102,6 @@ def posts_api(request):
     logger.info(f"post_data: {posts_data}")
     return JsonResponse(posts_data, safe=False)
 
-
 @login_required
 def post_delete(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -115,48 +117,51 @@ def post_delete(request, post_id):
     else:
         return render(request, "post_delete.html", {"post": post})
 
-
 def upvote_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     user = request.user
 
-    vote, created = Vote.objects.get_or_create(user=user, post=post)
-    if created and vote.vote_type == "upvote":
+    vote, created = Vote.objects.get_or_create(user=user, post=post, defaults={'vote_type': 'upvote'})
+
+    if vote.vote_type == "upvote":
+        if created:
+            post.upvotes += 1
+        else:
+            # Toggle to neutral if already upvoted
+            vote.delete()
+            post.upvotes -= 1
+    elif vote.vote_type == "downvote":
+        # Change downvote to upvote
+        post.downvotes -= 1
         post.upvotes += 1
-        post.save()
-    elif vote and vote.vote_type == "upvote":
-        pass
-    elif vote and vote.vote_type == "downvote":
-        post.upvotes += 1
-        post.save()
+        vote.vote_type = "upvote"
+        vote.save()
 
-    vote.vote_type = "upvote"
-    vote.save()
-
-    post_score = post.score
-    return JsonResponse({"score": post_score})
-
+    post.save()
+    return JsonResponse({"score": post.upvotes - post.downvotes})
 
 def downvote_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     user = request.user
 
-    vote, created = Vote.objects.get_or_create(user=user, post=post)
-    if created and vote.vote_type == "downvote":
+    vote, created = Vote.objects.get_or_create(user=user, post=post, defaults={'vote_type': 'downvote'})
+
+    if vote.vote_type == "downvote":
+        if created:
+            post.downvotes += 1
+        else:
+            # Toggle to neutral if already downvoted
+            vote.delete()
+            post.downvotes -= 1
+    elif vote.vote_type == "upvote":
+        # Change upvote to downvote
+        post.upvotes -= 1
         post.downvotes += 1
-        post.save()
-    elif vote and vote.vote_type == "downvote":
-        pass
-    elif vote and vote.vote_type == "upvote":
-        post.downvotes += 1
-        post.save()
+        vote.vote_type = "downvote"
+        vote.save()
 
-    vote.vote_type = "downvote"
-    vote.save()
-
-    post_score = post.score
-    return JsonResponse({"score": post_score})
-
+    post.save()
+    return JsonResponse({"score": post.upvotes - post.downvotes})
 
 @login_required
 def delete_comment(request, post_id, comment_id):
