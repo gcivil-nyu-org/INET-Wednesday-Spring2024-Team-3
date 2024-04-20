@@ -72,8 +72,7 @@
                 {% for comment in comments %}
                 <div class="comment-item">
                     <p>{{ comment.content }}</p>
-                    <p class="comment-meta">Commented on <a href="{% url 'post_detail' comment.post.id %}">{{
-                            comment.post.title }}</a> on {{ comment.created_at|date:"Y-m-d H:i" }}</p>
+                    <p class="comment-meta">Commented on <a href="{% url 'post_detail' comment.post.id %}">{{comment.post.title }}</a> on {{ comment.created_at|date:"Y-m-d H:i" }}</p>
                 </div>
                 {% empty %}
                 <p>No comments found.</p>
