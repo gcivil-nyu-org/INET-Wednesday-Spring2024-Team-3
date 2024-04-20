@@ -28,37 +28,51 @@ def forum_home(request):
 @login_required
 def post_create(request):
     categories = Category.objects.all()
+
     if request.method == "POST":
         title = request.POST.get("title")
         content = request.POST.get("content")
         category_id = request.POST.get("category")
+
+        if not title.strip():
+            messages.error(request, "Title cannot be empty.")
+            return render(request, "post_create.html", {"categories": categories})
+
+        if not content.strip():
+            messages.error(request, "Content cannot be empty.")
+            return render(request, "post_create.html", {"categories": categories})
+
         try:
             category = Category.objects.get(id=category_id)
-            # logger.info('cat found')
         except ObjectDoesNotExist:
             messages.error(request, "Selected category does not exist.")
-            # logger.info('cat fail')
             return render(request, "post_create.html", {"categories": categories})
-        if title and content and category:
-            # logger.info('new_post being created')
-            new_post = Post(
-                title=title, content=content, user=request.user, category=category
-            )
-            new_post.save()
-            return redirect("post_detail", post_id=new_post.id)
+
+        new_post = Post(
+            title=title, content=content, user=request.user, category=category
+        )
+        new_post.save()
+        return redirect("post_detail", post_id=new_post.id)
+
     return render(request, "post_create.html", {"categories": categories})
 
 
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
+
     if request.method == "POST":
         content = request.POST.get("content")
-        if content:
-            comment = Comment.objects.create(
-                post=post, content=content, user=request.user
-            )
-            comment.save()
+
+        if not content.strip():
+            messages.error(request, "Comment cannot be empty.")
+            return redirect("post_detail", post_id=post.id)
+
+        comment = Comment.objects.create(
+            post=post, content=content, user=request.user
+        )
+        comment.save()
         return redirect("post_detail", post_id=post.id)
+
     return redirect("forum_home")
 
 

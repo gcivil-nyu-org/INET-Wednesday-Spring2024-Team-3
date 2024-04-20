@@ -52,6 +52,7 @@
                 <div id="profile" class="section active">
                     <h2>Edit Profile</h2>
                     <form action="{% url 'save_profile' %}" method="POST">
+                        {% csrf_token %}
                         <div class="form-group">
                             <input type="text" name="first_name" placeholder="First Name" value="{{ first_name }}"
                                 required>

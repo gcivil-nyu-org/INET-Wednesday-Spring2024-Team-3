@@ -12,8 +12,9 @@
             <div class="user-info">
                 <img src="{% static 'css/images/placeholder_image.jpg' %}" alt="User Profile Image" class="user-image">
                 <h2 class="username">{{ user.username }}</h2>
-                {% if request.user.is_authenticated and request.user != user %}
+                {% if request.user.is_authenticated %}
                 <div class="user-actions">
+                    {% if request.user != user %}
                     {% if not is_friend %}
                     {% if has_received_request %}
                     <form method="POST" action="{% url 'accept_friend_request' received_request_id %}">
@@ -37,8 +38,9 @@
                         <button type="submit" class="btn btn-danger">Unfriend</button>
                     </form>
                     {% endif %}
+                    {% endif %}
                 </div>
-                {% elif not request.user.is_authenticated %}
+                {% else %}
                 <p class="login-message">Login to send a friend request and chat.</p>
                 {% endif %}
             </div>
@@ -61,7 +63,7 @@
             </div>
             {% if posts.has_next %}
             <div class="load-more">
-                <button id="load-more-posts">Load More Posts</button>
+                <button id="load-more-posts" data-page="{{ posts.next_page_number }}">Load More Posts</button>
             </div>
             {% endif %}
 
@@ -79,7 +81,7 @@
             </div>
             {% if comments.has_next %}
             <div class="load-more">
-                <button id="load-more-comments">Load More Comments</button>
+                <button id="load-more-comments" data-page="{{ comments.next_page_number }}">Load More Comments</button>
             </div>
             {% endif %}
         </div>
@@ -93,10 +95,12 @@
     document.addEventListener('DOMContentLoaded', function () {
         const loadMorePostsButton = document.getElementById('load-more-posts');
         loadMorePostsButton.addEventListener('click', function () {
+            const page = this.dataset.page;
         });
 
         const loadMoreCommentsButton = document.getElementById('load-more-comments');
         loadMoreCommentsButton.addEventListener('click', function () {
+            const page = this.dataset.page;
         });
     });
 </script>
