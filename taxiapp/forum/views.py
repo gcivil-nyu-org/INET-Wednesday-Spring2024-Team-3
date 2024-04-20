@@ -62,7 +62,6 @@ def post_create(request):
 
     return render(request, "post_create.html", {"categories": categories})
 
-
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
 
@@ -81,11 +80,9 @@ def add_comment(request, post_id):
 
     return redirect("forum_home")
 
-
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     return render(request, "post_detail.html", {"post": post})
-
 
 def posts_api(request):
     sort_by = request.GET.get("sort_by", "recent")
@@ -105,7 +102,6 @@ def posts_api(request):
     logger.info(f"post_data: {posts_data}")
     return JsonResponse(posts_data, safe=False)
 
-
 @login_required
 def post_delete(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -120,7 +116,6 @@ def post_delete(request, post_id):
         return redirect("forum_home")
     else:
         return render(request, "post_delete.html", {"post": post})
-
 
 def upvote_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
@@ -167,8 +162,6 @@ def downvote_post(request, post_id):
 
     post.save()
     return JsonResponse({"score": post.upvotes - post.downvotes})
-
-
 
 @login_required
 def delete_comment(request, post_id, comment_id):
