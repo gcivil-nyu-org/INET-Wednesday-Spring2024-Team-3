@@ -36,7 +36,9 @@
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Unfriend</button>
                     </form>
+                    <a href="{% url 'chat' user.username %}" class="btn btn-info">Chat with {{ user.username }}</a>
                     {% endif %}
+
                 </div>
                 {% elif not request.user.is_authenticated %}
                 <p class="login-message">Login to send a friend request and chat.</p>
