@@ -80,7 +80,6 @@ def reject_friend_request(request, request_id):
             friend_request.delete()
             return redirect(request.META.get('HTTP_REFERER', '/'))
 
-
 @login_required
 def unfriend(request, user_id):
     user1 = request.user
@@ -90,8 +89,6 @@ def unfriend(request, user_id):
     ChatMessage.objects.filter((Q(sender=user1, receiver=user2) |
                                 Q(sender=user2, receiver=user1))).delete()
     return redirect(request.META.get('HTTP_REFERER', '/'))
-
-
 
 @login_required
 def friend_requests(request):
@@ -113,7 +110,6 @@ def chat_view(request, username):
 
     return render(request, 'chat.html', {'other_user': other_user, 'messages': messages})
 
-
 def search_people(request):
     query = request.GET.get('query')
     users = User.objects.filter(username__icontains=query) if query else User.objects.none()
@@ -134,4 +130,3 @@ def search_people(request):
         'has_sent_request': has_sent_request,
     }
     return render(request, 'search_user.html', context)
-

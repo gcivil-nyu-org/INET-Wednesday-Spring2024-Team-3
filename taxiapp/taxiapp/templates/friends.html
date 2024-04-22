@@ -26,6 +26,10 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Remove Friend</button>
         </form>
+        <form method="POST" action="{% url 'chat' friend.username %}" class="chat-form">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-secondary">chat</button>
+        </form>
     </div>
     {% empty %}
     <p>You have no friends yet.</p>
