@@ -92,7 +92,6 @@ def unfriend(request, user_id):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
-
 @login_required
 def friend_requests(request):
     friend_requests = FriendRequest.objects.filter(to_user=request.user, status='pending')
@@ -134,4 +133,3 @@ def search_people(request):
         'has_sent_request': has_sent_request,
     }
     return render(request, 'search_user.html', context)
-
