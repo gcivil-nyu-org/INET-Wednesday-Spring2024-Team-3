@@ -34,7 +34,7 @@ def compare_fares(request):
         if passengers <= 4:
             passengers = 1
         elif passengers <= 6:
-            passengers = 6
+            passengers = 3
         else:
             passengers = passengers
         dis = geopy.distance.geodesic(startCoord, endCoord).km
@@ -45,8 +45,8 @@ def compare_fares(request):
 
         # Prepare the response data
         fare_data = {
-            "uber_fare": round(uber_fare * 2, 2),
-            "taxi_fare": round(taxi_fare * 2, 2),
+            "uber_fare": round(uber_fare * ((0.2541 * dis) + 0.7814), 2),
+            "taxi_fare": round(taxi_fare * ((0.2541 * dis) + 0.7814), 2),
         }
 
         return JsonResponse(fare_data)
