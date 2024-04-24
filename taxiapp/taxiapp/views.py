@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 import boto3
 from django.conf import settings
@@ -9,12 +10,13 @@ from botocore.exceptions import ClientError
 import hmac
 import hashlib
 import base64
-import logging
 import re
 import os
 from forum.models import Post, Comment
-from user.models import FriendRequest, Friendship
+from user.models import FriendRequest
+import logging
 
+logger = logging.getLogger(__name__)
 
 def login_view(request):
     if request.method == "POST":
@@ -342,18 +344,58 @@ def profile_view(request):
     return render(request, "profile.html", context)
 
 @login_required
+@csrf_protect
 def save_profile_view(request):
     if request.method == "POST":
         client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
         cognito_username = request.user.username
 
+        first_name = request.POST.get("first_name")
+        middle_name = request.POST.get("middle_name")
+        last_name = request.POST.get("last_name")
+        email = request.POST.get("email")
+        phone_number = request.POST.get("phone_number")
+        address = request.POST.get("address")
+
+        # Input validation
+        if not first_name or not last_name:
+            messages.error(request, "First name and last name are required.")
+            return redirect("/profile")
+
+        if len(first_name) > 50 or len(last_name) > 50:
+            messages.error(request, "First name and last name should not exceed 50 characters.")
+            return redirect("/profile")
+
+        if middle_name and len(middle_name) > 50:
+            messages.error(request, "Middle name should not exceed 50 characters.")
+            return redirect("/profile")
+
+        if not email or not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            messages.error(request, "Please enter a valid email address.")
+            return redirect("/profile")
+
+        if len(email) > 64:
+            messages.error(request, "Email should not exceed 64 characters.")
+            return redirect("/profile")
+
+        if phone_number and not re.match(r"^\+?1?\d{9,15}$", phone_number):
+            messages.error(request, "Please enter a valid phone number.")
+            return redirect("/profile")
+
+        if phone_number and len(phone_number) > 15:
+            messages.error(request, "Phone number should not exceed 15 characters.")
+            return redirect("/profile")
+
+        if address and len(address) > 200:
+            messages.error(request, "Address should not exceed 200 characters.")
+            return redirect("/profile")
         updated_attributes = [
-            {"Name": "given_name", "Value": request.POST.get("first_name")},
-            {"Name": "middle_name", "Value": request.POST.get("middle_name")},
-            {"Name": "family_name", "Value": request.POST.get("last_name")},
-            {"Name": "email", "Value": request.POST.get("email")},
-            {"Name": "phone_number", "Value": request.POST.get("phone_number")},
-            {"Name": "address", "Value": request.POST.get("address")},
+            {"Name": "given_name", "Value": first_name},
+            {"Name": "middle_name", "Value": middle_name},
+            {"Name": "family_name", "Value": last_name},
+            {"Name": "email", "Value": email},
+            {"Name": "phone_number", "Value": phone_number},
+            {"Name": "address", "Value": address},
         ]
 
         try:
@@ -362,15 +404,20 @@ def save_profile_view(request):
                 Username=cognito_username,
                 UserAttributes=updated_attributes,
             )
+            # Update the local Django user model
+            request.user.first_name = first_name
+            request.user.last_name = last_name
+            request.user.email = email
+            request.user.save()
+
+            # Refresh the user session with the specified backend
+            login(request, request.user, backend='taxiapp.cognito_backend.CognitoBackend')
             messages.success(request, "Profile updated successfully.")
         except Exception as e:
             messages.error(request, f"Failed to update profile: {str(e)}")
-
         return redirect("/profile")
     else:
         return redirect("/profile")
-
-
 def faq(request):
     faq_data = [
         {
@@ -400,3 +447,22 @@ def faq(request):
     ]
 
     return render(request, "faq.html", {"faq_data": faq_data})
+
+
+def sync_user_from_cognito(user):
+    client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
+    cognito_username = user.username
+
+    try:
+        response = client.admin_get_user(
+            UserPoolId=settings.COGNITO_USER_POOL_ID,
+            Username=cognito_username
+        )
+        user_attributes = {attr["Name"]: attr["Value"] for attr in response["UserAttributes"]}
+
+        user.first_name = user_attributes.get("given_name", "")
+        user.last_name = user_attributes.get("family_name", "")
+        user.email = user_attributes.get("email", "")
+        user.save()
+    except Exception as e:
+        logger.error(f"Failed to sync user from Cognito: {str(e)}")
