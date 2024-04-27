@@ -3,8 +3,10 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Post, Comment, Category, Vote
+from .models import Post, Comment, Category, Vote
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import F, ExpressionWrapper, IntegerField
 from django.db.models import F, ExpressionWrapper, IntegerField
 
 logger = logging.getLogger(__name__)
@@ -101,6 +103,10 @@ def posts_api(request):
     ]
     logger.info(f"post_data: {posts_data}")
     return JsonResponse(posts_data, safe=False)
+
+    except Exception as e:
+        logger.error(f'Error in posts_api: {e}')
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
 @login_required
 def post_delete(request, post_id):
