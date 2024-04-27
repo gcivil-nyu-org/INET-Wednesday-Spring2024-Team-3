@@ -1,13 +1,13 @@
 :root {
-    --primary-color: #007bff;
-    --secondary-color: #45a049;
-    --background-color: #f4f7f6;
-    --text-color: #343A40;
+    --primary-color: #1E88E5;
+    --secondary-color: #1565C0;
+    --background-color: #F5F5F5;
+    --text-color: #333;
     --error-color: #ff4d4d;
     --font-family: 'Poppins', sans-serif;
-    }
-    
-    body {
+}
+
+body {
     font-family: var(--font-family);
     background-color: var(--background-color);
     color: var(--text-color);
@@ -17,19 +17,19 @@
     align-items: center;
     flex-direction: column;
     gap: 30px;
-    }
-    
-    form {
+}
+
+form {
     background: #ffffff;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 400px;
     max-width: 100%;
-    }
-    
-    input,
-    button {
+}
+
+input,
+button {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
@@ -40,35 +40,35 @@
     background-color: #f4f4f4;
     color: var(--text-color);
     transition: background-color 0.3s ease;
-    }
-    
-    button {
+}
+
+button {
     background-color: var(--primary-color);
     color: white;
     cursor: pointer;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    }
-    
-    button:hover {
+}
+
+button:hover {
     background-color: var(--secondary-color);
-    }
-    
-    .footer-links {
+}
+
+.footer-links {
     text-align: center;
     margin-top: 20px;
-    }
-    
-    .footer-links a {
+}
+
+.footer-links a {
     text-decoration: none;
     color: var(--primary-color);
     margin: 0 15px;
     position: relative;
     transition: color 0.3s ease;
-    }
-    
-    .footer-links a::after {
+}
+
+.footer-links a::after {
     content: '';
     position: absolute;
     bottom: -2px;
@@ -79,19 +79,54 @@
     transform: scaleX(0);
     transition: transform 0.3s ease;
     transform-origin: left;
-    }
-    
-    .footer-links a:hover {
+}
+
+.footer-links a:hover {
     color: var(--secondary-color);
-    }
-    
-    .footer-links a:hover::after {
+}
+
+.footer-links a:hover::after {
     transform: scaleX(1);
-    }
-    
-    p {
+}
+
+p {
     color: var(--error-color);
     text-align: center;
     font-weight: 600;
     margin-top: 10px;
-    }
+}
+
+.messages {
+    margin-top: 20px;
+  }
+  
+  .alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+  }
+  
+  .alert-error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+  }
+  
+  .alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+  }
+  
+  .alert-info {
+    color: #0c5460;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+  }
+  
+  .alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+  }

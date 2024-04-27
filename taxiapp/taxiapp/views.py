@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 import boto3
 from django.conf import settings
@@ -9,12 +10,13 @@ from botocore.exceptions import ClientError
 import hmac
 import hashlib
 import base64
-import logging
 import re
 import os
+from forum.models import Post, Comment
+from user.models import FriendRequest
+import logging
 
 logger = logging.getLogger(__name__)
-
 
 def login_view(request):
     if request.method == "POST":
@@ -159,11 +161,13 @@ def get_secret_hash(username, client_id, client_secret):
 
 
 def home_view(request):
-    google_maps_api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
+    google_maps_api_key = os.environ.get("GOOGLE_MAPS_API_KEY")
+    latest_posts = Post.objects.all().order_by("-created_at")[:3]
     context = {
-        'google_maps_api_key': google_maps_api_key
+        "google_maps_api_key": google_maps_api_key,
+        "latest_posts": latest_posts,
     }
-    return render(request, 'home.html', context)
+    return render(request, "home.html", context)
 
 
 def reset_view(request):
@@ -198,9 +202,6 @@ def reset_view(request):
                     )
                     step = "confirm"  # Move to confirmation step
                 except ClientError as e:
-                    logger.error(
-                        f"Error initiating password reset for {user_identifier}: {e}"
-                    )
                     messages.error(
                         request,
                         "Failed to initiate password reset. Please try again later.",
@@ -235,9 +236,6 @@ def reset_view(request):
                     )
                     return redirect("login")
                 except ClientError as e:
-                    logger.error(
-                        f"Failed to reset password for username {username}: {e}"
-                    )
                     if e.response["Error"]["Code"] == "CodeMismatchException":
                         messages.error(
                             request, "Invalid verification code. Please try again."
@@ -294,17 +292,10 @@ def confirm_view(request):
             else:
                 error_message = "Failed to confirm account. Please try again later."
 
-            logger.error(f"Failed to confirm account for username {username}: {e}")
             messages.error(request, error_message)
             return render(request, "confirm.html")
     else:
         return render(request, "confirm.html")
-
-
-# def profile_view(request):
-#     if not request.user.is_authenticated:
-#         return redirect('/')
-#     return render(request, 'profile.html')
 
 
 def logout_view(request):
@@ -312,20 +303,27 @@ def logout_view(request):
     return redirect("/")
 
 
-@login_required
+@login_required(login_url='/login/')
 def profile_view(request):
     if not request.user.is_authenticated:
         return redirect("/")
+
     client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
     cognito_username = request.user.username
 
     try:
         response = client.admin_get_user(
-            UserPoolId=settings.COGNITO_USER_POOL_ID, Username=cognito_username
+            UserPoolId=settings.COGNITO_USER_POOL_ID,
+            Username=cognito_username
         )
-        user_attributes = {
-            attr["Name"]: attr["Value"] for attr in response["UserAttributes"]
-        }
+        user_attributes = {attr["Name"]: attr["Value"] for attr in response["UserAttributes"]}
+
+        user = request.user
+        posts = Post.objects.filter(user=user).order_by('-created_at')
+        comments = Comment.objects.filter(user=user).order_by('-created_at')
+        friend_requests = FriendRequest.objects.filter(to_user=user, status='pending')
+        friends = User.objects.filter(friendships1__user2=user) | User.objects.filter(friendships2__user1=user)
+
         context = {
             "first_name": user_attributes.get("given_name", ""),
             "middle_name": user_attributes.get("middle_name", ""),
@@ -334,6 +332,10 @@ def profile_view(request):
             "email": user_attributes.get("email", ""),
             "phone_number": user_attributes.get("phone_number", ""),
             "address": user_attributes.get("address", ""),
+            "posts": posts,
+            "comments": comments,
+            "friend_requests": friend_requests,
+            "friends": friends,
         }
     except Exception as e:
         messages.error(request, f"Failed to retrieve profile information: {str(e)}")
@@ -341,20 +343,59 @@ def profile_view(request):
 
     return render(request, "profile.html", context)
 
-
 @login_required
+@csrf_protect
 def save_profile_view(request):
     if request.method == "POST":
         client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
         cognito_username = request.user.username
 
+        first_name = request.POST.get("first_name")
+        middle_name = request.POST.get("middle_name")
+        last_name = request.POST.get("last_name")
+        email = request.POST.get("email")
+        phone_number = request.POST.get("phone_number")
+        address = request.POST.get("address")
+
+        # Input validation
+        if not first_name or not last_name:
+            messages.error(request, "First name and last name are required.")
+            return redirect("/profile")
+
+        if len(first_name) > 50 or len(last_name) > 50:
+            messages.error(request, "First name and last name should not exceed 50 characters.")
+            return redirect("/profile")
+
+        if middle_name and len(middle_name) > 50:
+            messages.error(request, "Middle name should not exceed 50 characters.")
+            return redirect("/profile")
+
+        if not email or not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            messages.error(request, "Please enter a valid email address.")
+            return redirect("/profile")
+
+        if len(email) > 64:
+            messages.error(request, "Email should not exceed 64 characters.")
+            return redirect("/profile")
+
+        if phone_number and not re.match(r"^\+?1?\d{9,15}$", phone_number):
+            messages.error(request, "Please enter a valid phone number.")
+            return redirect("/profile")
+
+        if phone_number and len(phone_number) > 15:
+            messages.error(request, "Phone number should not exceed 15 characters.")
+            return redirect("/profile")
+
+        if address and len(address) > 200:
+            messages.error(request, "Address should not exceed 200 characters.")
+            return redirect("/profile")
         updated_attributes = [
-            {"Name": "given_name", "Value": request.POST.get("first_name")},
-            {"Name": "middle_name", "Value": request.POST.get("middle_name")},
-            {"Name": "family_name", "Value": request.POST.get("last_name")},
-            {"Name": "email", "Value": request.POST.get("email")},
-            {"Name": "phone_number", "Value": request.POST.get("phone_number")},
-            {"Name": "address", "Value": request.POST.get("address")},
+            {"Name": "given_name", "Value": first_name},
+            {"Name": "middle_name", "Value": middle_name},
+            {"Name": "family_name", "Value": last_name},
+            {"Name": "email", "Value": email},
+            {"Name": "phone_number", "Value": phone_number},
+            {"Name": "address", "Value": address},
         ]
 
         try:
@@ -363,25 +404,65 @@ def save_profile_view(request):
                 Username=cognito_username,
                 UserAttributes=updated_attributes,
             )
+            # Update the local Django user model
+            request.user.first_name = first_name
+            request.user.last_name = last_name
+            request.user.email = email
+            request.user.save()
+
+            # Refresh the user session with the specified backend
+            login(request, request.user, backend='taxiapp.cognito_backend.CognitoBackend')
             messages.success(request, "Profile updated successfully.")
         except Exception as e:
             messages.error(request, f"Failed to update profile: {str(e)}")
-
         return redirect("/profile")
     else:
         return redirect("/profile")
-
-
 def faq(request):
     faq_data = [
         {
             "question": "How do I sign up for an account?",
-            "answer": "You can sign up by clicking the 'Register' button on the homepage and filling in the required information."
+            "answer": "You can sign up by clicking the 'Register' button on the homepage and filling in the required information.",
         },
         {
             "question": "How can I reset my password?",
-            "answer": "If you've forgotten your password, you can reset it by clicking the 'Forgot Password' link on the login page and following the instructions."
+            "answer": "If you've forgotten your password, you can reset it by clicking the 'Forgot Password' link on the login page and following the instructions.",
+        },
+        {
+            "question": "How do I compare taxi fares?",
+            "answer": "Enter your starting and destination addresses in the fare comparison section on the homepage to see a comparison of fares from different taxi services.",
+        },
+        {
+            "question": "Can I share my ride experiences?",
+            "answer": "Yes, you can share your ride experiences, reviews, and tips on the forum section of the site.",
+        },
+        {
+            "question": "Is my personal information safe on this site?",
+            "answer": "We take your privacy seriously. Your personal information is stored securely and is not shared with third parties without your consent.",
+        },
+        {
+            "question": "How do I contact customer support?",
+            "answer": "You can reach out to our customer support team via the 'Contact' link at the bottom of the page.",
         },
     ]
 
-    return render(request, 'faq.html', {'faq_data': faq_data})
+    return render(request, "faq.html", {"faq_data": faq_data})
+
+
+def sync_user_from_cognito(user):
+    client = boto3.client("cognito-idp", region_name=settings.COGNITO_AWS_REGION)
+    cognito_username = user.username
+
+    try:
+        response = client.admin_get_user(
+            UserPoolId=settings.COGNITO_USER_POOL_ID,
+            Username=cognito_username
+        )
+        user_attributes = {attr["Name"]: attr["Value"] for attr in response["UserAttributes"]}
+
+        user.first_name = user_attributes.get("given_name", "")
+        user.last_name = user_attributes.get("family_name", "")
+        user.email = user_attributes.get("email", "")
+        user.save()
+    except Exception as e:
+        logger.error(f"Failed to sync user from Cognito: {str(e)}")

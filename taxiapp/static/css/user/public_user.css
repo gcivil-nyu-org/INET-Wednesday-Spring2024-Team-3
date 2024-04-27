@@ -1,0 +1,107 @@
+.user-profile {
+    padding: 80px 0;
+    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+    color: #fff;
+    text-align: center;
+  }
+  
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .user-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+  }
+  
+  .username {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  
+  .user-activity {
+    padding: 60px 0;
+  }
+  
+  .post-list,
+  .comment-list {
+    margin-bottom: 40px;
+  }
+  
+  .post-item,
+  .comment-item {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .post-meta,
+  .comment-meta {
+    font-size: 14px;
+    color: #777;
+    margin-top: 10px;
+  }
+
+  .load-more {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .load-more button {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .login-message {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+}
+
+.messages {
+  margin-top: 20px;
+}
+
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.alert-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+
+.alert-warning {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}

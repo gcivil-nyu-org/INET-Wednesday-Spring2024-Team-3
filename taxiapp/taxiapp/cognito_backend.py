@@ -9,7 +9,7 @@ from authlib.jose import JsonWebKey, jwt
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-
+import botocore.exceptions
 logger = logging.getLogger(__name__)
 
 
@@ -23,9 +23,19 @@ class CognitoBackend(BaseBackend):
             claims = self.verify_token(id_token)
             if claims:
                 return self.get_or_create_user(claims, username)
+        except botocore.exceptions.ClientError as e:
+            error_code = e.response["Error"]["Code"]
+            if error_code == "UserNotConfirmedException":
+                logger.warning(f"User {username} is not confirmed.")
+            elif error_code == "NotAuthorizedException":
+                logger.warning(f"Invalid credentials for user {username}.")
+            elif error_code == "UserNotFoundException":
+                logger.warning(f"User {username} not found.")
+            else:
+                logger.error(f"Authentication failed: {str(e)}")
         except Exception as e:
             logger.error(f"Authentication failed: {str(e)}")
-            return None
+        return None
 
     def initiate_auth(self, client, username, password, secret_hash):
         return client.admin_initiate_auth(
@@ -57,7 +67,11 @@ class CognitoBackend(BaseBackend):
         try:
             user = User.objects.get(username=username)
             # Update user attributes if they have changed in Cognito
-            if user.email != email or user.first_name != given_name or user.last_name != family_name:
+            if (
+                user.email != email
+                or user.first_name != given_name
+                or user.last_name != family_name
+            ):
                 user.email = email
                 user.first_name = given_name
                 user.last_name = family_name

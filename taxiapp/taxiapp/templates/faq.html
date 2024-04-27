@@ -3,7 +3,12 @@
 {% block title %}FAQ{% endblock %}
 
 {% block content %}
-<div class="container">
+<section class="hero-section">
+    <div class="container">
+      <h1>Frequently Asked Questions</h1>
+    </div>
+  </section>
+<div class="container" style="padding-bottom: 200px;">
     <h1 class="my-4">FAQ</h1>
     <div class="faq-container">
         {% for item in faq_data %}
@@ -12,6 +17,8 @@
                 <p>{{ item.answer }}</p>
             </div>
         {% endfor %}
+
     </div>
+
 </div>
 {% endblock %}

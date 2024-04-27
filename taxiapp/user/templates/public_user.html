@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/user/public_user.css' %}" />
+{% endblock %}
+
+{% block content %}
+<main>
+    <section class="user-profile">
+        <div class="container">
+            <div class="user-info">
+                <img src="{% static 'css/images/placeholder_image.jpg' %}" alt="User Profile Image" class="user-image">
+                <h2 class="username">{{ user.username }}</h2>
+                {% if request.user.is_authenticated %}
+                <div class="user-actions">
+                    {% if request.user != user %}
+                    {% if not is_friend %}
+                    {% if has_received_request %}
+                    <form method="POST" action="{% url 'accept_friend_request' received_request_id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success">Accept Friend Request</button>
+                    </form>
+                    {% elif has_sent_request %}
+                    <form method="POST" action="{% url 'cancel_friend_request' user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-secondary">Cancel Friend Request</button>
+                    </form>
+                    {% else %}
+                    <form method="POST" action="{% url 'send_friend_request' user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Send Friend Request</button>
+                    </form>
+                    {% endif %}
+                    {% else %}
+                    <form method="POST" action="{% url 'unfriend' user.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Unfriend</button>
+                    </form>
+                    <a href="{% url 'chat' user.username %}" class="btn btn-info">Chat with {{ user.username }}</a>
+                    {% endif %}
+                    {% endif %}
+                </div>
+                {% else %}
+                <p class="login-message">Login to send a friend request and chat.</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    <section class="user-activity">
+        <div class="container">
+            <a href="{% url 'forum_home' %}" class="btn btn-primary mb-4">Forum</a>
+            <h3>Recent Posts</h3>
+            <div class="post-list">
+                {% for post in posts %}
+                <div class="post-item">
+                    <h4><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h4>
+                    <p>{{ post.content|truncatewords:20|safe }}</p>
+                    <p class="post-meta">Posted on {{ post.created_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                {% empty %}
+                <p>No posts found.</p>
+                {% endfor %}
+            </div>
+            {% if posts.has_next %}
+            <div class="load-more">
+                <button id="load-more-posts" data-page="{{ posts.next_page_number }}">Load More Posts</button>
+            </div>
+            {% endif %}
+
+            <h3>Recent Comments</h3>
+            <div class="comment-list">
+                {% for comment in comments %}
+                <div class="comment-item">
+                    <p>{{ comment.content }}</p>
+                    <p class="comment-meta">Commented on <a href="{% url 'post_detail' comment.post.id %}">{{comment.post.title }}</a> on {{ comment.created_at|date:"Y-m-d H:i" }}</p>
+                </div>
+                {% empty %}
+                <p>No comments found.</p>
+                {% endfor %}
+            </div>
+            {% if comments.has_next %}
+            <div class="load-more">
+                <button id="load-more-comments" data-page="{{ comments.next_page_number }}">Load More Comments</button>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/public_user.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loadMorePostsButton = document.getElementById('load-more-posts');
+        loadMorePostsButton.addEventListener('click', function () {
+            const page = this.dataset.page;
+        });
+
+        const loadMoreCommentsButton = document.getElementById('load-more-comments');
+        loadMoreCommentsButton.addEventListener('click', function () {
+            const page = this.dataset.page;
+        });
+    });
+</script>
+{% endblock %}

@@ -51,6 +51,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # environ.Env.read_env(env_file="secrets.env")
 # SECRET_KEY = env("SECRET_KEY")
 
+
 # # SECURITY WARNING: keep the secret key used in production secret!
 # COGNITO_DOMAIN = env("COGNITO_DOMAIN")
 # COGNITO_APP_CLIENT_SECRET = env("COGNITO_APP_CLIENT_SECRET")
@@ -77,11 +78,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ##########################################################
 
 # In the future, add this as travis variables to protect URL.
-AWS_STORAGE_BUCKET_NAME = 'taxiapp-static-bucket'
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-# STATIC_LOCATION = 'static'  # I don't know if we need this
-# STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
-# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_STORAGE_BUCKET_NAME = "taxiapp-static-bucket"
+AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com"
+STATIC_LOCATION = "static"  # I don't know if we need this
+STATIC_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -101,6 +102,8 @@ INSTALLED_APPS = [
     "taxiapp",
     "forum",
     "rideshare",
+    "user",
+    "tools",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -117,6 +120,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "forum.middleware.RedirectIfPostNotFoundMiddleware",
 ]
 
 ROOT_URLCONF = "taxiapp.urls"
@@ -158,9 +162,15 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
 
 
@@ -185,7 +195,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -194,6 +204,17 @@ SESSION_ENGINE = "django.contrib.sessions.backends.db"
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler",},},
-    "loggers": {"": {"handlers": ["console"], "level": "DEBUG", "propagate": True,},},
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+        },
+    },
+    "loggers": {
+        "": {
+            "handlers": ["console"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+    },
 }

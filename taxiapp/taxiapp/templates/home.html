@@ -107,34 +107,81 @@
   }
 
   function compareFares() {
-    var startAddress = document.getElementById("start-address").value;
-    var endAddress = document.getElementById("end-address").value;
-    if (!startAddress || !endAddress) {
-      alert("Please enter both start and end addresses.");
+    var startAddress = document.getElementById('start-address').value;
+    var endAddress = document.getElementById('end-address').value;
+    if (startAddress == endAddress){
+      alert('Start and end addresses must not be the same.');
       return;
     }
-    fetch("/rideshare/api/compare-fares/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": "{{ csrf_token }}",
-      },
-      body: JSON.stringify({
-        start_address: startAddress,
-        end_address: endAddress,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        document.getElementById("uber-fare").textContent =
-          "Uber Fare: $" + data.uber_fare;
-        document.getElementById("lyft-fare").textContent =
-          "Lyft Fare: $" + data.lyft_fare;
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        alert("An error occurred while comparing fares. Please try again.");
-      });
+    var geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ 'address': startAddress }, function (results, status) {
+        if (status === 'OK') {
+            var startlat = results[0].geometry.location.lat();
+            var startlng = results[0].geometry.location.lng();
+            // Check if start address is in NYC
+            if (!isInNYC(startlat, startlng)) {
+              alert('Start address is not in NYC.');
+              return;
+          }
+            geocoder.geocode({ 'address': endAddress }, function (results, status) {
+                if (status === 'OK') {
+                    var endlat = results[0].geometry.location.lat();
+                    var endlng = results[0].geometry.location.lng();
+                    // Check if end address is in NYC
+                    if (!isInNYC(endlat, endlng)) {
+                      alert('End address is not in NYC.');
+                      return;
+                  }
+                    var num_passengers = parseInt(document.getElementById('num_passengers').value);
+
+                    if (!num_passengers || num_passengers <= 0 || num_passengers > 6) {
+                        alert('Please enter a valid number of passengers.');
+                        return;
+                    }
+
+                    fetch('/rideshare/api/compare-fares/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: JSON.stringify({
+                            'startlat': startlat,
+                            'startlng': startlng,
+                            'endlat': endlat,
+                            'endlng': endlng,
+                            'num_passengers': num_passengers
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('uber-fare').textContent = 'Uber Fare: $' + data.uber_fare;
+                            document.getElementById('taxi-fare').textContent = 'Taxi Fare: $' + data.taxi_fare;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while comparing fares. Please try again.');
+                        });
+                } else {
+                    alert('Please enter valid end address.');
+                }
+            });
+        } else {
+            alert('Please enter valid start address.');
+        }
+    });
+
+    function isInNYC(lat, lng) {
+      // Define the boundaries of NYC
+      var nycBounds = {
+          north: 40.92,
+          south: 40.49,
+          west: -74.27,
+          east: -73.68
+      };
+      // Check if the coordinates are within NYC boundaries
+      return lat >= nycBounds.south && lat <= nycBounds.north && lng >= nycBounds.west && lng <= nycBounds.east;
+  }
   }
 </script>
 {% endblock %} {% block content %}
@@ -168,13 +215,20 @@
                 placeholder="End Address"
               />
             </div>
+            <div class="form-group">
+              <input 
+                type="text" 
+                id="num_passengers" 
+                class="form-control" 
+                placeholder="Number of Passengers">
+          </div>
             <button class="btn btn-primary" onclick="compareFares()">
               Compare Fares
             </button>
             <div class="fare-comparison">
               <h3>Fare Comparison</h3>
               <div id="uber-fare"></div>
-              <div id="lyft-fare"></div>
+              <div id="taxi-fare"></div>
             </div>
           </div>
           <div class="col-md-6">
@@ -225,30 +279,20 @@
       <div class="container">
         <h2>Trending on the Forum</h2>
         <div class="row">
-          <div class="col-md-4">
-            <div class="forum-post">
-              <h3>Forum Post Title 1</h3>
-              <p>Short excerpt from the post...</p>
-              <a href="#" class="btn btn-link">Read More</a>
+          {% for post in latest_posts %}
+            <div class="col-md-4">
+              <div class="forum-post">
+                <h3><a href="{% url 'post_detail' post.id %}">{{ post.title }}</a></h3>
+                <p>{{ post.content|truncatewords:20|safe }}</p>
+                <a href="{% url 'post_detail' post.id %}" class="btn btn-link">Read More</a>
+              </div>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="forum-post">
-              <h3>Forum Post Title 2</h3>
-              <p>Short excerpt from the post...</p>
-              <a href="#" class="btn btn-link">Read More</a>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="forum-post">
-              <h3>Forum Post Title 3</h3>
-              <p>Short excerpt from the post...</p>
-              <a href="#" class="btn btn-link">Read More</a>
-            </div>
-          </div>
+          {% empty %}
+            <p>No posts found.</p>
+          {% endfor %}
         </div>
       </div>
-    </section>
+    </section>    
   </main>
 </body>
 

@@ -28,8 +28,10 @@ urlpatterns = [
     path("success/", views.success_view, name="success"),
     path("profile/", views.profile_view, name="profile"),
     path("logout/", views.logout_view, name="logout"),
-    path("profile/", views.save_profile_view, name="save_profile"),
+    path("save_profile/", views.save_profile_view, name="save_profile"),
     path("faq/", views.faq, name="faq"),
     path("forum/", include("forum.urls")),
     path("rideshare/", include("rideshare.urls")),
+    path("tools/", include("tools.urls")),
+    path("user/", include("user.urls")),
 ]

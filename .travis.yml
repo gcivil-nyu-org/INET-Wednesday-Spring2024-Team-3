@@ -1,7 +1,9 @@
 language: python
-
+python:
+  - "3.9"  
 install:
   - cd taxiapp
+  - python3 -m pip install --upgrade pip
   - pip install -r requirements.txt
 before_script:
   - python manage.py migrate
@@ -24,5 +26,5 @@ deploy:
     branch: 
       - master
       - develop
-      - mapApi
+      - masterfix
   cleanup: 'false'

@@ -2,11 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinLengthValidator
 
+
 class Forum(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -15,12 +17,13 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200, validators=[MinLengthValidator(10)])
     content = models.TextField(validators=[MinLengthValidator(20)])
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-    topic = models.ForeignKey('Topic', on_delete=models.SET_NULL, null=True, blank=True)
+    topic = models.ForeignKey("Topic", on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     upvotes = models.IntegerField(default=0)
@@ -30,27 +33,35 @@ class Post(models.Model):
     def score(self):
         return self.upvotes - self.downvotes
 
-    
+
 class Topic(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
-    
+
+
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-    parent_comment = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    parent_comment = models.ForeignKey(
+        "self", on_delete=models.CASCADE, null=True, blank=True, related_name="replies"
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
+
 class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    vote_type = models.CharField(max_length=10, choices=(('upvote', 'Upvote'), ('downvote', 'Downvote')))
+    vote_type = models.CharField(
+        max_length=10,
+        choices=(("upvote", "Upvote"), ("downvote", "Downvote"), ("neutral", "Neutral")),
+        default="neutral",
+    )
 
     class Meta:
-        unique_together = ('user', 'post')
+        unique_together = ("user", "post")

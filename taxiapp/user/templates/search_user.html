@@ -1,0 +1,85 @@
+{% extends 'base.html' %} {% load static %} {% load custom_filters %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/user/search_user.css' %}" />
+{% endblock %} {% block content %}
+<body>
+  <main>
+    <section class="hero-section">
+      <div class="container">
+        <h1>Search Users In Our Network</h1>
+        <p>Make Friends, Learn, and Explore</p>
+      </div>
+    </section>
+    <section class="search-section">
+      <div class="container">
+        <h1>Search Users</h1>
+        <form method="GET" action="{% url 'search_people' %}">
+          <div class="form-group">
+            <input
+              type="text"
+              name="query"
+              class="form-control"
+              placeholder="Search for people..."
+              value="{{ request.GET.query }}"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+      </div>
+    </section>
+    <section class="search-results-section">
+      <div class="container">
+        <h2>Search Results</h2>
+        {% for user in users %}
+        <div class="user-card">
+          <div class="user-info">
+            <img
+              src="{% static 'css/images/placeholder_image.jpg' %}"
+              alt="User Profile Image"
+              class="user-image"
+            />
+            <h3>
+              <a href="{% url 'public_user' user.username %}"
+                >{{ user.username }}</a
+              >
+            </h3>
+          </div>
+          <div class="user-actions">
+            {% if request.user.is_authenticated %} {% if user == request.user %}
+            {% elif user in friends %}
+            <form method="POST" action="{% url 'unfriend' user.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Unfriend</button>
+            </form>
+            {% elif has_sent_request|get_item:user %}
+            <form
+              method="POST"
+              action="{% url 'cancel_friend_request' user.id %}"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-warning">
+                Cancel Request
+              </button>
+            </form>
+            {% else %}
+            <form
+              method="POST"
+              action="{% url 'send_friend_request' user.id %}"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-success">Add Friend</button>
+            </form>
+            {% endif %} {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary"
+              >Login to send friend request</a
+            >
+            {% endif %}
+          </div>
+        </div>
+        {% empty %}
+        <p>No users found.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+</body>
+{% endblock %}
