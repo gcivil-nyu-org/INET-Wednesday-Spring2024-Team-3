@@ -53,6 +53,7 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
+
 class Vote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
