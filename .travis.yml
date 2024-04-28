@@ -1,11 +1,9 @@
 language: python
-
-env:
-  global:
-    - GOOGLE_MAPS_API_KEY=$GOOGLE_MAPS_API_KEY
-
+python:
+  - "3.9"  
 install:
   - cd taxiapp
+  - python3 -m pip install --upgrade pip
   - pip install -r requirements.txt
 before_script:
   - python manage.py migrate
@@ -15,20 +13,18 @@ script:
   - coverage report
 after_script:
   - coveralls
-before_deploy:
-  - python manage.py collectstatic --noinput
 deploy:
   provider: elasticbeanstalk
   access_key_id: $AWS_KEY
   secret_access_key: $AWS_SECRET_KEY
   region: us-east-1
-  app: taxiapp
-  env: taxiapp-dev
+  app: taxiapp-v2
+  env: Taxiapp2
   bucket_name: elasticbeanstalk-us-east-1-963295565159
   on:
     repo: gcivil-nyu-org/INET-Wednesday-Spring2024-Team-3
     branch: 
       - master
       - develop
-      - mapApi
+      - masterfix
   cleanup: 'false'
