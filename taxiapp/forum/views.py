@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import Post, Comment, Category, Vote
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import F
+from django.db.models import F, ExpressionWrapper, IntegerField
 
 logger = logging.getLogger(__name__)
 
@@ -78,9 +78,6 @@ def posts_api(request):
         logger.error(f'Error in posts_api: {e}')
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
-    except Exception as e:
-        logger.error(f'Error in posts_api: {e}')
-        return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
 @login_required
 def post_delete(request, post_id):
